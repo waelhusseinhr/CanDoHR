@@ -84,13 +84,12 @@ Scripts:
 
 ## This PC
 
-- Node installed for the user: `C:\Program Files\nodejs` (v22.14.0 when this app was created). Put that folder, plus Git and GitHub CLI, on `PATH` in a shell that does not see them:
+- Node for this app: `C:\Program Files\nodejs`, now **v22.23.4**. The PC originally had v22.14.0. `npm run dev` then failed with: `cloudflare.config.ts loading requires Node.js v22.18.0 or higher.` The `cf` package also asks for `^22.23.0 || ^24.22.0 || ^26.12.0`. It was upgraded with `winget upgrade --id OpenJS.NodeJS.22` (the Windows installer may show an administrator prompt). Stay on Node 22.23 or newer. Do not switch stacks if a future Node error appears — upgrade Node and report the exact error.
+- Git and `gh` are installed but were not on `PATH`. In a fresh PowerShell:
 
 ```powershell
 $env:Path = "C:\Program Files\GitHub CLI;C:\Program Files\Git\cmd;C:\Program Files\nodejs;" + $env:Path
 ```
-
-- The `cf` package warns it wants Node `^22.23.0 || ^24.22.0 || ^26.12.0`. Install succeeded on v22.14.0 with an `EBADENGINE` warning. If `cf` or the dev server then fails because of the Node version, upgrade Node. Do not change the stack to work around it.
 - Git: `C:\Program Files\Git\cmd\git.exe`. It was not on `PATH` until added as above. No global `user.name` / `user.email` was set. Do not change git config. If a commit needs an identity, pass `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`, `GIT_COMMITTER_NAME`, and `GIT_COMMITTER_EMAIL` for that command only.
 - GitHub CLI: `C:\Program Files\GitHub CLI\gh.exe` (also not on `PATH` by default). `gh auth status` was **not logged in** when this repo was created. Do not invent a token. If `gh` is still logged out, Wa'el must run `gh auth login` himself (GitHub.com, HTTPS, login with the browser) before anyone can push.
 
