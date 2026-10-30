@@ -1,8 +1,8 @@
 # CanDoHR
 
-CanDoHR is the website for this product. The public address will be **candohr.ca** later. Right now the site only runs on this computer, so you can open it here and on a phone that is on the same Wi-Fi.
+CanDoHR is the website for this product. It is on the internet at **[https://candohr.ca](https://candohr.ca)** and **[https://www.candohr.ca](https://www.candohr.ca)**.
 
-The page you see is a starting page. It is not the finished product.
+The page you see is a starting page. It is not the finished product. You can also open a copy on this computer while you work.
 
 ## Start it on this computer
 
@@ -49,12 +49,17 @@ The first time the site starts, Windows may show a security alert for **Node.js*
 
 Click **Allow** (private networks). That lets a phone on the same Wi-Fi open the page. You only need to do this once. If you click Cancel, the page still works on this computer, but the phone will not be able to connect.
 
-## What is not set up yet
+## What is ready
 
-These are planned. They are not done:
+- **The website** is on Cloudflare and answers at candohr.ca.
+- **Email for candohr.ca** still goes to Hostinger. Those mail settings were left as they were.
+- **Supabase** is the sign-in and database service. The project is named **CanDo** (it was already on the account and had been paused; it is running again). The database is empty, which is what we want before building features. Sign-in screens are not built yet.
+- A file named `.env.local` on this computer holds the public Supabase address and key for local work. It is not uploaded to GitHub.
 
-- **Supabase** — sign-in and the database. Not created.
-- **Cloudflare** — putting the site on the internet. Not deployed.
-- **candohr.ca** — the real web address. Not connected.
+## What still needs a click from you
 
-Do not put passwords or secret keys in this folder’s files. Nothing secret is stored here yet.
+- **File storage (R2).** Cloudflare asks you to turn R2 on once in the dashboard before a bucket can be created. Open the Cloudflare dashboard, go to R2, and click to enable it.
+- **Hyperdrive** (the fast connection from the website to the Supabase database). This needs the database password from the Supabase dashboard. That password is not stored in this project.
+- **GitHub Actions** (automatic publish when code is pushed). This needs a Cloudflare API token saved as a secret on the GitHub repo. Not created yet.
+
+Do not put the Supabase secret service key, the database password, or a Cloudflare token in files that go to GitHub.

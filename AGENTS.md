@@ -28,16 +28,20 @@ The npm package name must stay lowercase `candohr`. The folder and GitHub repo s
 
 If vinext tooling fails, stop and report the exact error. Do not fall back to Cloudflare Pages, OpenNext, or a different framework.
 
-### Later, not now
+## What is already connected
 
-Do not create these until a task explicitly asks:
+- **Cloudflare account** `cd54a788a204d1515eb3b3224cd9594a`. `accountId` is set in `cloudflare.config.ts`. On this PC, sign in with `cf auth login`. Use the project's `cf` (`npx cf` or `node_modules/.bin/cf.cmd`).
+- **Worker** `candohr` is deployed. Custom domains `candohr.ca` and `www.candohr.ca` returned HTTP 200 with the CanDoHR title.
+- **DNS:** Hostinger mail records stayed (MX, SPF, DMARC, autoconfig, autodiscover). The old `www` CNAME to Hostinger's CDN was removed so the Worker could use `www`. Do not delete the MX or mail TXT records.
+- **Supabase** organization `CanDo` (`wnmfevcahefzizowklxv`), project `CanDo` (`lasowjpgxlxijpaeezxe`), region `us-east-1`. It was paused and is active again. API URL: `https://lasowjpgxlxijpaeezxe.supabase.co`. The `public` schema has no tables. Do not create a second project unless asked.
+- **Local env:** `.env.local` is gitignored and holds `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. `.env.example` is committed with the URL and an empty key. Use the publishable key. Never commit the secret service-role key or the database password.
 
-- **Supabase Auth + Postgres + Row Level Security (RLS).** This will be sign-in and the database. Do not create a Supabase project, keys, or schema yet.
-- **Cloudflare deploy.** Do not run `npm run deploy`, `cf auth login`, or create a `workers.dev` hostname until asked.
-- **R2.** File storage for uploads, later. Do not create a bucket.
-- **Hyperdrive.** Later, so the Worker can reach Supabase Postgres through a pooled connection. Do not configure it.
-- **GitHub Actions.** Later, for checks and deploy. Do not add workflow files yet.
-- **Domain `candohr.ca`.** Later.
+## Still not done
+
+- **R2.** `cf r2 buckets list` returned 403, error 10042: enable R2 once in the Cloudflare dashboard. Then create a bucket named `candohr` and add `bindings.r2({ name: "candohr" })`. Do not add that binding before the bucket exists.
+- **Hyperdrive.** Not created. `cf hyperdrive create` needs the Supabase database password, which is not in this repo. Keep the password out of git. After it exists, bind it with `bindings.hyperdrive({ id })`.
+- **GitHub Actions.** No workflow yet. A deploy workflow needs a Cloudflare API token in GitHub Actions secrets.
+- **Product schema and sign-in screens.** Not built. When you add tables in `public`, enable RLS and write policies for the real access rules. Do not use `user_metadata` for authorization.
 
 ## Where docs live
 
