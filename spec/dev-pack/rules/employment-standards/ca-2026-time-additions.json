@@ -1,0 +1,66 @@
+{
+ "$comment": "Time, scheduling and leave values from the law for docs/27 and migration 0013. Merge into the employment standards edition in Step 7 with the other additions files. Every entry is verify_at_load or secondary until checked against the statute; a jurisdiction an organization uses with no entry stops with JURISDICTION_RULE_MISSING when the value is needed (for an exemption, HR cannot pick one until the province's list is loaded).",
+ "version": "2026-10-28",
+ "source_decisions": "claude/review/06-time-attendance-leave-decisions.md; docs/27",
+ "keys": {
+  "overtime_exemptions": "Who the province's overtime (or hours of work) rules do not apply to. HR picks one of these codes, with the legal basis, when it marks a position exempt (docs/27 §5.3). An excluded employee is still paid for every hour worked.",
+  "schedule_notice": "Notice the law requires before a work schedule starts or a shift changes, what the employee may do when it is shorter, and whether an agreement may change it. Where an agreement or the law sets none, the organization's scheduling.notice_days applies (docs/27 §9.1)."
+ },
+ "jurisdictions": {
+  "FED": {
+   "overtime_exemptions": {
+    "list": [
+     {"code": "FED_MANAGER", "name_en": "Managers, superintendents and employees who exercise management functions", "name_fr": "Directeurs, chefs et employés exerçant des fonctions de direction", "basis": "Canada Labour Code, s. 167(2)"},
+     {"code": "FED_PROFESSIONAL", "name_en": "Members of the professions designated by regulation (architecture, dentistry, engineering, law, medicine)", "name_fr": "Membres des professions désignées par règlement (architecture, art dentaire, génie, droit, médecine)", "basis": "Canada Labour Code, s. 167(2); Canada Labour Standards Regulations"}
+    ],
+    "status": "secondary"
+   },
+   "schedule_notice": {
+    "schedule_hours_before": 96,
+    "change_hours_before": 24,
+    "notice_in_writing": true,
+    "employee_may_refuse_short_notice_shift": true,
+    "agreement_may_vary": true,
+    "emergency_exception": true,
+    "cite": "Canada Labour Code, Part III (work schedules and shift changes); ESDC, Labour Standards questions and answers",
+    "status": "secondary"
+   }
+  },
+  "ON": {
+   "overtime_exemptions": {
+    "list": [
+     {"code": "ON_SUPERVISORY_MANAGERIAL", "name_en": "Work that is supervisory or managerial in character, with non-supervisory or non-managerial tasks only on an irregular or exceptional basis", "name_fr": "Travail de nature surveillante ou de direction, les tâches non surveillantes ou non liées à la direction n'étant exécutées qu'irrégulièrement ou exceptionnellement", "basis": "O. Reg. 285/01 (exemptions from Part VIII, overtime pay)"},
+     {"code": "ON_IT_PROFESSIONAL", "name_en": "Information technology professionals (duties primarily systems analysis or programming)", "name_fr": "Professionnels des technologies de l'information (fonctions principalement d'analyse de systèmes ou de programmation)", "basis": "O. Reg. 285/01 (exemptions from Part VIII, overtime pay)"},
+     {"code": "ON_PROFESSIONAL", "name_en": "Regulated professionals the regulation excludes from hours of work and overtime (for example accountants, architects, engineers, lawyers, doctors), practising their profession", "name_fr": "Professionnels réglementés que le règlement exclut des heures de travail et des heures supplémentaires (par exemple comptables, architectes, ingénieurs, avocats, médecins), exerçant leur profession", "basis": "O. Reg. 285/01, s. 2"}
+    ],
+    "status": "secondary"
+   },
+   "schedule_notice": {
+    "schedule_hours_before": null,
+    "cite": "No general schedule notice found in the Employment Standards Act, 2000; to confirm",
+    "status": "verify_at_load"
+   }
+  },
+  "BC": {
+   "overtime_exemptions": {
+    "list": [
+     {"code": "BC_MANAGER", "name_en": "Managers, as the regulation defines them", "name_fr": "Gestionnaires, au sens du règlement", "basis": "Employment Standards Regulation, s. 34(f) and s. 1 (definition of manager)"},
+     {"code": "BC_HIGH_TECH_PROFESSIONAL", "name_en": "High technology professionals of a high technology company", "name_fr": "Professionnels de la haute technologie d'une entreprise de haute technologie", "basis": "Employment Standards Regulation, s. 37.8"},
+     {"code": "BC_TEACHER_SCHOOL", "name_en": "Teachers, and noon-hour supervisors and teacher's aides of school boards and independent schools", "name_fr": "Enseignants, et surveillants du midi et aides-enseignants des conseils scolaires et des écoles indépendantes", "basis": "Employment Standards Regulation, s. 34"},
+     {"code": "BC_POLICE_FIRE", "name_en": "Municipal police officers and paid fire fighters", "name_fr": "Policiers municipaux et pompiers rémunérés", "basis": "Employment Standards Regulation, s. 34"},
+     {"code": "BC_RESIDENTIAL_CARE", "name_en": "Live-in home support workers, night attendants and residential care workers", "name_fr": "Préposés au soutien à domicile résidant chez le client, préposés de nuit et préposés en établissement résidentiel", "basis": "Employment Standards Regulation, s. 34"},
+     {"code": "BC_POST_SECONDARY", "name_en": "University faculty and college and institute instructors", "name_fr": "Professeurs d'université et formateurs de collèges et d'instituts", "basis": "Employment Standards Regulation, s. 34"},
+     {"code": "BC_OTHER_S34", "name_en": "Another group the regulation lists (guides, exploration, marine, commercial travellers and the others in s. 34)", "name_fr": "Autre groupe énuméré par le règlement (guides, exploration, marine, voyageurs de commerce et les autres de l'art. 34)", "basis": "Employment Standards Regulation, s. 34"}
+    ],
+    "status": "secondary",
+    "note": "Excluded employees are still paid for all time worked, at their regular rate (BC Interpretation Guidelines, s. 34)."
+   },
+   "schedule_notice": {
+    "schedule_hours_before": null,
+    "cite": "Employment Standards Act, s. 31 (posting hours of work); no number of days found; to confirm",
+    "status": "verify_at_load"
+   }
+  }
+ },
+ "others": "Every other jurisdiction: overtime_exemptions and schedule_notice not yet entered (verify_at_load)."
+}

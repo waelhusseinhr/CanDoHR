@@ -1,0 +1,80 @@
+{
+ "description": "Generic import profiles for salary survey and practice survey files (docs/19 §6.2). A tenant imports its own licensed copy of a survey; nothing here contains survey data. A profile says what each column means; the import wizard proposes a profile from the headers and the analyst confirms or adjusts it before a dry run.",
+ "version": "2026.10",
+ "vocabulary": {
+  "elements": {
+   "base_salary": {"basis": "annual", "en": "Annual base salary", "fr": "Salaire de base annuel"},
+   "hourly_rate": {"basis": "hourly", "en": "Hourly base rate", "fr": "Taux horaire de base"},
+   "range_min": {"basis": "annual", "en": "Salary range minimum", "fr": "Minimum de l’échelle"},
+   "range_mid": {"basis": "annual", "en": "Salary range midpoint", "fr": "Point milieu de l’échelle"},
+   "range_max": {"basis": "annual", "en": "Salary range maximum", "fr": "Maximum de l’échelle"},
+   "sti_target_pct": {"basis": "percent", "en": "Short-term incentive target (% of base)", "fr": "Cible de prime à court terme (% du salaire)"},
+   "sti_actual": {"basis": "annual", "en": "Short-term incentive paid", "fr": "Prime à court terme versée"},
+   "sti_actual_pct": {"basis": "percent", "en": "Short-term incentive paid (% of base)", "fr": "Prime à court terme versée (% du salaire)"},
+   "sti_eligible": {"basis": "prevalence", "en": "Share eligible for short-term incentives", "fr": "Proportion admissible aux primes à court terme"},
+   "allowances": {"basis": "annual", "en": "Recurring cash allowances", "fr": "Allocations récurrentes en espèces"},
+   "total_cash": {"basis": "annual", "en": "Total cash (base plus incentive paid)", "fr": "Rémunération totale en espèces (salaire et prime versée)"},
+   "total_direct": {"basis": "annual", "en": "Total direct compensation", "fr": "Rémunération directe totale"}
+  },
+  "statistics": ["n_orgs", "n_incumbents", "mean", "p10", "p25", "p50", "p75", "p90", "prevalence_pct"],
+  "weightings": {
+   "organization": "Each organization counts once (its average for the job); describes what organizations pay",
+   "incumbent": "Each incumbent counts once; describes what people are paid and leans toward large employers",
+   "single": "The file has only one weighting"
+  },
+  "cut_dimensions": ["all", "region", "size_fte", "size_budget", "size_revenue", "complexity", "sector", "focus", "industry", "ownership", "other"]
+ },
+ "parsing": {
+  "masked_tokens": ["", "-", "–", "—", "*", "**", "n/a", "N/A", "NA", "s.o.", "S.O.", "x", "X", "..", "ID", "Insufficient data", "Données insuffisantes"],
+  "numbers": "Accept 65000, 65,000, $65,000, 65 000 $ and 65 000,50 (fr-CA, with a space, no-break space or narrow no-break space as the thousands separator and a comma as the decimal mark). The locale is chosen per file in the wizard; a file never mixes locales.",
+  "percent": "Accept 12.5, 12.5% and 0.125 when the column is marked as a fraction.",
+  "store": "Amounts are stored as numeric(14,4) in the edition's currency; masked or blank values are stored as null and listed in masked_fields. Nothing is ever imputed."
+ },
+ "profiles": [
+  {"code": "wide_stats", "name_en": "One row per job, cut and weighting", "name_fr": "Une ligne par emploi, découpage et pondération",
+   "row_key": ["job_code", "cut_code", "weighting"],
+   "columns": {
+    "job_code": {"required": true, "aliases": ["job code", "benchmark code", "survey code", "position code", "code"]},
+    "job_title": {"required": false, "aliases": ["job title", "benchmark title", "title", "position"]},
+    "cut_code": {"required": false, "default": "ALL", "aliases": ["cut", "cut id", "cut code", "data cut", "segment"]},
+    "weighting": {"required": false, "default": "single", "aliases": ["weighting", "weight", "data type", "basis"],
+                  "values": {"organization": ["org", "organization", "organisation", "org-weighted", "company"], "incumbent": ["inc", "incumbent", "employee", "inc-weighted"]}},
+    "n_orgs": {"required": true, "aliases": ["# orgs", "no. of orgs", "orgs", "organizations", "n orgs", "companies"]},
+    "n_incumbents": {"required": false, "aliases": ["# incs", "no. of incs", "incumbents", "n incs", "employees"]},
+    "element_stat": {"pattern": "{element} {stat}", "stat_aliases": {"mean": ["avg", "average", "mean", "moyenne"], "p10": ["p10", "10th", "10th percentile"], "p25": ["p25", "25th", "q1", "1st quartile"], "p50": ["p50", "50th", "median", "médiane"], "p75": ["p75", "75th", "q3", "3rd quartile"], "p90": ["p90", "90th"]},
+                     "element_aliases": {"base_salary": ["base salary", "base", "annual base", "salaire de base"], "hourly_rate": ["hourly", "hourly rate", "taux horaire"], "range_min": ["range min", "minimum"], "range_mid": ["range mid", "midpoint"], "range_max": ["range max", "maximum"], "sti_target_pct": ["sti target", "target bonus %"], "sti_actual": ["sti actual", "actual bonus", "bonus paid"], "total_cash": ["total cash", "tcc", "total cash compensation"]}}
+   }},
+  {"code": "long_stats", "name_en": "One row per job, cut, weighting and element", "name_fr": "Une ligne par emploi, découpage, pondération et élément",
+   "row_key": ["job_code", "cut_code", "weighting", "element"],
+   "columns": {"job_code": {"required": true}, "cut_code": {"required": false, "default": "ALL"}, "weighting": {"required": false, "default": "single"}, "element": {"required": true},
+               "n_orgs": {"required": true}, "n_incumbents": {"required": false}, "mean": {}, "p10": {}, "p25": {}, "p50": {}, "p75": {}, "p90": {}, "prevalence_pct": {}}},
+  {"code": "job_catalogue", "name_en": "Survey job catalogue", "name_fr": "Catalogue des emplois de l’enquête",
+   "row_key": ["job_code"],
+   "loads_into": "core.code_value of the survey's code scheme (docs/18 §3.3), so survey matches are ordinary code assignments",
+   "columns": {"job_code": {"required": true}, "job_title": {"required": true}, "family": {}, "family_title": {}, "sub_family": {}, "sub_family_title": {}, "level": {}, "level_title": {}, "description": {"note": "Licensed text; stored for the tenant only and shown only to roles the survey's licence allows"}}},
+  {"code": "cut_dictionary", "name_en": "Data cut dictionary", "name_fr": "Dictionnaire des découpages",
+   "row_key": ["cut_code"],
+   "columns": {"cut_code": {"required": true}, "dimension": {"required": true, "values": "vocabulary.cut_dimensions"}, "label_en": {"required": true}, "label_fr": {}, "criteria": {"note": "Optional JSON, e.g. {\"fteMin\": 100, \"fteMax\": 250} or {\"province\": \"BC\"}; used to suggest the cut that fits the tenant"}}},
+  {"code": "practice_prevalence", "name_en": "Benefits and practice prevalence", "name_fr": "Prévalence des avantages et des pratiques",
+   "row_key": ["practice_code", "cut_code"],
+   "loads_into": "benefits.practice_market",
+   "columns": {"practice_code": {"required": true, "note": "The survey's question code; the wizard maps it to a catalogue practice (rules/total-rewards/benefit-practices.json) or a tenant practice"},
+               "cut_code": {"required": false, "default": "ALL"}, "n_orgs": {"required": true}, "prevalence_pct": {}, "p25": {}, "p50": {}, "p75": {}, "mode": {}, "distribution": {"note": "Optional JSON of value to share, e.g. {\"2\": 40, \"3\": 35, \"4\": 25} for vacation weeks"}}}
+ ],
+ "validation": {
+  "errors": [
+   {"code": "JOB_NOT_IN_CATALOGUE", "text_en": "The job code is not in this edition's job catalogue."},
+   {"code": "DUPLICATE_KEY", "text_en": "Two rows have the same job, cut, weighting and element."},
+   {"code": "PERCENTILES_NOT_ORDERED", "text_en": "Percentiles must not decrease from P10 to P90."},
+   {"code": "NEGATIVE_VALUE", "text_en": "Counts and amounts cannot be negative."},
+   {"code": "NOT_A_NUMBER", "text_en": "The value is not a number and is not a masking mark."},
+   {"code": "UNKNOWN_CUT", "text_en": "The cut code is not in the cut dictionary."}
+  ],
+  "warnings": [
+   {"code": "BELOW_PUBLISHED_MASKING", "text_en": "A statistic is shown with fewer data points than the edition's published masking rule. Check the file."},
+   {"code": "MEAN_OUTSIDE_RANGE", "text_en": "The mean is outside P10 to P90."},
+   {"code": "HOURLY_ANNUAL_MISMATCH", "text_en": "Hourly rate times the edition's annual hours differs from base salary by more than 15%."},
+   {"code": "LARGE_CHANGE_FROM_PRIOR", "text_en": "The P50 changed by more than 25% from the previous edition for the same job and cut."}
+  ]
+ }
+}

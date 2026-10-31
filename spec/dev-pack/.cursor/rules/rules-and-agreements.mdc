@@ -1,0 +1,14 @@
+---
+description: Rules for statutory rule editions, employment standards and collective agreements
+globs: rules/**,packages/rules/**,packages/modules/time-leave/**
+alwaysApply: false
+---
+
+Follow `AGENTS.md` rules 4, 15, 17 and 22, and `docs/08`, `docs/09` and `docs/17` §7 and §11.
+
+- Files under `rules/` are protected data. Never edit a tested edition or a verified agreement version; publish a new one with a source.
+- Never hard-code a rate, threshold, notice period, minimum wage or agreement term in code.
+- Employment standards entries marked `verify_at_load` cannot be activated in production.
+- Overtime, holiday and premium combinations come from `pay_composition`. If a combination is not defined, raise `UNRESOLVED_INTERACTION`. Never choose a default.
+- `tests/agreements/stacking_cases.json` is the acceptance suite; `reference/premium_stacking_reference.py` is the specification.
+- Changes to `rules/agreements/agreement.schema.json` go in their own pull request for the owner's approval.

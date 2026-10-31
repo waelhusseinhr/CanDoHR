@@ -1,0 +1,1249 @@
+openapi: 3.1.0
+info:
+  title: CanDo HRIS API
+  version: 1.0.0-draft
+  description: |
+    Contract for the CanDo HRIS backend. Rules that apply to every endpoint:
+    * Every read accepts `asOf` (business date, default today). Auditors may also pass `knownAt` (system time).
+    * Every write goes through a change set, either directly (`/v1/change-sets`) or created internally by a module endpoint.
+    * POST requests accept an `Idempotency-Key` header.
+    * Money is a decimal string with two decimals (e.g. "1234.50"); never a JSON number.
+    * Sensitive fields are masked unless the caller has the `reveal` permission and passes `reveal=true` with a reason.
+    * Errors use RFC 9457 problem details.
+servers:
+  - url: https://api.cando.example/v1
+    description: Production (Canada)
+security:
+  - oauth2: []
+tags:
+  - name: Change sets
+  - name: Organization
+  - name: People
+  - name: Payroll
+  - name: Rules
+  - name: Time and leave
+  - name: Assistant
+  - name: Audit
+  - name: Webhooks
+
+paths:
+  /change-sets:
+    post:
+      tags: [Change sets]
+      operationId: createChangeSet
+      summary: Create a draft change set (the only write path)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChangeSetCreate' }
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeSet' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+    get:
+      tags: [Change sets]
+      operationId: listChangeSets
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/ChangeSetStatus' }
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Page of change sets
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/ChangeSet' } }
+                  nextCursor: { type: [string, 'null'] }
+  /change-sets/{changeSetId}:
+    get:
+      tags: [Change sets]
+      operationId: getChangeSet
+      parameters: [ { $ref: '#/components/parameters/ChangeSetId' } ]
+      responses:
+        '200':
+          description: Change set with operations, validation and approvals
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeSet' }
+        '404': { $ref: '#/components/responses/Problem' }
+  /change-sets/{changeSetId}/validate:
+    post:
+      tags: [Change sets]
+      operationId: validateChangeSet
+      summary: Run validation and the cascade in preview; returns errors, warnings and consequences
+      parameters: [ { $ref: '#/components/parameters/ChangeSetId' } ]
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidationResult' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /change-sets/{changeSetId}/submit:
+    post:
+      tags: [Change sets]
+      operationId: submitChangeSet
+      parameters: [ { $ref: '#/components/parameters/ChangeSetId' } ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                acknowledgedWarnings: { type: array, items: { type: string } }
+                comment: { type: string }
+      responses:
+        '200':
+          description: Submitted for approval (or committed if no approval is required)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeSet' }
+        '409': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/Problem' }
+  /change-sets/{changeSetId}/decision:
+    post:
+      tags: [Change sets]
+      operationId: decideChangeSet
+      summary: Approve or reject the current approval step
+      parameters: [ { $ref: '#/components/parameters/ChangeSetId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { enum: [approve, reject] }
+                comment: { type: string }
+      responses:
+        '200':
+          description: Updated change set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeSet' }
+        '403': { $ref: '#/components/responses/Problem' }
+
+  /org-chart:
+    get:
+      tags: [Organization]
+      operationId: getOrgChart
+      summary: Org chart nodes and edges as of a date (computed from records, never cached)
+      parameters:
+        - $ref: '#/components/parameters/AsOf'
+        - name: rootId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: depth
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 3 }
+        - name: mode
+          in: query
+          schema: { enum: [position, person], default: position }
+        - name: planId
+          in: query
+          description: Include the draft change sets of a plan (visible to plan members only)
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Chart
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrgChart' }
+  /org-chart/moves:
+    post:
+      tags: [Organization]
+      operationId: proposeOrgChartMove
+      summary: Turn a drag-and-drop gesture into a draft change set with consequences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OrgChartMove' }
+      responses:
+        '201':
+          description: Draft change set with validation preview
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [changeSet, validation]
+                properties:
+                  changeSet: { $ref: '#/components/schemas/ChangeSet' }
+                  validation: { $ref: '#/components/schemas/ValidationResult' }
+                  interpretations:
+                    description: Present when the gesture is ambiguous; the client asks the user to choose one
+                    type: array
+                    items:
+                      type: object
+                      required: [code, label]
+                      properties:
+                        code: { enum: [move_position, transfer_to_vacancy, create_position, temporary_reporting] }
+                        label: { type: string }
+  /plans:
+    post:
+      tags: [Organization]
+      operationId: createPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, asOf]
+              properties:
+                name: { type: string }
+                asOf: { type: string, format: date }
+                members: { type: array, items: { type: string, format: uuid } }
+      responses:
+        '201':
+          description: Plan created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Plan' }
+  /plans/{planId}/submit:
+    post:
+      tags: [Organization]
+      operationId: submitPlan
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: All draft change sets in the plan submitted as one batch
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Plan' }
+  /positions:
+    get:
+      tags: [Organization]
+      operationId: listPositions
+      parameters:
+        - $ref: '#/components/parameters/AsOf'
+        - name: orgUnitId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: vacant
+          in: query
+          schema: { type: boolean }
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Positions as of the date
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/Position' } }
+                  nextCursor: { type: [string, 'null'] }
+  /positions/{positionId}:
+    get:
+      tags: [Organization]
+      operationId: getPosition
+      parameters:
+        - name: positionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/AsOf'
+      responses:
+        '200':
+          description: Position as of the date, with holders and history links
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Position' }
+  /people:
+    get:
+      tags: [People]
+      operationId: searchPeople
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+        - $ref: '#/components/parameters/AsOf'
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: People within the caller's scope
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/PersonSummary' } }
+                  nextCursor: { type: [string, 'null'] }
+  /employments/{employmentId}:
+    get:
+      tags: [People]
+      operationId: getEmployment
+      parameters:
+        - $ref: '#/components/parameters/EmploymentId'
+        - $ref: '#/components/parameters/AsOf'
+        - $ref: '#/components/parameters/KnownAt'
+      responses:
+        '200':
+          description: Employment with assignments, rates and derived values as of the date
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Employment' }
+  /employments/{employmentId}/history:
+    get:
+      tags: [People]
+      operationId: getEmploymentHistory
+      parameters: [ { $ref: '#/components/parameters/EmploymentId' } ]
+      responses:
+        '200':
+          description: Every version with its change set, actor and reason
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/HistoryEntry' }
+
+  /payroll/runs:
+    post:
+      tags: [Payroll]
+      operationId: createPayRun
+      summary: Create a pay run for any population, work period and pay date
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PayRunCreate' }
+      responses:
+        '201':
+          description: Run created in draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayRun' }
+        '422':
+          description: For example NO_RULE_EDITION when no statutory edition covers the pay date
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /payroll/runs/{payRunId}:
+    get:
+      tags: [Payroll]
+      operationId: getPayRun
+      parameters: [ { $ref: '#/components/parameters/PayRunId' } ]
+      responses:
+        '200':
+          description: Run with status, control totals and exceptions count
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayRun' }
+  /payroll/runs/{payRunId}/actions/{action}:
+    post:
+      tags: [Payroll]
+      operationId: payRunAction
+      summary: Advance a run (lock inputs, calculate, mark reviewed, approve, finalize, cancel)
+      parameters:
+        - $ref: '#/components/parameters/PayRunId'
+        - name: action
+          in: path
+          required: true
+          schema: { enum: [lock_inputs, calculate, mark_reviewed, approve, finalize, cancel] }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment: { type: string }
+      responses:
+        '202':
+          description: Accepted; long actions run as jobs and report progress on the run
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayRun' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '409':
+          description: >-
+            For example SUBJECT_IN_OPEN_RUN on lock_inputs when a person in the population is already
+            leased by another open run (blockingRunId names it), or VERSION_CONFLICT on a stale action
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+        '422':
+          description: For example UNRESOLVED_INTERACTION when an agreement leaves a premium combination undefined (lock_inputs)
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /payroll/runs/{payRunId}/results:
+    get:
+      tags: [Payroll]
+      operationId: listPayResults
+      parameters:
+        - $ref: '#/components/parameters/PayRunId'
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Results per employee
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/PayResult' } }
+                  nextCursor: { type: [string, 'null'] }
+  /payroll/results/{payResultId}/explanation:
+    get:
+      tags: [Payroll]
+      operationId: explainPayResult
+      summary: Calculation trace and a plain-language explanation of every amount
+      parameters:
+        - name: payResultId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: lang
+          in: query
+          required: true
+          description: One of the organization's data languages (BCP 47 code, for example en, fr, iu). No language is assumed (docs/22 §4).
+          schema: { type: string, pattern: '^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$' }
+      responses:
+        '200':
+          description: Explanation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PayExplanation' }
+  /payroll/simulations:
+    post:
+      tags: [Payroll]
+      operationId: simulatePay
+      summary: What-if calculation for one employee; never stored in YTD
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [employmentId, payDate]
+              properties:
+                employmentId: { type: string, format: uuid }
+                payDate: { type: string, format: date }
+                workPeriod: { $ref: '#/components/schemas/DateRange' }
+                applyChangeSetId: { type: string, format: uuid, description: Draft change set applied in memory }
+                overrides:
+                  type: object
+                  description: Temporary inputs such as a different TD1 claim or RRSP amount
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Simulated result and comparison with the current expected pay
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  simulated: { $ref: '#/components/schemas/PayResult' }
+                  baseline: { $ref: '#/components/schemas/PayResult' }
+                  netDifference: { $ref: '#/components/schemas/Money' }
+  /payroll/retro-requests:
+    get:
+      tags: [Payroll]
+      operationId: listRetroRequests
+      parameters:
+        - name: status
+          in: query
+          schema: { enum: [queued, calculated, approved, paid, no_difference, cancelled] }
+        - name: changeSetId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Retro requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RetroRequest' }
+
+  /rules/editions:
+    get:
+      tags: [Rules]
+      operationId: listRuleEditions
+      parameters:
+        - name: family
+          in: query
+          schema: { enum: [statutory, employer_taxes, employment_standards, quebec_tax] }
+      responses:
+        '200':
+          description: Editions with status and effective dates
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RuleEdition' }
+  /rules/resolve:
+    get:
+      tags: [Rules]
+      operationId: resolveRules
+      summary: Effective rules for an assignment on a date (statute, agreement, policy; greater right applied)
+      parameters:
+        - name: assignmentId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/AsOf'
+      responses:
+        '200':
+          description: Resolved rules with their sources
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /agreements/{agreementId}/versions:
+    post:
+      tags: [Rules]
+      operationId: createAgreementVersion
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: One version object as defined in rules/agreements/agreement.schema.json ($defs.version)
+              type: object
+              additionalProperties: true
+      responses:
+        '201':
+          description: Draft version created; rules start unverified
+  /agreements/{agreementId}/versions/{version}/activate:
+    post:
+      tags: [Rules]
+      operationId: activateAgreementVersion
+      summary: Creates an agreement.activate_version change set (two-person approval; retro if retro_from is set)
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: version
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '201':
+          description: Change set created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeSet' }
+        '422':
+          description: Unverified rules remain
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+
+  /timesheets/{timesheetId}/submit:
+    post:
+      tags: [Time and leave]
+      operationId: submitTimesheet
+      parameters:
+        - name: timesheetId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Submitted }
+  /leave/balances:
+    get:
+      tags: [Time and leave]
+      operationId: getLeaveBalances
+      summary: Balances as of any date, including scheduled future accruals
+      parameters:
+        - name: employmentId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/AsOf'
+      responses:
+        '200':
+          description: Balances by leave type
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [leaveType, hours]
+                  properties:
+                    leaveType: { type: string }
+                    hours: { type: string }
+                    amount: { $ref: '#/components/schemas/Money' }
+                    asOf: { type: string, format: date }
+  /leave/requests:
+    post:
+      tags: [Time and leave]
+      operationId: createLeaveRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [employmentId, leaveType, start, end]
+              properties:
+                employmentId: { type: string, format: uuid }
+                leaveType: { type: string }
+                start: { type: string, format: date-time }
+                end: { type: string, format: date-time }
+                comment: { type: string }
+      responses:
+        '201': { description: Request created and routed for approval }
+
+  /assistant/messages:
+    post:
+      tags: [Assistant]
+      operationId: askAssistant
+      summary: Ask the assistant; it acts as the caller and can only propose draft change sets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                conversationId: { type: string, format: uuid }
+                message: { type: string, maxLength: 4000 }
+                context:
+                  type: object
+                  properties:
+                    screen: { type: string }
+                    recordType: { type: string }
+                    recordId: { type: string }
+      responses:
+        '200':
+          description: Answer with citations and optional draft change set
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [answer]
+                properties:
+                  answer: { type: string }
+                  citations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        kind: { enum: [record, rule, document, trace, report] }
+                        ref: { type: string }
+                        label: { type: string }
+                  draftChangeSetId: { type: [string, 'null'], format: uuid }
+        '403':
+          description: Assistant disabled for this tenant (residency or settings)
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+
+  /audit/entries/{auditId}/proof:
+    get:
+      tags: [Audit]
+      operationId: getAuditInclusionProof
+      summary: Inclusion proof for one audit row, checkable offline with the published public key
+      parameters:
+        - name: auditId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Proof (see reference/audit_merkle_reference.py verify_inclusion)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuditProof' }
+        '409':
+          description: AUDIT_NOT_SEALED when the row is not yet in a batch (sealing runs hourly)
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /audit/verifications:
+    post:
+      tags: [Audit]
+      operationId: runAuditVerification
+      summary: Verify the tenant's audit chain (all batches or a range) against the anchored copies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fromBatchNo: { type: integer }
+                toBatchNo: { type: integer }
+                customerDigest:
+                  type: object
+                  description: A digest the customer kept, to confirm it is still in the chain
+                  properties:
+                    batchNo: { type: integer }
+                    batchHash: { type: string }
+      responses:
+        '200':
+          description: Result per batch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid: { type: boolean }
+                  batchesChecked: { type: integer }
+                  failures:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        batchNo: { type: integer }
+                        check: { enum: [root, chain, signature, anchor, gap] }
+                        auditIds: { type: array, items: { type: integer } }
+  /webhooks/subscriptions:
+    post:
+      tags: [Webhooks]
+      operationId: createWebhookSubscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, eventTypes]
+              properties:
+                url: { type: string, format: uri }
+                eventTypes: { type: array, items: { type: string } }
+      responses:
+        '201':
+          description: Subscription created; the signing secret is shown once
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscriptionId: { type: string, format: uuid }
+                  secret: { type: string }
+
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.cando.example/oauth2/authorize
+          tokenUrl: https://auth.cando.example/oauth2/token
+          scopes:
+            core.read: Read Core HR
+            core.write: Create change sets in Core HR
+            payroll.read: Read payroll
+            payroll.process: Create and calculate pay runs
+            payroll.approve: Approve and finalize pay runs
+            rules.admin: Manage rule editions and agreements
+            assistant.use: Use the assistant
+        clientCredentials:
+          tokenUrl: https://auth.cando.example/oauth2/token
+          scopes:
+            core.read: Read Core HR
+            core.write: Create change sets in Core HR
+            payroll.read: Read payroll
+
+  parameters:
+    AsOf:
+      name: asOf
+      in: query
+      description: Business date for the read (default today in the legal entity's time zone)
+      schema: { type: string, format: date }
+    KnownAt:
+      name: knownAt
+      in: query
+      description: System time for audit reads (what CanDo knew at that moment)
+      schema: { type: string, format: date-time }
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 500, default: 50 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      schema: { type: string, maxLength: 128 }
+    ChangeSetId:
+      name: changeSetId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    EmploymentId:
+      name: employmentId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    PayRunId:
+      name: payRunId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    Problem:
+      description: Error (RFC 9457)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+
+  schemas:
+    Money:
+      type: string
+      pattern: '^-?[0-9]+\.[0-9]{2}$'
+      examples: ['2500.00']
+    DateRange:
+      type: object
+      required: [start, end]
+      properties:
+        start: { type: string, format: date }
+        end: { type: string, format: date, description: Inclusive }
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        code: { type: string, examples: [NO_RULE_EDITION, VERSION_CONFLICT, SELF_APPROVAL_BLOCKED, OVER_FTE, SUBJECT_IN_OPEN_RUN, RULE_HASH_MISMATCH, RULE_EDITION_IMMUTABLE, AGREEMENT_VERSION_IMMUTABLE, UNRESOLVED_INTERACTION] }
+        blockingRunId: { type: string, format: uuid, description: Set on SUBJECT_IN_OPEN_RUN }
+        current: { description: Current state on VERSION_CONFLICT, type: object, additionalProperties: true }
+    ChangeSetStatus:
+      enum: [draft, validated, pending_approval, approved, scheduled, committed, rejected, cancelled]
+    Operation:
+      type: object
+      required: [op]
+      properties:
+        op:
+          type: string
+          examples: [assignment.update, position.update, org_unit.move, employment.hire, compensation.set_rate, agreement.activate_version, time.correct]
+        targetId: { type: string, format: uuid }
+        set:
+          type: object
+          additionalProperties: true
+        addedByCascade: { type: boolean, readOnly: true }
+    ChangeSetCreate:
+      type: object
+      required: [kind, reasonCode, effectiveDate, operations]
+      properties:
+        kind: { type: string }
+        reasonCode: { type: string }
+        isCorrection: { type: boolean, default: false }
+        effectiveDate: { type: string, format: date }
+        planId: { type: string, format: uuid }
+        operations:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Operation' }
+        baseVersions:
+          type: object
+          additionalProperties: { type: integer }
+        comment: { type: string }
+    ChangeSet:
+      allOf:
+        - $ref: '#/components/schemas/ChangeSetCreate'
+        - type: object
+          required: [changeSetId, number, status, source, requestedBy, requestedAt]
+          properties:
+            changeSetId: { type: string, format: uuid }
+            number: { type: integer }
+            status: { $ref: '#/components/schemas/ChangeSetStatus' }
+            source: { enum: [ui_form, org_chart, mass_change, import, api, workflow, assistant_draft, system] }
+            requestedBy: { type: string, format: uuid }
+            requestedAt: { type: string, format: date-time }
+            committedAt: { type: [string, 'null'], format: date-time }
+            validation: { $ref: '#/components/schemas/ValidationResult' }
+            retroEstimate: { oneOf: [ { $ref: '#/components/schemas/Money' }, { type: 'null' } ] }
+            approvals:
+              type: array
+              items:
+                type: object
+                properties:
+                  step: { type: integer }
+                  assignee: { type: string }
+                  status: { enum: [open, approved, rejected, delegated, expired] }
+                  decidedAt: { type: [string, 'null'], format: date-time }
+    ValidationResult:
+      type: object
+      required: [errors, warnings, consequences]
+      properties:
+        errors:
+          type: array
+          items: { $ref: '#/components/schemas/Finding' }
+        warnings:
+          type: array
+          items: { $ref: '#/components/schemas/Finding' }
+        consequences:
+          type: array
+          items:
+            type: object
+            required: [kind, description]
+            properties:
+              kind:
+                enum: [org_unit, cost_centre, location_province, tax_province, holiday_calendar, agreement, approver, benefits_class, budget, retro, conflict_future_change, task]
+              description: { type: string }
+              from: {}
+              to: {}
+              addedOperation: { $ref: '#/components/schemas/Operation' }
+    Finding:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        operationIndex: { type: integer }
+        field: { type: string }
+    OrgChartMove:
+      type: object
+      required: [subject, target, effectiveDate]
+      properties:
+        subject:
+          type: object
+          required: [type, id]
+          properties:
+            type: { enum: [position, person_assignment, org_unit, multiple] }
+            id: { type: string, format: uuid }
+            ids: { type: array, items: { type: string, format: uuid } }
+        target:
+          type: object
+          required: [type, id]
+          properties:
+            type: { enum: [position, vacant_position, org_unit, person_assignment] }
+            id: { type: string, format: uuid }
+        interpretation:
+          description: Chosen by the user when the server returned several interpretations
+          enum: [move_position, transfer_to_vacancy, create_position, temporary_reporting]
+        effectiveDate: { type: string, format: date }
+        reasonCode: { type: string }
+        planId: { type: string, format: uuid }
+    OrgChart:
+      type: object
+      required: [asOf, nodes, edges]
+      properties:
+        asOf: { type: string, format: date }
+        nodes:
+          type: array
+          items:
+            type: object
+            required: [id, kind, title]
+            properties:
+              id: { type: string, format: uuid }
+              kind: { enum: [position, person, org_unit] }
+              title: { type: string }
+              orgUnitId: { type: string, format: uuid }
+              holders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    assignmentId: { type: string, format: uuid }
+                    displayName: { type: string }
+                    acting: { type: boolean }
+              vacant: { type: boolean }
+              badges:
+                type: array
+                items: { type: string, examples: [agreement:EXAMPLE-MUNI-0001, upcoming_change:2026-12-01, funding_ends:2027-03-31, draft] }
+              hasChildren: { type: boolean }
+        edges:
+          type: array
+          items:
+            type: object
+            required: [from, to, kind]
+            properties:
+              from: { type: string, format: uuid }
+              to: { type: string, format: uuid }
+              kind: { enum: [solid, dotted, acting] }
+    Plan:
+      type: object
+      required: [planId, name, status]
+      properties:
+        planId: { type: string, format: uuid }
+        name: { type: string }
+        asOf: { type: string, format: date }
+        status: { enum: [open, submitted, approved, discarded] }
+        changeSetIds: { type: array, items: { type: string, format: uuid } }
+        summary:
+          type: object
+          properties:
+            headcountDelta: { type: integer }
+            annualCostDelta: { $ref: '#/components/schemas/Money' }
+    Position:
+      type: object
+      required: [positionId, number, title, status]
+      properties:
+        positionId: { type: string, format: uuid }
+        number: { type: string }
+        title: { type: string }
+        jobId: { type: string, format: uuid }
+        orgUnitId: { type: string, format: uuid }
+        locationId: { type: string, format: uuid }
+        reportsToPositionId: { type: [string, 'null'], format: uuid }
+        fteBudget: { type: string }
+        fteFilled: { type: string }
+        status: { enum: [active, frozen, eliminated] }
+        agreementId: { type: [string, 'null'] }
+        languageRequirement: { type: [string, 'null'] }
+        vacancySince: { type: [string, 'null'], format: date }
+    PersonSummary:
+      type: object
+      required: [personId, displayName]
+      properties:
+        personId: { type: string, format: uuid }
+        displayName: { type: string }
+        primaryEmploymentId: { type: string, format: uuid }
+        jobTitle: { type: string }
+        orgUnitName: { type: string }
+        workEmail: { type: string, format: email }
+    Employment:
+      type: object
+      required: [employmentId, personId, legalEntityId, status, assignments]
+      properties:
+        employmentId: { type: string, format: uuid }
+        personId: { type: string, format: uuid }
+        employeeNumber: { type: string }
+        legalEntityId: { type: string, format: uuid }
+        status: { enum: [active, on_leave, suspended, terminated] }
+        originalHireDate: { type: string, format: date }
+        continuousServiceDate: { type: string, format: date }
+        assignments:
+          type: array
+          items:
+            type: object
+            properties:
+              assignmentId: { type: string, format: uuid }
+              positionId: { type: [string, 'null'], format: uuid }
+              orgUnitId: { type: string, format: uuid }
+              locationId: { type: string, format: uuid }
+              managerAssignmentId: { type: [string, 'null'], format: uuid }
+              fte: { type: string }
+              agreementId: { type: [string, 'null'] }
+              isPrimary: { type: boolean }
+        derived:
+          type: object
+          description: Values computed at read time, never stored
+          properties:
+            managerName: { type: string }
+            taxProvince: { type: string }
+            esJurisdiction: { type: string }
+            holidayCalendar: { type: string }
+        upcomingChanges:
+          type: array
+          items:
+            type: object
+            properties:
+              effectiveDate: { type: string, format: date }
+              changeSetId: { type: string, format: uuid }
+              summary: { type: string }
+    HistoryEntry:
+      type: object
+      required: [entity, validFrom, recordedAt, changeSetId]
+      properties:
+        entity: { type: string }
+        validFrom: { type: string, format: date }
+        validTo: { type: [string, 'null'], format: date }
+        recordedAt: { type: string, format: date-time }
+        supersededAt: { type: [string, 'null'], format: date-time }
+        changeSetId: { type: string, format: uuid }
+        actor: { type: string }
+        reason: { type: string }
+        changes: { type: object, additionalProperties: true }
+    PayRunCreate:
+      type: object
+      required: [type, legalEntityId, population, payDate]
+      properties:
+        type: { enum: [regular, off_cycle, bonus, retro, final, adjustment, reversal, manual_payment_record, simulation] }
+        legalEntityId: { type: string, format: uuid }
+        payGroupId: { type: string, format: uuid }
+        population:
+          type: object
+          required: [mode]
+          properties:
+            mode: { enum: [pay_group, employees, query, change_set] }
+            employmentIds: { type: array, items: { type: string, format: uuid } }
+            query: { type: object, additionalProperties: true }
+            changeSetId: { type: string, format: uuid }
+        workPeriod: { $ref: '#/components/schemas/DateRange' }
+        payDate: { type: string, format: date }
+        include:
+          type: object
+          properties:
+            salaryAndHourly: { type: boolean, default: true }
+            approvedTime: { type: boolean, default: true }
+            leave: { type: boolean, default: true }
+            benefits: { type: boolean, default: true }
+            recurringDeductions: { type: boolean, default: true }
+            oneTimes: { type: array, items: { type: string, format: uuid } }
+        taxMethod: { enum: [auto, periodic, non_periodic], default: auto }
+        reason: { type: string }
+    PayRun:
+      allOf:
+        - $ref: '#/components/schemas/PayRunCreate'
+        - type: object
+          required: [payRunId, number, status, taxYear]
+          properties:
+            payRunId: { type: string, format: uuid }
+            number: { type: integer }
+            status: { enum: [draft, inputs_locked, calculating, calculated, reviewed, approved, finalized, paid, cancelled] }
+            taxYear: { type: integer }
+            ruleEditionId: { type: string, examples: [CA-2026-07-01] }
+            inputsKnownAt: { type: [string, 'null'], format: date-time, description: System time every calculation read uses; set at lock_inputs }
+            engineVersion: { type: [string, 'null'], description: Git commit of the engine build pinned at lock_inputs }
+            bucketCount: { type: [integer, 'null'], minimum: 1, maximum: 256 }
+            rulePins:
+              type: array
+              items: { $ref: '#/components/schemas/RulePin' }
+            subjectsInOpenRuns:
+              type: array
+              description: Warning while in draft; lock_inputs fails until these runs finalize or the subjects are removed
+              items:
+                type: object
+                properties:
+                  personId: { type: string, format: uuid }
+                  payrollAccountId: { type: string, format: uuid }
+                  blockingRunId: { type: string, format: uuid }
+            changesSinceLock: { type: integer, description: Committed change sets affecting the work period after inputs_known_at; they become retro after finalization }
+            progress:
+              type: object
+              properties:
+                total: { type: integer }
+                done: { type: integer }
+                exceptions: { type: integer }
+            controlTotals:
+              type: object
+              properties:
+                gross: { $ref: '#/components/schemas/Money' }
+                net: { $ref: '#/components/schemas/Money' }
+                employees: { type: integer }
+    RulePin:
+      type: object
+      required: [family, refId, contentSha256]
+      properties:
+        family: { enum: [statutory, employment_standards, employer_taxes, quebec_tax, agreement, policy, engine] }
+        refId: { type: string, examples: [CA-2026-07-01, 'CUPE-1234-OUTSIDE@3'] }
+        contentSha256: { type: string, pattern: '^[0-9a-f]{64}$' }
+    AuditProof:
+      type: object
+      required: [auditId, leafHash, batch, path, batchHash, signature, signingKeyId]
+      properties:
+        auditId: { type: integer }
+        leafHash: { type: string, description: hex }
+        leafIndex: { type: integer, description: Position of the row in its batch }
+        batch:
+          type: object
+          description: Batch header exactly as hashed (canonical JSON)
+          properties:
+            tenant_id: { type: string, format: uuid }
+            batch_no: { type: integer }
+            first_audit_id: { type: [integer, 'null'] }
+            last_audit_id: { type: [integer, 'null'] }
+            leaf_count: { type: integer }
+            sealed_at: { type: string }
+        merkleRoot: { type: string }
+        prevBatchHash: { type: string }
+        path: { type: array, items: { type: string }, description: RFC 6962 audit path, hex, leaf to root }
+        batchHash: { type: string }
+        signature: { type: string, description: base64 }
+        signingKeyId: { type: string }
+        anchorUri: { type: [string, 'null'] }
+        anchorVersionId: { type: [string, 'null'] }
+    PayResult:
+      type: object
+      required: [payResultId, employmentId, payDate, taxYear, gross, net]
+      properties:
+        payResultId: { type: string, format: uuid }
+        employmentId: { type: string, format: uuid }
+        payDate: { type: string, format: date }
+        taxYear: { type: integer }
+        province: { type: string }
+        taxMethod: { enum: [periodic, non_periodic, mixed] }
+        gross: { $ref: '#/components/schemas/Money' }
+        cpp: { $ref: '#/components/schemas/Money' }
+        cpp2: { $ref: '#/components/schemas/Money' }
+        ei: { $ref: '#/components/schemas/Money' }
+        incomeTaxFederal: { $ref: '#/components/schemas/Money' }
+        incomeTaxProvincial: { $ref: '#/components/schemas/Money' }
+        territorialPayrollTax: { $ref: '#/components/schemas/Money' }
+        net: { $ref: '#/components/schemas/Money' }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [payCode, amount]
+            properties:
+              payCode: { type: string }
+              description: { type: string }
+              workPeriod: { $ref: '#/components/schemas/DateRange' }
+              hours: { type: [string, 'null'] }
+              rate: { type: [string, 'null'] }
+              amount: { $ref: '#/components/schemas/Money' }
+              fiscalYear: { type: integer }
+              fiscalPeriod: { type: integer }
+              retroOfResultId: { type: [string, 'null'], format: uuid }
+    PayExplanation:
+      type: object
+      required: [payResultId, steps]
+      properties:
+        payResultId: { type: string, format: uuid }
+        ruleEditionId: { type: string }
+        steps:
+          type: array
+          items:
+            type: object
+            required: [label, value]
+            properties:
+              label: { type: string, examples: [regular.A, regular.K1, CPP.exemption_per_period] }
+              value: { type: string }
+              formulaRef: { type: string, examples: ['T4127 ch.4 Step 2'] }
+              plainLanguage: { type: string }
+    RetroRequest:
+      type: object
+      required: [retroRequestId, employmentId, status]
+      properties:
+        retroRequestId: { type: string, format: uuid }
+        employmentId: { type: string, format: uuid }
+        triggerChangeSetId: { type: string, format: uuid }
+        originalResultId: { type: string, format: uuid }
+        status: { enum: [queued, calculated, approved, paid, no_difference, cancelled] }
+        difference:
+          type: object
+          additionalProperties: { $ref: '#/components/schemas/Money' }
+    RuleEdition:
+      type: object
+      required: [editionId, family, effectiveFrom, effectiveTo, status]
+      properties:
+        editionId: { type: string }
+        family: { enum: [statutory, employer_taxes, employment_standards, quebec_tax] }
+        taxYear: { type: integer }
+        effectiveFrom: { type: string, format: date }
+        effectiveTo: { type: string, format: date }
+        status: { enum: [draft, tested, active, retired] }
+        contentSha256: { type: string }

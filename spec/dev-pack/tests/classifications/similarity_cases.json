@@ -1,0 +1,1229 @@
+{
+ "description": "Acceptance cases for the position similarity scorer (docs/18 §7). The TypeScript port must reproduce every value exactly.",
+ "catalogue": "rules/classifications/noc-2021-v1.0-structure.json",
+ "cases": [
+  {
+   "id": "SIM-001",
+   "kind": "rank",
+   "title": "Nearest available positions to a Community Support Worker 2 (NOC 42201), default profile",
+   "query": {
+    "id": "NL-041",
+    "title": "Community Support Worker 2",
+    "noc": {
+     "version": "NOC-2021-1.0",
+     "code": "42201"
+    },
+    "codes": {
+     "JOB_FAMILY": {
+      "code": "CS-SUP"
+     },
+     "GRADE": {
+      "code": "G05",
+      "rank": 5
+     }
+    },
+    "requirements": [
+     {
+      "key": "education:college_diploma",
+      "strength": "required"
+     },
+     {
+      "key": "experience:social_services",
+      "strength": "preferred"
+     },
+     {
+      "key": "screening:vulnerable_sector",
+      "strength": "required"
+     },
+     {
+      "key": "licence:driver",
+      "strength": "asset"
+     }
+    ]
+   },
+   "candidates": [
+    {
+     "id": "NL-041",
+     "available": true,
+     "title": "Community Support Worker 2",
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "42201"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SUP"
+      },
+      "GRADE": {
+       "code": "G05",
+       "rank": 5
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:college_diploma",
+       "strength": "required"
+      },
+      {
+       "key": "experience:social_services",
+       "strength": "preferred"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      },
+      {
+       "key": "licence:driver",
+       "strength": "asset"
+      }
+     ]
+    },
+    {
+     "id": "H-118",
+     "title": "Housing Support Worker",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "42201"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SUP"
+      },
+      "GRADE": {
+       "code": "G05",
+       "rank": 5
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:college_diploma",
+       "strength": "required"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      },
+      {
+       "key": "licence:driver",
+       "strength": "asset"
+      }
+     ]
+    },
+    {
+     "id": "NL-047",
+     "title": "Early Childhood Educator",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "42202"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-ECE"
+      },
+      "GRADE": {
+       "code": "G04",
+       "rank": 4
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:college_diploma",
+       "strength": "required"
+      },
+      {
+       "key": "registration:early_childhood_educator",
+       "strength": "required"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      }
+     ]
+    },
+    {
+     "id": "NL-031",
+     "title": "Social Worker",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "41300"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SW"
+      },
+      "GRADE": {
+       "code": "G08",
+       "rank": 8
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:bachelor_social_work",
+       "strength": "required"
+      },
+      {
+       "key": "registration:social_worker",
+       "strength": "required"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      }
+     ]
+    },
+    {
+     "id": "H-126",
+     "title": "Home Support Worker",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "44101"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SUP"
+      },
+      "GRADE": {
+       "code": "G03",
+       "rank": 3
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:secondary_school",
+       "strength": "required"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      },
+      {
+       "key": "licence:driver",
+       "strength": "required"
+      }
+     ]
+    },
+    {
+     "id": "NL-012",
+     "title": "Payroll Administrator",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "13102"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "FIN-PAY"
+      },
+      "GRADE": {
+       "code": "G05",
+       "rank": 5
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:secondary_school",
+       "strength": "preferred"
+      },
+      {
+       "key": "certification:payroll",
+       "strength": "preferred"
+      }
+     ]
+    },
+    {
+     "id": "NL-050",
+     "title": "Community Support Worker 2",
+     "available": false,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "42201"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SUP"
+      },
+      "GRADE": {
+       "code": "G05",
+       "rank": 5
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:college_diploma",
+       "strength": "required"
+      },
+      {
+       "key": "experience:social_services",
+       "strength": "preferred"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      },
+      {
+       "key": "licence:driver",
+       "strength": "asset"
+      }
+     ]
+    }
+   ],
+   "profile": {
+    "code": "default",
+    "weights": {
+     "occupation": "0.45",
+     "teer": "0.15",
+     "requirements": "0.25",
+     "internal": "0.15",
+     "title": "0"
+    },
+    "proximity": {
+     "5": "1.00",
+     "4": "0.75",
+     "3": "0.55",
+     "2": "0.40",
+     "1": "0.15",
+     "0": "0",
+     "related": "0.60"
+    },
+    "strength_weights": {
+     "required": "1.0",
+     "preferred": "0.5",
+     "asset": "0.25"
+    },
+    "internal_schemes": [
+     {
+      "scheme": "JOB_FAMILY",
+      "kind": "equal",
+      "weight": 1
+     },
+     {
+      "scheme": "GRADE",
+      "kind": "rank",
+      "weight": 1,
+      "range": 10
+     }
+    ],
+    "filters": {
+     "only_available": true,
+     "exclude_self": true
+    },
+    "must_meet_required": false
+   },
+   "expect": {
+    "ranked": [
+     {
+      "id": "H-118",
+      "total": "95.5",
+      "components": {
+       "internal": "1.0000",
+       "occupation": "1.0000",
+       "requirements": "0.8182",
+       "teer": "1.0000"
+      },
+      "reason_codes": [
+       "SAME_UNIT_GROUP",
+       "TEER_SAME",
+       "REQUIREMENTS_SHARED",
+       "INTERNAL_MATCH",
+       "INTERNAL_MATCH"
+      ]
+     },
+     {
+      "id": "NL-047",
+      "total": "68.8",
+      "components": {
+       "internal": "0.4500",
+       "occupation": "0.7500",
+       "requirements": "0.5333",
+       "teer": "1.0000"
+      },
+      "reason_codes": [
+       "SAME_MINOR_GROUP",
+       "TEER_SAME",
+       "REQUIREMENTS_SHARED",
+       "INTERNAL_DIFFERENT",
+       "INTERNAL_DIFFERENT"
+      ]
+     },
+     {
+      "id": "NL-031",
+      "total": "49.5",
+      "components": {
+       "internal": "0.3500",
+       "occupation": "0.6000",
+       "requirements": "0.2105",
+       "teer": "0.8000"
+      },
+      "reason_codes": [
+       "NOC_CROSS_REFERENCE",
+       "TEER_DIFFERENT",
+       "REQUIREMENTS_SHARED",
+       "INTERNAL_DIFFERENT",
+       "INTERNAL_DIFFERENT"
+      ]
+     },
+     {
+      "id": "H-126",
+      "total": "36.2",
+      "components": {
+       "internal": "0.9000",
+       "occupation": "0.1500",
+       "requirements": "0.2778",
+       "teer": "0.6000"
+      },
+      "reason_codes": [
+       "SAME_BROAD_CATEGORY",
+       "TEER_DIFFERENT",
+       "REQUIREMENTS_SHARED",
+       "INTERNAL_MATCH",
+       "INTERNAL_DIFFERENT"
+      ]
+     },
+     {
+      "id": "NL-012",
+      "total": "19.5",
+      "components": {
+       "internal": "0.5000",
+       "occupation": "0.0000",
+       "requirements": "0.0000",
+       "teer": "0.8000"
+      },
+      "reason_codes": [
+       "DIFFERENT_OCCUPATION",
+       "TEER_DIFFERENT",
+       "REQUIREMENTS_SHARED",
+       "INTERNAL_DIFFERENT",
+       "INTERNAL_MATCH"
+      ]
+     }
+    ],
+    "excluded": [
+     {
+      "id": "NL-050",
+      "reason": "NOT_AVAILABLE"
+     }
+    ]
+   }
+  },
+  {
+   "id": "SIM-002",
+   "kind": "rank",
+   "title": "A candidate still coded in NOC 2016 V1.3 is compared through the correspondence table",
+   "query": {
+    "id": "NL-041",
+    "title": "Community Support Worker 2",
+    "noc": {
+     "version": "NOC-2021-1.0",
+     "code": "42201"
+    },
+    "codes": {
+     "JOB_FAMILY": {
+      "code": "CS-SUP"
+     },
+     "GRADE": {
+      "code": "G05",
+      "rank": 5
+     }
+    },
+    "requirements": [
+     {
+      "key": "education:college_diploma",
+      "strength": "required"
+     },
+     {
+      "key": "experience:social_services",
+      "strength": "preferred"
+     },
+     {
+      "key": "screening:vulnerable_sector",
+      "strength": "required"
+     },
+     {
+      "key": "licence:driver",
+      "strength": "asset"
+     }
+    ]
+   },
+   "candidates": [
+    {
+     "id": "L-900",
+     "title": "Youth Worker (legacy job)",
+     "available": true,
+     "noc": {
+      "version": "NOC-2016-1.3",
+      "code": "4212"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SUP"
+      },
+      "GRADE": {
+       "code": "G05",
+       "rank": 5
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:college_diploma",
+       "strength": "required"
+      }
+     ]
+    }
+   ],
+   "profile": {
+    "code": "default",
+    "weights": {
+     "occupation": "0.45",
+     "teer": "0.15",
+     "requirements": "0.25",
+     "internal": "0.15",
+     "title": "0"
+    },
+    "proximity": {
+     "5": "1.00",
+     "4": "0.75",
+     "3": "0.55",
+     "2": "0.40",
+     "1": "0.15",
+     "0": "0",
+     "related": "0.60"
+    },
+    "strength_weights": {
+     "required": "1.0",
+     "preferred": "0.5",
+     "asset": "0.25"
+    },
+    "internal_schemes": [
+     {
+      "scheme": "JOB_FAMILY",
+      "kind": "equal",
+      "weight": 1
+     },
+     {
+      "scheme": "GRADE",
+      "kind": "rank",
+      "weight": 1,
+      "range": 10
+     }
+    ],
+    "filters": {
+     "only_available": true,
+     "exclude_self": true
+    },
+    "must_meet_required": false
+   },
+   "expect": {
+    "ranked": [
+     {
+      "id": "L-900",
+      "total": "84.1",
+      "components": {
+       "internal": "1.0000",
+       "occupation": "1.0000",
+       "requirements": "0.3636",
+       "teer": "1.0000"
+      },
+      "reason_codes": [
+       "SAME_UNIT_GROUP",
+       "VIA_CORRESPONDENCE",
+       "TEER_SAME",
+       "REQUIREMENTS_SHARED",
+       "INTERNAL_MATCH",
+       "INTERNAL_MATCH"
+      ]
+     }
+    ],
+    "excluded": []
+   },
+   "mappings": [
+    {
+     "from_version": "NOC-2016-1.3",
+     "from_code": "4212",
+     "to_version": "NOC-2021-1.0",
+     "to_code": "42201",
+     "relation": "one_to_one",
+     "share": "1",
+     "source": "test fixture (NOC 2016 V1.3 4212 Social and community service workers)"
+    }
+   ]
+  },
+  {
+   "id": "SIM-003",
+   "kind": "rank",
+   "title": "A split correspondence is the share-weighted average: 0.6 x 1.00 + 0.4 x 0.75 = 0.90",
+   "query": {
+    "id": "Q",
+    "noc": {
+     "version": "NOC-2021-1.0",
+     "code": "42201"
+    }
+   },
+   "candidates": [
+    {
+     "id": "X-001",
+     "title": "Community and early learning worker",
+     "available": true,
+     "noc": {
+      "version": "TEST-OLD",
+      "code": "X1"
+     },
+     "codes": {},
+     "requirements": []
+    }
+   ],
+   "profile": {
+    "code": "default",
+    "weights": {
+     "occupation": "0.45",
+     "teer": "0.15",
+     "requirements": "0.25",
+     "internal": "0.15",
+     "title": "0"
+    },
+    "proximity": {
+     "5": "1.00",
+     "4": "0.75",
+     "3": "0.55",
+     "2": "0.40",
+     "1": "0.15",
+     "0": "0",
+     "related": "0.60"
+    },
+    "strength_weights": {
+     "required": "1.0",
+     "preferred": "0.5",
+     "asset": "0.25"
+    },
+    "internal_schemes": [],
+    "filters": {
+     "only_available": true,
+     "exclude_self": true
+    },
+    "must_meet_required": false
+   },
+   "expect": {
+    "ranked": [
+     {
+      "id": "X-001",
+      "total": "92.5",
+      "components": {
+       "occupation": "0.9000",
+       "teer": "1.0000"
+      },
+      "reason_codes": [
+       "SAME_UNIT_GROUP",
+       "VIA_CORRESPONDENCE",
+       "TEER_DIFFERENT"
+      ]
+     }
+    ],
+    "excluded": []
+   },
+   "mappings": [
+    {
+     "from_version": "TEST-OLD",
+     "from_code": "X1",
+     "to_version": "NOC-2021-1.0",
+     "to_code": "42201",
+     "relation": "split",
+     "share": "0.6",
+     "source": "test fixture"
+    },
+    {
+     "from_version": "TEST-OLD",
+     "from_code": "X1",
+     "to_version": "NOC-2021-1.0",
+     "to_code": "42202",
+     "relation": "split",
+     "share": "0.4",
+     "source": "test fixture"
+    }
+   ]
+  },
+  {
+   "id": "SIM-004",
+   "kind": "rank",
+   "title": "Redeployment: the person must hold every required item; screening is missing, so positions requiring it drop out",
+   "query": {
+    "id": "NL-041",
+    "title": "Community Support Worker 2",
+    "noc": {
+     "version": "NOC-2021-1.0",
+     "code": "42201"
+    },
+    "codes": {
+     "JOB_FAMILY": {
+      "code": "CS-SUP"
+     },
+     "GRADE": {
+      "code": "G05",
+      "rank": 5
+     }
+    },
+    "requirements": [
+     {
+      "key": "education:college_diploma",
+      "strength": "required"
+     },
+     {
+      "key": "experience:social_services",
+      "strength": "preferred"
+     },
+     {
+      "key": "screening:vulnerable_sector",
+      "strength": "required"
+     },
+     {
+      "key": "licence:driver",
+      "strength": "asset"
+     }
+    ],
+    "person": {
+     "credential_keys": [
+      "education:college_diploma",
+      "experience:social_services",
+      "licence:driver"
+     ]
+    }
+   },
+   "candidates": [
+    {
+     "id": "NL-041",
+     "available": true,
+     "title": "Community Support Worker 2",
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "42201"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SUP"
+      },
+      "GRADE": {
+       "code": "G05",
+       "rank": 5
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:college_diploma",
+       "strength": "required"
+      },
+      {
+       "key": "experience:social_services",
+       "strength": "preferred"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      },
+      {
+       "key": "licence:driver",
+       "strength": "asset"
+      }
+     ]
+    },
+    {
+     "id": "H-118",
+     "title": "Housing Support Worker",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "42201"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SUP"
+      },
+      "GRADE": {
+       "code": "G05",
+       "rank": 5
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:college_diploma",
+       "strength": "required"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      },
+      {
+       "key": "licence:driver",
+       "strength": "asset"
+      }
+     ]
+    },
+    {
+     "id": "NL-047",
+     "title": "Early Childhood Educator",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "42202"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-ECE"
+      },
+      "GRADE": {
+       "code": "G04",
+       "rank": 4
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:college_diploma",
+       "strength": "required"
+      },
+      {
+       "key": "registration:early_childhood_educator",
+       "strength": "required"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      }
+     ]
+    },
+    {
+     "id": "NL-031",
+     "title": "Social Worker",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "41300"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SW"
+      },
+      "GRADE": {
+       "code": "G08",
+       "rank": 8
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:bachelor_social_work",
+       "strength": "required"
+      },
+      {
+       "key": "registration:social_worker",
+       "strength": "required"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      }
+     ]
+    },
+    {
+     "id": "H-126",
+     "title": "Home Support Worker",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "44101"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SUP"
+      },
+      "GRADE": {
+       "code": "G03",
+       "rank": 3
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:secondary_school",
+       "strength": "required"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      },
+      {
+       "key": "licence:driver",
+       "strength": "required"
+      }
+     ]
+    },
+    {
+     "id": "NL-012",
+     "title": "Payroll Administrator",
+     "available": true,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "13102"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "FIN-PAY"
+      },
+      "GRADE": {
+       "code": "G05",
+       "rank": 5
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:secondary_school",
+       "strength": "preferred"
+      },
+      {
+       "key": "certification:payroll",
+       "strength": "preferred"
+      }
+     ]
+    },
+    {
+     "id": "NL-050",
+     "title": "Community Support Worker 2",
+     "available": false,
+     "noc": {
+      "version": "NOC-2021-1.0",
+      "code": "42201"
+     },
+     "codes": {
+      "JOB_FAMILY": {
+       "code": "CS-SUP"
+      },
+      "GRADE": {
+       "code": "G05",
+       "rank": 5
+      }
+     },
+     "requirements": [
+      {
+       "key": "education:college_diploma",
+       "strength": "required"
+      },
+      {
+       "key": "experience:social_services",
+       "strength": "preferred"
+      },
+      {
+       "key": "screening:vulnerable_sector",
+       "strength": "required"
+      },
+      {
+       "key": "licence:driver",
+       "strength": "asset"
+      }
+     ]
+    }
+   ],
+   "profile": {
+    "code": "redeployment",
+    "weights": {
+     "occupation": "0.35",
+     "teer": "0.15",
+     "requirements": "0.40",
+     "internal": "0.10",
+     "title": "0"
+    },
+    "proximity": {
+     "5": "1.00",
+     "4": "0.75",
+     "3": "0.55",
+     "2": "0.40",
+     "1": "0.15",
+     "0": "0",
+     "related": "0.60"
+    },
+    "strength_weights": {
+     "required": "1.0",
+     "preferred": "0.5",
+     "asset": "0.25"
+    },
+    "internal_schemes": [
+     {
+      "scheme": "JOB_FAMILY",
+      "kind": "equal",
+      "weight": 1
+     },
+     {
+      "scheme": "GRADE",
+      "kind": "rank",
+      "weight": 1,
+      "range": 10
+     }
+    ],
+    "filters": {
+     "only_available": true,
+     "exclude_self": true
+    },
+    "must_meet_required": true
+   },
+   "expect": {
+    "ranked": [
+     {
+      "id": "NL-012",
+      "total": "17.0",
+      "components": {
+       "internal": "0.5000",
+       "occupation": "0.0000",
+       "requirements": "0.0000",
+       "teer": "0.8000"
+      },
+      "reason_codes": [
+       "DIFFERENT_OCCUPATION",
+       "TEER_DIFFERENT",
+       "REQUIREMENTS_SHARED",
+       "INTERNAL_DIFFERENT",
+       "INTERNAL_MATCH"
+      ]
+     }
+    ],
+    "excluded": [
+     {
+      "id": "H-118",
+      "reason": "MISSING_REQUIRED",
+      "keys": [
+       "screening:vulnerable_sector"
+      ]
+     },
+     {
+      "id": "NL-047",
+      "reason": "MISSING_REQUIRED",
+      "keys": [
+       "registration:early_childhood_educator",
+       "screening:vulnerable_sector"
+      ]
+     },
+     {
+      "id": "NL-031",
+      "reason": "MISSING_REQUIRED",
+      "keys": [
+       "education:bachelor_social_work",
+       "registration:social_worker",
+       "screening:vulnerable_sector"
+      ]
+     },
+     {
+      "id": "H-126",
+      "reason": "MISSING_REQUIRED",
+      "keys": [
+       "education:secondary_school",
+       "screening:vulnerable_sector"
+      ]
+     },
+     {
+      "id": "NL-050",
+      "reason": "NOT_AVAILABLE"
+     }
+    ]
+   }
+  },
+  {
+   "id": "SIM-005",
+   "kind": "rank",
+   "title": "Free-text title only: the score is pg_trgm similarity x 100",
+   "query": {
+    "id": "T",
+    "title": "youth outreach worker"
+   },
+   "candidates": [
+    {
+     "id": "A",
+     "title": "Aboriginal outreach worker",
+     "available": true
+    },
+    {
+     "id": "B",
+     "title": "Youth Worker",
+     "available": true
+    },
+    {
+     "id": "C",
+     "title": "Outreach Coordinator",
+     "available": true
+    }
+   ],
+   "profile": {
+    "code": "title_search",
+    "weights": {
+     "occupation": "0",
+     "teer": "0",
+     "requirements": "0",
+     "internal": "0",
+     "title": "1"
+    },
+    "proximity": {
+     "5": "1.00",
+     "4": "0.75",
+     "3": "0.55",
+     "2": "0.40",
+     "1": "0.15",
+     "0": "0",
+     "related": "0.60"
+    },
+    "strength_weights": {
+     "required": "1.0",
+     "preferred": "0.5",
+     "asset": "0.25"
+    },
+    "internal_schemes": [],
+    "filters": {
+     "only_available": true,
+     "exclude_self": true
+    },
+    "must_meet_required": false
+   },
+   "expect": {
+    "ranked": [
+     {
+      "id": "B",
+      "total": "61.9",
+      "components": {
+       "title": "0.6190"
+      },
+      "reason_codes": [
+       "TITLE_SIMILAR"
+      ]
+     },
+     {
+      "id": "A",
+      "total": "50.0",
+      "components": {
+       "title": "0.5000"
+      },
+      "reason_codes": [
+       "TITLE_SIMILAR"
+      ]
+     },
+     {
+      "id": "C",
+      "total": "27.3",
+      "components": {
+       "title": "0.2727"
+      },
+      "reason_codes": [
+       "TITLE_SIMILAR"
+      ]
+     }
+    ],
+    "excluded": []
+   }
+  },
+  {
+   "id": "TRGM-001",
+   "kind": "trgm",
+   "title": "similarity('youth worker', 'youth care worker') as PostgreSQL computes it",
+   "a": "youth worker",
+   "b": "youth care worker",
+   "expect": "0.7222"
+  },
+  {
+   "id": "TRGM-002",
+   "kind": "trgm",
+   "title": "similarity('Community Support Worker 2', 'Community support worker') as PostgreSQL computes it",
+   "a": "Community Support Worker 2",
+   "b": "Community support worker",
+   "expect": "0.9259"
+  },
+  {
+   "id": "TRGM-003",
+   "kind": "trgm",
+   "title": "similarity('payroll officer', 'pay clerk') as PostgreSQL computes it",
+   "a": "payroll officer",
+   "b": "pay clerk",
+   "expect": "0.1304"
+  },
+  {
+   "id": "TRGM-004",
+   "kind": "trgm",
+   "title": "similarity('youth outreach worker', 'Aboriginal outreach worker') as PostgreSQL computes it",
+   "a": "youth outreach worker",
+   "b": "Aboriginal outreach worker",
+   "expect": "0.5000"
+  },
+  {
+   "id": "TRGM-005",
+   "kind": "trgm",
+   "title": "similarity('youth outreach worker', 'Youth Worker') as PostgreSQL computes it",
+   "a": "youth outreach worker",
+   "b": "Youth Worker",
+   "expect": "0.6190"
+  },
+  {
+   "id": "TRGM-006",
+   "kind": "trgm",
+   "title": "similarity('youth outreach worker', 'Outreach Coordinator') as PostgreSQL computes it",
+   "a": "youth outreach worker",
+   "b": "Outreach Coordinator",
+   "expect": "0.2727"
+  },
+  {
+   "id": "TRGM-007",
+   "kind": "trgm",
+   "title": "similarity('Développeur·se web', 'developpeur web') as PostgreSQL computes it",
+   "a": "Développeur·se web",
+   "b": "developpeur web",
+   "expect": "0.5909"
+  },
+  {
+   "id": "DEPTH-001",
+   "kind": "common_depth",
+   "title": "common depth of 42201 and 42201 in NOC 2021 V1.0",
+   "a": "42201",
+   "b": "42201",
+   "expect": 5
+  },
+  {
+   "id": "DEPTH-002",
+   "kind": "common_depth",
+   "title": "common depth of 42201 and 42202 in NOC 2021 V1.0",
+   "a": "42201",
+   "b": "42202",
+   "expect": 4
+  },
+  {
+   "id": "DEPTH-003",
+   "kind": "common_depth",
+   "title": "common depth of 42201 and 41300 in NOC 2021 V1.0",
+   "a": "42201",
+   "b": "41300",
+   "expect": 1
+  },
+  {
+   "id": "DEPTH-004",
+   "kind": "common_depth",
+   "title": "common depth of 42201 and 44101 in NOC 2021 V1.0",
+   "a": "42201",
+   "b": "44101",
+   "expect": 1
+  },
+  {
+   "id": "DEPTH-005",
+   "kind": "common_depth",
+   "title": "common depth of 42201 and 13102 in NOC 2021 V1.0",
+   "a": "42201",
+   "b": "13102",
+   "expect": 0
+  },
+  {
+   "id": "DEPTH-006",
+   "kind": "common_depth",
+   "title": "common depth of 11200 and 12101 in NOC 2021 V1.0",
+   "a": "11200",
+   "b": "12101",
+   "expect": 1
+  },
+  {
+   "id": "DEPTH-007",
+   "kind": "common_depth",
+   "title": "common depth of 31301 and 31300 in NOC 2021 V1.0",
+   "a": "31301",
+   "b": "31300",
+   "expect": 4
+  }
+ ]
+}

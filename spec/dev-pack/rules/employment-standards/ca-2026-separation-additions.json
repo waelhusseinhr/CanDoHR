@@ -1,0 +1,517 @@
+{
+  "$comment": "Separation, final pay and records values that the module specifications state only in prose (requirements/02, requirements/11, stories/11). Each one is a rule value, never a constant in code. Merged into rules/employment-standards/ca-2026.json as new keys of each jurisdiction in Step 7, with the core HR additions; a tested edition is never edited (AGENTS rule 15). Every entry is verify_at_load: a value given here comes from the specifications and is checked against the statute before activation; null means not yet researched, and CanDo stops with RULE_NOT_VERIFIED rather than assuming anything (docs/22 FB-008).",
+  "version": "2026-10-25",
+  "source_decisions": "Hard-coding review, 25 Oct 2026 (docs/22)",
+  "keys": {
+    "final_pay_deadline": {
+      "meaning": "When final pay is due after employment ends, by who ended it.",
+      "fields": {
+        "employer_ends / employee_quits": "{rule: later_of | within_days | within_hours, days_after_end, hours_after_end, or: next_regular_pay_day}"
+      }
+    },
+    "statutory_severance": {
+      "meaning": "Statutory severance pay, where the jurisdiction has it (separate from notice).",
+      "fields": {
+        "exists": "true | false | null (not researched)",
+        "other fields": "as given per jurisdiction"
+      }
+    },
+    "group_termination": {
+      "meaning": "Thresholds that make terminations a group (mass) termination, with the longer notice and ministry notice they trigger.",
+      "fields": {
+        "thresholds": "[{employees_at_least, within_weeks, notice_weeks, ministry_notice}]"
+      }
+    },
+    "temporary_layoff": {
+      "meaning": "How long a temporary layoff may last before it becomes a termination.",
+      "fields": {
+        "max_weeks": "weeks of layoff",
+        "within_weeks": "in this many consecutive weeks"
+      }
+    },
+    "records_retention": {
+      "meaning": "How long employment and payroll records are kept.",
+      "fields": {
+        "years": "number of years",
+        "from_event": "what the period runs from"
+      }
+    }
+  },
+  "structured_fields": {
+    "$comment": "Fields that replace prose in existing keys of the edition; the prose stays beside them for people to read.",
+    "ON": {
+      "public_holiday_pay": {
+        "lookback_work_weeks": 4,
+        "includes_vacation_pay_in_period": true,
+        "divisor": 20,
+        "status": "verify_at_load"
+      },
+      "pay_transparency": {
+        "applicant_outcome_notice_days": 45,
+        "posting_records_years": 3,
+        "pay_or_range_in_public_postings": true,
+        "ai_use_disclosed": true,
+        "vacancy_status_stated": true,
+        "canadian_experience_requirement_allowed": false,
+        "status": "secondary"
+      }
+    }
+  },
+  "jurisdictions": {
+    "FED": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "exists": true,
+        "rule": "greater_of",
+        "days_wages_per_year_of_service": 2,
+        "minimum_days_wages": 5,
+        "min_service_months": 12,
+        "cite": "Canada Labour Code, s. 235",
+        "from_spec": "requirements/11; stories/11 OFF-003"
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "payroll_records_years": 6,
+        "from_event": "end_of_last_tax_year_they_relate_to",
+        "cite": "Income Tax Act, s. 230(4) (applies to every employer, whatever the employment standards jurisdiction)",
+        "from_spec": "requirements/11 (records after separation)"
+      }
+    },
+    "NL": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "PE": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "NS": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "NB": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "QC": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "ON": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "employer_ends": {
+          "rule": "later_of",
+          "days_after_end": 7,
+          "or": "next_regular_pay_day"
+        },
+        "employee_quits": {
+          "rule": "later_of",
+          "days_after_end": 7,
+          "or": "next_regular_pay_day"
+        },
+        "cite": "Employment Standards Act, 2000, s. 11(5)",
+        "from_spec": "requirements/11; stories/11 OFF-004"
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "exists": true,
+        "weeks_per_year_of_service": 1,
+        "prorated_for_part_years": true,
+        "max_weeks": 26,
+        "min_service_years": 5,
+        "applies_when_any": [
+          {
+            "employer_ontario_payroll_at_least": 2500000
+          },
+          {
+            "qualifying_group_termination": true
+          }
+        ],
+        "cite": "Employment Standards Act, 2000, ss. 63-65",
+        "from_spec": "requirements/11; stories/11 OFF-003"
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "MB": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "SK": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "AB": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "BC": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "employer_ends": {
+          "rule": "within_hours",
+          "hours_after_end": 48
+        },
+        "employee_quits": {
+          "rule": "within_days",
+          "days_after_end": 6
+        },
+        "cite": "Employment Standards Act, RSBC 1996, c. 113, s. 18",
+        "from_spec": "requirements/11; stories/11 OFF-004"
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "YT": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "NT": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    },
+    "NU": {
+      "final_pay_deadline": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "employer_ends": null,
+        "employee_quits": null
+      },
+      "statutory_severance": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "exists": null
+      },
+      "group_termination": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "thresholds": null
+      },
+      "temporary_layoff": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "max_weeks": null,
+        "within_weeks": null
+      },
+      "records_retention": {
+        "status": "verify_at_load",
+        "cite": "Not yet researched",
+        "years": null,
+        "from_event": null
+      }
+    }
+  }
+}

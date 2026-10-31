@@ -1,0 +1,15 @@
+---
+description: Rules for Cloudflare Workers, Durable Objects, Queues, Workflows and Cron Triggers
+globs: apps/**,wrangler.jsonc,**/wrangler.jsonc,infra/**
+alwaysApply: false
+---
+
+Follow `AGENTS.md` rules 9 and 23 to 27, and `docs/02` and `docs/10`.
+
+- Every request handler verifies the Supabase JWT and loads tenant, roles and scopes from `platform.app_user` and `platform.role_grant`. Never trust user metadata in the token.
+- Database access only through `withTenant` over Hyperdrive with caching disabled. Every Hyperdrive configuration is created with caching disabled.
+- The `service_role` secret is bound only to `apps/identity`, which has no Hyperdrive binding.
+- No personal data in R2, Workers KV, Durable Object storage, Queue messages, Workflow step outputs or logs. Documents and generated files go to Supabase Storage.
+- Workers that reach the database carry the placement hint for Supabase's region.
+- Stream large files; split long work into retry-safe Queue messages or Workflow steps; make every consumer idempotent and acknowledge after commit.
+- Secrets come from Workers secrets set by GitHub Actions. Never put a secret in `wrangler.jsonc`, the repository or an `.env` file that is committed.
