@@ -460,5 +460,20 @@ BEGIN
   END LOOP;
 END $$;
 
--- Grants for the finance schema follow 0002_roles: cando_app gets SELECT, INSERT on business
--- tables and SELECT on derived tables; core.org_closure is written only by the rebuild job.
+-- Grants for finance (schema is created here; 0002 runs before this file).
+ALTER ROLE cando_app SET search_path = platform, core, payroll, timeleave, recruit, comp, benefits, talent, offboard, compliance, ref, finance, extensions, public;
+
+GRANT USAGE ON SCHEMA finance TO cando_app, cando_sealer;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA finance TO cando_app;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA finance TO cando_app;
+
+DO $$
+BEGIN
+  EXECUTE 'REVOKE ALL ON SCHEMA finance FROM anon, authenticated';
+  EXECUTE 'REVOKE ALL ON ALL TABLES IN SCHEMA finance FROM anon, authenticated';
+  EXECUTE 'REVOKE ALL ON ALL SEQUENCES IN SCHEMA finance FROM anon, authenticated';
+  EXECUTE 'REVOKE ALL ON ALL FUNCTIONS IN SCHEMA finance FROM anon, authenticated';
+  EXECUTE 'ALTER DEFAULT PRIVILEGES IN SCHEMA finance REVOKE ALL ON TABLES FROM anon, authenticated';
+  EXECUTE 'ALTER DEFAULT PRIVILEGES IN SCHEMA finance REVOKE ALL ON SEQUENCES FROM anon, authenticated';
+  EXECUTE 'ALTER DEFAULT PRIVILEGES IN SCHEMA finance REVOKE ALL ON FUNCTIONS FROM anon, authenticated';
+END $$;

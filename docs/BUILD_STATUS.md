@@ -4,8 +4,8 @@ Following `docs/15-build-plan.md` (October 2026 spec).
 
 | Step | Status | Notes |
 |------|--------|--------|
-| 0 Repository & tooling | **In progress on branch `cursor/step-0-repository-4cf6`** | pnpm monorepo, dev-pack copied to repo root, Worker stubs, CI, platform guards, vinext still at repo root for candohr.ca |
-| 1 Database | **Started** | Supabase migration files copied from `schema/`; apply locally with `supabase start` then `supabase db reset` when Docker is available |
+| 0 Repository & tooling | **Ready for review on `cursor/step-0-repository-4cf6`** | pnpm monorepo, dev-pack at repo root, Worker stubs, platform guards, vinext at repo root for candohr.ca |
+| 1 Database | **CI validates migrations** | All migration files under `supabase/migrations/`; GitHub Actions runs `supabase db reset` + schema smokes (no Docker needed on your PC). Link the CanDo Supabase project with `supabase link` + `supabase db push` when you want the cloud DB to match — do not expose CanDo schemas in the Data API. |
 | 2+ | Not started | |
 
 Spec mirror: `spec/dev-pack/` and `spec/claude/review/`.

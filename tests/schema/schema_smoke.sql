@@ -2,7 +2,7 @@
 -- audit immutability and sealing, pay-run subject leases, rule edition and agreement version immutability.
 -- Run: psql -v ON_ERROR_STOP=1 -f schema/cando_schema.sql && psql -f tests/schema/schema_smoke.sql
 \set ON_ERROR_STOP 1
-CREATE ROLE cando_app LOGIN;
+DO $$ BEGIN CREATE ROLE cando_app LOGIN NOBYPASSRLS; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 GRANT USAGE ON SCHEMA ref, platform, core, payroll TO cando_app;
 GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA platform, core, payroll TO cando_app;
 GRANT SELECT ON ALL TABLES IN SCHEMA ref TO cando_app;

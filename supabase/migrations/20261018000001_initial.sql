@@ -11,9 +11,10 @@
 -- Validated by loading into PostgreSQL 16 (see tests/schema/load_schema.sh).
 -- =====================================================================================
 
-CREATE EXTENSION IF NOT EXISTS btree_gist;
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-CREATE EXTENSION IF NOT EXISTS citext;
+-- Supabase hosts extensions in the `extensions` schema; include it on app role search_path (0002).
+CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA extensions;
 
 CREATE SCHEMA IF NOT EXISTS ref;
 CREATE SCHEMA IF NOT EXISTS platform;
