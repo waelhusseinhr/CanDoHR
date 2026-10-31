@@ -1,0 +1,507 @@
+openapi: 3.1.0
+info:
+  title: CanDo HRIS API — codes, classifications, requirements and similar positions
+  version: 1.0.0-draft
+  description: |
+    Contract for docs/18. Merge these paths and component schemas into api/openapi.yaml in Step 5, in their own
+    pull request. Servers, security, the Idempotency-Key header, RFC 9457 errors and the asOf/knownAt rules are those
+    of api/openapi.yaml. Every write goes through /change-sets; the endpoints below read, search, suggest and score.
+    Reason codes are returned as codes with parameters; the screens translate them into the user's screen language.
+    No endpoint assumes a language, version or profile the caller did not give (docs/22).
+servers:
+  - url: https://api.cando.example/v1
+    description: Production (Canada)
+tags:
+  - name: Codes
+  - name: Classifications
+  - name: Requirements
+  - name: Similar positions
+
+paths:
+  /code-schemes:
+    get:
+      tags: [Codes]
+      operationId: listCodeSchemes
+      summary: Code schemes the tenant uses, in display order
+      parameters:
+        - { name: appliesTo, in: query, schema: { $ref: '#/components/schemas/TargetType' } }
+        - { name: status, in: query, schema: { type: string, enum: [active, retired] } }
+      responses:
+        '200':
+          description: Schemes
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/CodeScheme' } }
+  /code-schemes/{schemeCode}:
+    get:
+      tags: [Codes]
+      operationId: getCodeScheme
+      summary: One scheme with its settings
+      parameters: [ { $ref: '#/components/parameters/SchemeCode' } ]
+      responses:
+        '200':
+          description: Scheme
+          content: { application/json: { schema: { $ref: '#/components/schemas/CodeScheme' } } }
+        '404': { description: Unknown scheme }
+  /code-schemes/{schemeCode}/values:
+    get:
+      tags: [Codes]
+      operationId: listCodeValues
+      summary: Values of a scheme on a date, in the scheme's ordering, with optional search
+      description: For a published scheme this lists the items of the tenant's current version; use /classifications for other versions.
+      parameters:
+        - $ref: '#/components/parameters/SchemeCode'
+        - $ref: '#/components/parameters/AsOf'
+        - { name: q, in: query, description: Text search on code and title, schema: { type: string } }
+        - { name: parent, in: query, description: Children of this code (hierarchical schemes), schema: { type: string } }
+        - { name: lang, in: query, required: true, description: "One of the organization's data languages (BCP 47). A published title that does not exist in it comes back in its published language, marked (docs/22 FB-018)", schema: { $ref: '#/components/schemas/LanguageCode' } }
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Values
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/CodeValue' } }
+                  nextCursor: { type: [string, 'null'] }
+  /classifications/{versionId}/items/{code}:
+    get:
+      tags: [Classifications]
+      operationId: getClassificationItem
+      summary: A published group with its full profile (definition, duties, requirements, examples, exclusions)
+      parameters:
+        - $ref: '#/components/parameters/VersionId'
+        - { name: code, in: path, required: true, schema: { type: string } }
+        - { name: lang, in: query, required: true, description: "One of the organization's data languages (BCP 47). A published title that does not exist in it comes back in its published language, marked (docs/22 FB-018)", schema: { $ref: '#/components/schemas/LanguageCode' } }
+      responses:
+        '200':
+          description: Item
+          content: { application/json: { schema: { $ref: '#/components/schemas/ClassificationItem' } } }
+        '404': { description: Unknown version or code }
+  /classifications/{versionId}/search:
+    get:
+      tags: [Classifications]
+      operationId: searchClassification
+      summary: Title search over official, example, inclusion and index titles (pg_trgm word similarity)
+      parameters:
+        - $ref: '#/components/parameters/VersionId'
+        - { name: q, in: query, required: true, schema: { type: string, minLength: 2 } }
+        - { name: lang, in: query, required: true, description: "One of the organization's data languages (BCP 47). A published title that does not exist in it comes back in its published language, marked (docs/22 FB-018)", schema: { $ref: '#/components/schemas/LanguageCode' } }
+        - { name: broadCategory, in: query, schema: { type: string, pattern: '^[0-9]$' } }
+        - { name: teer, in: query, schema: { type: integer, minimum: 0, maximum: 5 } }
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: One row per code, best match first
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/TitleMatch' } }
+  /{targetType}/{targetId}/codes:
+    get:
+      tags: [Codes]
+      operationId: getEffectiveCodes
+      summary: Effective codes of a target on a date, with the level each one comes from (core.resolve_codes)
+      parameters:
+        - { name: targetType, in: path, required: true, schema: { type: string, enum: [jobs, positions, assignments, people, org-units, locations, requisitions] } }
+        - { name: targetId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/AsOf'
+        - $ref: '#/components/parameters/KnownAt'
+      responses:
+        '200':
+          description: Codes
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/EffectiveCode' } }
+  /{targetType}/{targetId}/code-suggestions:
+    post:
+      tags: [Codes]
+      operationId: suggestCodes
+      summary: Suggest codes for a target from its title, duties text or a structure walk; stored as a code suggestion
+      parameters:
+        - { name: targetType, in: path, required: true, schema: { type: string, enum: [jobs, positions, requisitions] } }
+        - { name: targetId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [schemeCode, method]
+              properties:
+                schemeCode: { type: string, examples: [NOC] }
+                versionId: { type: string, examples: [NOC-2021-1.0] }
+                method: { type: string, enum: [title_index, structure_walk, duties_text, assistant] }
+                title: { type: string }
+                dutiesText: { type: string, description: Used by duties_text and assistant only; never logged }
+      responses:
+        '201':
+          description: Suggestion with ranked candidates; accept it by creating a change set with code.assign
+          content: { application/json: { schema: { $ref: '#/components/schemas/CodeSuggestion' } } }
+        '409': { description: 'ASSISTANT_DISABLED when method is assistant and the tenant has not enabled it' }
+  /jobs/{jobId}/requirements:
+    get:
+      tags: [Requirements]
+      operationId: getJobRequirements
+      summary: Active and proposed requirements of a job
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/AsOf'
+      responses:
+        '200':
+          description: Requirements
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Requirement' } } } }
+  /jobs/{jobId}/requirements/propose:
+    post:
+      tags: [Requirements]
+      operationId: proposeJobRequirements
+      summary: Create a draft change set with requirement proposals from the job's NOC unit group (status proposed)
+      parameters:
+        - { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                versionId: { type: string, examples: [NOC-2021-1.0], description: When not given, the version the organization's scheme uses on the effective date }
+                appliesTo: { type: string, description: 'Sub-group heading from the publication, e.g. "Notaries (Quebec)"' }
+                effectiveFrom: { type: string, format: date }
+      responses:
+        '201':
+          description: Draft change set id and the proposals it holds
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [changeSetId, proposals]
+                properties:
+                  changeSetId: { type: string, format: uuid }
+                  proposals: { type: array, items: { $ref: '#/components/schemas/Requirement' } }
+  /positions/{positionId}/requirements:
+    get:
+      tags: [Requirements]
+      operationId: getPositionRequirements
+      summary: A position's requirements with those inherited from its job and any suppressions
+      parameters:
+        - { name: positionId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/AsOf'
+      responses:
+        '200':
+          description: Requirements, each marked own, inherited or suppressed
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Requirement' } } } }
+  /similar-positions:
+    post:
+      tags: [Similar positions]
+      operationId: findSimilarPositions
+      summary: Rank positions by similarity to a position, job, NOC code, title, person or external code (docs/18 §7)
+      description: |
+        Scores follow reference/position_similarity_reference.py exactly. Results are proposals for a person to review.
+        Candidates are limited to the caller's security scope; reasons never include another position's incumbent or pay.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SimilarityQuery' }
+      responses:
+        '200':
+          description: Ranked candidates and the ones excluded by filters
+          content: { application/json: { schema: { $ref: '#/components/schemas/SimilarityResult' } } }
+        '422': { description: 'NOTHING_TO_COMPARE when the query resolves to no code, requirement or title' }
+  /recoding-campaigns:
+    post:
+      tags: [Classifications]
+      operationId: createRecodingCampaign
+      summary: Start recoding from one version to another (for example NOC 2021 to NOC 2026)
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [schemeCode, fromVersionId, toVersionId, effectiveFrom]
+              properties:
+                schemeCode: { type: string }
+                fromVersionId: { type: string }
+                toVersionId: { type: string }
+                effectiveFrom: { type: string, format: date }
+      responses:
+        '201':
+          description: Campaign created; proposals are built in the background
+          content: { application/json: { schema: { $ref: '#/components/schemas/RecodingCampaign' } } }
+        '409': { description: 'VERSION_NOT_PUBLISHED or CAMPAIGN_ALREADY_OPEN' }
+  /recoding-campaigns/{campaignId}:
+    get:
+      tags: [Classifications]
+      operationId: getRecodingCampaign
+      summary: Campaign progress, counts and the open split decisions
+      parameters:
+        - { name: campaignId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Campaign
+          content: { application/json: { schema: { $ref: '#/components/schemas/RecodingCampaign' } } }
+
+components:
+  parameters:
+    AsOf:
+      name: asOf
+      in: query
+      description: Business date for the read (default today in the legal entity's time zone)
+      schema: { type: string, format: date }
+    KnownAt:
+      name: knownAt
+      in: query
+      description: System time for audit reads
+      schema: { type: string, format: date-time }
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, maxLength: 200 }
+    SchemeCode:
+      name: schemeCode
+      in: path
+      required: true
+      schema: { type: string, examples: [NOC, JOB_FAMILY, SURVEY_A] }
+    VersionId:
+      name: versionId
+      in: path
+      required: true
+      schema: { type: string, examples: [NOC-2021-1.0] }
+
+  schemas:
+    LanguageCode: { type: string, pattern: '^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$', examples: [en, fr, iu] }
+    TargetType:
+      type: string
+      enum: [job, position, assignment, person, org_unit, location, requisition]
+    Reason:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+          enum: [SAME_UNIT_GROUP, SAME_MINOR_GROUP, SAME_SUB_MAJOR_GROUP, SAME_MAJOR_GROUP, SAME_BROAD_CATEGORY, DIFFERENT_OCCUPATION,
+                 NOC_CROSS_REFERENCE, VIA_CORRESPONDENCE, NO_CORRESPONDENCE, TEER_SAME, TEER_DIFFERENT, REQUIREMENTS_SHARED,
+                 INTERNAL_MATCH, INTERNAL_DIFFERENT, TITLE_SIMILAR, TITLE_MATCH, NOT_AVAILABLE, MISSING_REQUIRED, NOTHING_TO_COMPARE]
+        params: { type: object, additionalProperties: true }
+    CodeScheme:
+      type: object
+      required: [code, nameEn, source, purpose, appliesTo, valuesPerTarget, uniqueness, inherit, ordering, status]
+      properties:
+        code: { type: string }
+        nameEn: { type: string }
+        nameFr: { type: [string, 'null'] }
+        source: { type: string, enum: [published, tenant, derived] }
+        refSchemeCode: { type: [string, 'null'] }
+        currentVersionId: { type: [string, 'null'] }
+        acceptedVersionIds: { type: array, items: { type: string } }
+        purpose: { type: string, enum: [occupation, job_family, job_level, pay_grade, salary_survey, department, cost, pay_equity, employment_equity, identifier, external_system, other] }
+        country: { type: [string, 'null'] }
+        structure: { type: string, enum: [flat, hierarchical] }
+        ordering: { type: string, enum: [natural_code, alpha_code, alpha_title, custom_rank, hierarchy] }
+        valuesMode: { type: string, enum: [list, free, list_or_free] }
+        codePattern: { type: [string, 'null'] }
+        codeCase: { type: string, enum: [as_entered, upper] }
+        appliesTo: { type: array, items: { $ref: '#/components/schemas/TargetType' } }
+        requiredOn: { type: array, items: { $ref: '#/components/schemas/TargetType' } }
+        valuesPerTarget: { type: string, enum: [one, many] }
+        sharesTotal100: { type: boolean }
+        uniqueness: { type: string, enum: [none, unique] }
+        inherit: { type: string, enum: [none, down] }
+        overrideNeedsReason: { type: boolean }
+        status: { type: string, enum: [active, retired] }
+        displayOrder: { type: integer }
+    CodeValue:
+      type: object
+      required: [code, titleEn]
+      properties:
+        code: { type: string }
+        parentCode: { type: [string, 'null'] }
+        titleEn: { type: string }
+        titleFr: { type: [string, 'null'] }
+        rank: { type: [integer, 'null'] }
+        level: { type: [string, 'null'], description: Published schemes only }
+        attributes: { type: object, additionalProperties: true }
+        validFrom: { type: string, format: date }
+        validTo: { type: [string, 'null'], format: date }
+    ClassificationItem:
+      type: object
+      required: [versionId, code, level, titleEn]
+      properties:
+        versionId: { type: string }
+        code: { type: string }
+        level: { type: string }
+        parentCode: { type: [string, 'null'] }
+        path: { type: array, items: { type: object, properties: { code: { type: string }, titleEn: { type: string }, titleFr: { type: [string, 'null'] } } } }
+        titleEn: { type: string }
+        titleFr: { type: [string, 'null'] }
+        definitionEn: { type: [string, 'null'] }
+        definitionFr: { type: [string, 'null'] }
+        teer: { type: [integer, 'null'] }
+        exampleTitles: { type: array, items: { type: string } }
+        inclusions: { type: array, items: { type: string } }
+        exclusions: { type: array, items: { type: string } }
+        relatedCodes: { type: array, items: { type: string } }
+        mainDuties: { type: array, items: { type: object, properties: { textEn: { type: string }, appliesTo: { type: [string, 'null'] } } } }
+        employmentRequirements:
+          type: array
+          items:
+            type: object
+            required: [seq, textEn, strength]
+            properties:
+              seq: { type: integer }
+              textEn: { type: string }
+              appliesTo: { type: [string, 'null'] }
+              kinds: { type: array, items: { type: string, enum: [education, training, experience, licence_or_certification, other] } }
+              strength: { type: string, enum: [required, usually_required, may_be_required, unspecified] }
+        additionalInformation: { type: array, items: { type: string } }
+    TitleMatch:
+      type: object
+      required: [code, titleEn, matchedTitle, kind, score]
+      properties:
+        code: { type: string }
+        titleEn: { type: string }
+        matchedTitle: { type: string }
+        kind: { type: string, enum: [official, example, inclusion, index] }
+        score: { type: number, minimum: 0, maximum: 1 }
+        teer: { type: [integer, 'null'] }
+    EffectiveCode:
+      type: object
+      required: [schemeCode, code, originType, originId]
+      properties:
+        schemeCode: { type: string }
+        versionId: { type: [string, 'null'] }
+        code: { type: string }
+        titleEn: { type: string }
+        titleFr: { type: [string, 'null'] }
+        share: { type: [string, 'null'], description: Decimal string, e.g. "60.00" }
+        matchQuality: { type: [string, 'null'], enum: [exact, close, partial, blended, null] }
+        originType: { $ref: '#/components/schemas/TargetType' }
+        originId: { type: string, format: uuid }
+        validFrom: { type: string, format: date }
+        validTo: { type: [string, 'null'], format: date }
+    CodeSuggestion:
+      type: object
+      required: [suggestionId, schemeCode, method, candidates, status]
+      properties:
+        suggestionId: { type: string, format: uuid }
+        schemeCode: { type: string }
+        versionId: { type: [string, 'null'] }
+        method: { type: string }
+        candidates:
+          type: array
+          items:
+            type: object
+            required: [code, score]
+            properties:
+              code: { type: string }
+              titleEn: { type: string }
+              score: { type: number }
+              reasons: { type: array, items: { $ref: '#/components/schemas/Reason' } }
+        status: { type: string, enum: [open, accepted, rejected, superseded, expired] }
+    Requirement:
+      type: object
+      required: [requirementId, kind, strength, textEn, status, source, origin]
+      properties:
+        requirementId: { type: string, format: uuid }
+        kind: { type: string, enum: [education, training, experience, licence, certification, registration, language, security_screening, driver_licence, physical_demand, working_condition, skill, competency, other] }
+        strength: { type: string, enum: [required, preferred, asset] }
+        textEn: { type: string }
+        textFr: { type: [string, 'null'] }
+        matchKey: { type: [string, 'null'] }
+        criteria: { type: object, additionalProperties: true }
+        jurisdictions: { type: [array, 'null'], items: { type: string } }
+        verification: { type: string, enum: [self_declared, document, credential_record, background_check, assessment, none] }
+        satisfiedBy: { type: array, items: { type: object, additionalProperties: true } }
+        rationale: { type: [string, 'null'] }
+        status: { type: string, enum: [proposed, active] }
+        source: { type: string, enum: [noc, job, position, agreement, legislation, manual] }
+        sourceRef: { type: [object, 'null'], additionalProperties: true }
+        origin: { type: string, enum: [own, inherited, suppressed] }
+        validFrom: { type: string, format: date }
+        validTo: { type: [string, 'null'], format: date }
+    SimilarityQuery:
+      type: object
+      required: [profile]
+      properties:
+        positionId: { type: string, format: uuid }
+        jobId: { type: string, format: uuid }
+        code: { type: object, properties: { schemeCode: { type: string }, versionId: { type: string }, code: { type: string } } }
+        title: { type: string }
+        personId: { type: string, format: uuid, description: The person who would move; enables must-meet-required filtering }
+        asOf: { type: string, format: date }
+        profile: { type: string, description: Code of one of the organization's similarity profiles, examples: [default, redeployment, succession, survey_benchmark, duplicate_jobs, title_search] }
+        filters:
+          type: object
+          properties:
+            onlyAvailable: { type: boolean }
+            legalEntityId: { type: string, format: uuid }
+            locationIds: { type: array, items: { type: string, format: uuid } }
+            orgUnitId: { type: string, format: uuid, description: The subtree under this unit }
+        limit: { type: integer, minimum: 1, maximum: 200, default: 20 }
+      anyOf:
+        - required: [positionId]
+        - required: [jobId]
+        - required: [code]
+        - required: [title]
+    SimilarityResult:
+      type: object
+      required: [profile, ranked, excluded]
+      properties:
+        profile: { type: string }
+        ranked:
+          type: array
+          items:
+            type: object
+            required: [positionId, total, components, reasons]
+            properties:
+              positionId: { type: string, format: uuid }
+              positionNumber: { type: string }
+              title: { type: string }
+              total: { type: string, description: 'Score 0 to 100 with one decimal, e.g. "95.5"' }
+              components:
+                type: object
+                properties:
+                  occupation: { type: string }
+                  teer: { type: string }
+                  requirements: { type: string }
+                  internal: { type: string }
+                  title: { type: string }
+              reasons: { type: array, items: { $ref: '#/components/schemas/Reason' } }
+              available: { type: boolean }
+        excluded:
+          type: array
+          items:
+            type: object
+            required: [positionId, reason]
+            properties:
+              positionId: { type: string, format: uuid }
+              reason: { type: string, enum: [NOT_AVAILABLE, MISSING_REQUIRED, NOTHING_TO_COMPARE] }
+              keys: { type: array, items: { type: string } }
+    RecodingCampaign:
+      type: object
+      required: [campaignId, schemeCode, fromVersionId, toVersionId, effectiveFrom, status]
+      properties:
+        campaignId: { type: string, format: uuid }
+        schemeCode: { type: string }
+        fromVersionId: { type: string }
+        toVersionId: { type: string }
+        effectiveFrom: { type: string, format: date }
+        status: { type: string, enum: [draft, proposals_ready, in_review, committed, cancelled] }
+        counts: { type: object, additionalProperties: { type: integer } }
+        changeSetId: { type: [string, 'null'], format: uuid }

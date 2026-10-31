@@ -1,0 +1,1068 @@
+{
+  "description": "Pay composition test cases for reference/premium_stacking_reference.py and the TypeScript engine. Each case starts from version 1 of rules/agreements/example-municipal-agreement.json (Clerk 2 step 3, $30.85/h), applies the overrides (objects merge, lists replace, null removes a key), and composes one block of hours.",
+  "cases": [
+    {
+      "id": "straight-night",
+      "description": "8 straight hours with the night premium",
+      "block": {
+        "hours": "8",
+        "base_rate": "30.85",
+        "sources": [],
+        "premiums": [
+          "SHIFT_NIGHT"
+        ]
+      },
+      "expected": {
+        "multiplier": "1",
+        "total": "260.80",
+        "lines": [
+          [
+            "time",
+            "246.80"
+          ],
+          [
+            "SHIFT_NIGHT",
+            "14.00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "ot-night-flat",
+      "description": "2 h daily overtime at 1.5, night premium flat: 2×30.85×1.5 + 2×1.75",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": [
+          "SHIFT_NIGHT"
+        ]
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "96.05",
+        "lines": [
+          [
+            "time",
+            "92.55"
+          ],
+          [
+            "SHIFT_NIGHT",
+            "3.50"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "ot-night-multiplied",
+      "description": "Same hours, premium multiplied: + 2×1.75×1.5",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": [
+          "SHIFT_NIGHT"
+        ]
+      },
+      "premium_override": {
+        "SHIFT_NIGHT": {
+          "overtime_interaction": "multiplied"
+        }
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "97.80",
+        "lines": [
+          [
+            "time",
+            "92.55"
+          ],
+          [
+            "SHIFT_NIGHT",
+            "5.25"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "ot-night-in-regular-rate",
+      "description": "Premium in the regular rate: 2×(30.85+1.75)×1.5, one line",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": [
+          "SHIFT_NIGHT"
+        ]
+      },
+      "premium_override": {
+        "SHIFT_NIGHT": {
+          "in_regular_rate": true,
+          "overtime_interaction": "multiplied",
+          "holiday_interaction": "multiplied"
+        }
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "97.80",
+        "lines": [
+          [
+            "time",
+            "97.80"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "ot-night-excluded",
+      "description": "Premium not paid on overtime hours",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": [
+          "SHIFT_NIGHT"
+        ]
+      },
+      "premium_override": {
+        "SHIFT_NIGHT": {
+          "overtime_interaction": "excluded"
+        }
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "92.55",
+        "lines": [
+          [
+            "time",
+            "92.55"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "daily-second-tier",
+      "description": "1 h past 11 hours at 2.0, night flat",
+      "block": {
+        "hours": "1",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "daily",
+            "after_hours": 11
+          }
+        ],
+        "premiums": [
+          "SHIFT_NIGHT"
+        ]
+      },
+      "expected": {
+        "multiplier": "2",
+        "total": "63.45",
+        "lines": [
+          [
+            "time",
+            "61.70"
+          ],
+          [
+            "SHIFT_NIGHT",
+            "1.75"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "daily-tier-not-given",
+      "description": "Daily has two tiers; the block must say which",
+      "block": {
+        "hours": "1",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "daily"
+          }
+        ],
+        "premiums": []
+      },
+      "expected": {
+        "error": "AMBIGUOUS_TIER"
+      }
+    },
+    {
+      "id": "holiday-night-flat",
+      "description": "8 h on a holiday at 1.5, night premium flat on holiday hours",
+      "block": {
+        "hours": "8",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          }
+        ],
+        "premiums": [
+          "SHIFT_NIGHT"
+        ]
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "384.20",
+        "lines": [
+          [
+            "time",
+            "370.20"
+          ],
+          [
+            "SHIFT_NIGHT",
+            "14.00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "holiday-7h-rounding",
+      "description": "7 h on a holiday at 1.5: 7×30.85×1.5 = 323.925 rounds half up to 323.93 (TIME-013 AC2)",
+      "block": {
+        "hours": "7",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          }
+        ],
+        "premiums": []
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "323.93",
+        "lines": [
+          [
+            "time",
+            "323.93"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "holiday-night-multiplied",
+      "description": "holiday_interaction governs holiday hours, even when overtime_interaction is flat",
+      "block": {
+        "hours": "8",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          }
+        ],
+        "premiums": [
+          "SHIFT_NIGHT"
+        ]
+      },
+      "premium_override": {
+        "SHIFT_NIGHT": {
+          "holiday_interaction": "multiplied"
+        }
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "391.20",
+        "lines": [
+          [
+            "time",
+            "370.20"
+          ],
+          [
+            "SHIFT_NIGHT",
+            "21.00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "holiday-daily-sum",
+      "description": "Holiday 1.5 and daily overtime 1.5, rule sum_premiums: 1 + 0.5 + 0.5 = 2.0",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          },
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": []
+      },
+      "expected": {
+        "multiplier": "2",
+        "total": "123.40"
+      }
+    },
+    {
+      "id": "holiday-daily-greater",
+      "description": "Same hours, rule greater_of: 1.5",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          },
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": []
+      },
+      "rules_override": {
+        "pay_composition": {
+          "multiplier_conflicts": {
+            "rules": [
+              {
+                "when": [
+                  "holiday",
+                  "daily"
+                ],
+                "resolution": "greater_of",
+                "cite": {
+                  "article": "20.04"
+                },
+                "provenance": {
+                  "extracted_by": "human",
+                  "verified": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "92.55"
+      }
+    },
+    {
+      "id": "holiday-daily-multiply",
+      "description": "Rule multiply: 2.25, and 2×30.85×2.25 = 138.825 rounds half up to 138.83",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          },
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": []
+      },
+      "rules_override": {
+        "pay_composition": {
+          "multiplier_conflicts": {
+            "rules": [
+              {
+                "when": [
+                  "holiday",
+                  "daily"
+                ],
+                "resolution": "multiply",
+                "cite": {
+                  "article": "20.04"
+                },
+                "provenance": {
+                  "extracted_by": "human",
+                  "verified": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "multiplier": "2.25",
+        "total": "138.83"
+      }
+    },
+    {
+      "id": "holiday-daily-multiply-capped",
+      "description": "Rule multiply with multiplier_cap 2.0",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          },
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": []
+      },
+      "rules_override": {
+        "pay_composition": {
+          "multiplier_conflicts": {
+            "rules": [
+              {
+                "when": [
+                  "holiday",
+                  "daily"
+                ],
+                "resolution": "multiply",
+                "cite": {
+                  "article": "20.04"
+                },
+                "provenance": {
+                  "extracted_by": "human",
+                  "verified": true
+                },
+                "multiplier_cap": 2.0
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "multiplier": "2",
+        "total": "123.40"
+      }
+    },
+    {
+      "id": "holiday-second-rest-default",
+      "description": "No exact rule, default greater_of: second rest day 2.0 wins",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          },
+          {
+            "basis": "second_rest_day",
+            "after_hours": 0
+          }
+        ],
+        "premiums": []
+      },
+      "expected": {
+        "multiplier": "2",
+        "total": "123.40"
+      }
+    },
+    {
+      "id": "holiday-second-rest-first-in-order",
+      "description": "Default first_in_order: holiday comes first in evaluation_order, so 1.5",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          },
+          {
+            "basis": "second_rest_day",
+            "after_hours": 0
+          }
+        ],
+        "premiums": []
+      },
+      "rules_override": {
+        "pay_composition": {
+          "multiplier_conflicts": {
+            "default_resolution": "first_in_order"
+          }
+        }
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "92.55"
+      }
+    },
+    {
+      "id": "triple-uses-default",
+      "description": "Holiday + second rest day + daily: the holiday+daily rule matches only that exact pair, so the default applies",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          },
+          {
+            "basis": "second_rest_day",
+            "after_hours": 0
+          },
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": []
+      },
+      "expected": {
+        "multiplier": "2",
+        "total": "123.40"
+      }
+    },
+    {
+      "id": "unresolved-without-default",
+      "description": "No rule for holiday+weekly and no default: refused",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          },
+          {
+            "basis": "weekly",
+            "after_hours": 35
+          }
+        ],
+        "premiums": []
+      },
+      "rules_override": {
+        "pay_composition": {
+          "multiplier_conflicts": {
+            "default_resolution": null
+          }
+        }
+      },
+      "expected": {
+        "error": "UNRESOLVED_INTERACTION"
+      }
+    },
+    {
+      "id": "eve-night-exclusive",
+      "description": "Evening and night both met: exclusive group pays only the higher (night)",
+      "block": {
+        "hours": "8",
+        "base_rate": "30.85",
+        "sources": [],
+        "premiums": [
+          "SHIFT_EVE",
+          "SHIFT_NIGHT"
+        ]
+      },
+      "expected": {
+        "multiplier": "1",
+        "total": "260.80",
+        "lines": [
+          [
+            "time",
+            "246.80"
+          ],
+          [
+            "SHIFT_NIGHT",
+            "14.00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "eve-night-stack-all",
+      "description": "Without the exclusive group, premium_stacking all pays both",
+      "block": {
+        "hours": "8",
+        "base_rate": "30.85",
+        "sources": [],
+        "premiums": [
+          "SHIFT_EVE",
+          "SHIFT_NIGHT"
+        ]
+      },
+      "rules_override": {
+        "pay_composition": {
+          "exclusive_groups": []
+        }
+      },
+      "expected": {
+        "multiplier": "1",
+        "total": "270.80",
+        "lines": [
+          [
+            "time",
+            "246.80"
+          ],
+          [
+            "SHIFT_EVE",
+            "10.00"
+          ],
+          [
+            "SHIFT_NIGHT",
+            "14.00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "highest-only",
+      "description": "premium_stacking highest_only: evening 1.25 beats language 0.90",
+      "block": {
+        "hours": "8",
+        "base_rate": "30.85",
+        "sources": [],
+        "premiums": [
+          "SHIFT_EVE",
+          "LANG"
+        ]
+      },
+      "rules_override": {
+        "pay_composition": {
+          "premium_stacking": "highest_only",
+          "exclusive_groups": []
+        }
+      },
+      "premium_add": [
+        {
+          "code": "LANG",
+          "type": "language",
+          "amount": {
+            "per_hour": 0.9
+          },
+          "in_regular_rate": false,
+          "overtime_interaction": "flat",
+          "holiday_interaction": "flat",
+          "cite": {
+            "article": "16.08"
+          },
+          "provenance": {
+            "extracted_by": "human",
+            "verified": true
+          }
+        }
+      ],
+      "expected": {
+        "multiplier": "1",
+        "total": "256.80",
+        "lines": [
+          [
+            "time",
+            "246.80"
+          ],
+          [
+            "SHIFT_EVE",
+            "10.00"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "percent-premium-in-regular-rate",
+      "description": "Lead hand 5% in the regular rate: 2×(30.85×1.05)×1.5 = 97.1775 → 97.18",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "daily",
+            "after_hours": 7
+          }
+        ],
+        "premiums": [
+          "LEAD"
+        ]
+      },
+      "premium_add": [
+        {
+          "code": "LEAD",
+          "type": "lead_hand",
+          "amount": {
+            "percent_of_rate": 5
+          },
+          "in_regular_rate": true,
+          "overtime_interaction": "multiplied",
+          "holiday_interaction": "multiplied",
+          "cite": {
+            "article": "16.09"
+          },
+          "provenance": {
+            "extracted_by": "human",
+            "verified": true
+          }
+        }
+      ],
+      "expected": {
+        "multiplier": "1.5",
+        "total": "97.18",
+        "lines": [
+          [
+            "time",
+            "97.18"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "statute-floor",
+      "description": "An agreement weekly rate of 1.25 is raised to the ES minimum of 1.5 for those hours",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "weekly",
+            "after_hours": 35
+          }
+        ],
+        "premiums": [],
+        "statutory_minimum_multiplier": "1.5"
+      },
+      "rules_override": {
+        "overtime": {
+          "thresholds": [
+            {
+              "basis": "daily",
+              "after_hours": 7,
+              "multiplier": 1.5
+            },
+            {
+              "basis": "daily",
+              "after_hours": 11,
+              "multiplier": 2.0
+            },
+            {
+              "basis": "weekly",
+              "after_hours": 35,
+              "multiplier": 1.25
+            },
+            {
+              "basis": "second_rest_day",
+              "after_hours": 0,
+              "multiplier": 2.0
+            }
+          ]
+        }
+      },
+      "expected": {
+        "multiplier": "1.5",
+        "total": "92.55"
+      }
+    },
+    {
+      "id": "per-shift-premium-in-block",
+      "description": "Standby is paid per shift by the time engine, never per hour",
+      "block": {
+        "hours": "8",
+        "base_rate": "30.85",
+        "sources": [],
+        "premiums": [
+          "STANDBY"
+        ]
+      },
+      "expected": {
+        "error": "NOT_AN_HOURLY_PREMIUM"
+      }
+    },
+    {
+      "id": "source-not-in-agreement",
+      "description": "The example agreement has no rest_day threshold",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "rest_day",
+            "after_hours": 0
+          }
+        ],
+        "premiums": []
+      },
+      "expected": {
+        "error": "UNKNOWN_SOURCE"
+      }
+    },
+    {
+      "id": "first-in-order-without-order",
+      "description": "first_in_order but the agreement gives no evaluation_order: CanDo never picks an order itself",
+      "block": {
+        "hours": "2",
+        "base_rate": "30.85",
+        "sources": [
+          {
+            "basis": "holiday"
+          },
+          {
+            "basis": "second_rest_day",
+            "after_hours": 0
+          }
+        ],
+        "premiums": []
+      },
+      "rules_override": {
+        "pay_composition": {
+          "evaluation_order": null,
+          "multiplier_conflicts": {
+            "default_resolution": "first_in_order"
+          }
+        }
+      },
+      "expected": {
+        "error": "UNRESOLVED_INTERACTION"
+      }
+    }
+  ],
+  "validation_cases": [
+    {
+      "id": "example-as-published",
+      "description": "The example agreement version 1 is complete",
+      "expected_problems": []
+    },
+    {
+      "id": "no-default",
+      "description": "Without default_resolution, every combination that can occur needs its own rule (daily and weekly never meet: no pyramiding)",
+      "rules_override": {
+        "pay_composition": {
+          "multiplier_conflicts": {
+            "default_resolution": null,
+            "default_cite": null
+          }
+        }
+      },
+      "expected_problems": [
+        [
+          "UNRESOLVED_INTERACTION",
+          "daily+second_rest_day"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "weekly+second_rest_day"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "weekly+holiday"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "second_rest_day+holiday"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "daily+second_rest_day+holiday"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "weekly+second_rest_day+holiday"
+        ]
+      ]
+    },
+    {
+      "id": "no-default-with-pyramiding",
+      "description": "If daily overtime hours also count toward weekly, daily and weekly can meet, so four more combinations need rules",
+      "rules_override": {
+        "pay_composition": {
+          "multiplier_conflicts": {
+            "default_resolution": null,
+            "default_cite": null
+          },
+          "hours_counting": {
+            "daily_overtime_counts_toward_weekly": true
+          }
+        }
+      },
+      "expected_problems": [
+        [
+          "UNRESOLVED_INTERACTION",
+          "daily+weekly"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "daily+second_rest_day"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "weekly+second_rest_day"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "weekly+holiday"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "second_rest_day+holiday"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "daily+weekly+second_rest_day"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "daily+weekly+holiday"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "daily+second_rest_day+holiday"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "weekly+second_rest_day+holiday"
+        ],
+        [
+          "UNRESOLVED_INTERACTION",
+          "daily+weekly+second_rest_day+holiday"
+        ]
+      ]
+    },
+    {
+      "id": "regular-rate-but-flat",
+      "description": "A premium in the regular rate cannot be flat on overtime",
+      "premium_override": {
+        "SHIFT_NIGHT": {
+          "in_regular_rate": true
+        }
+      },
+      "expected_problems": [
+        [
+          "INCONSISTENT_INTERACTION",
+          "SHIFT_NIGHT is in the regular rate, so it is always multiplied"
+        ]
+      ]
+    },
+    {
+      "id": "missing-interaction",
+      "description": "Every hourly premium states its holiday interaction",
+      "premium_override": {
+        "SHIFT_EVE": {
+          "holiday_interaction": null
+        }
+      },
+      "expected_problems": [
+        [
+          "MISSING_INTERACTION",
+          "SHIFT_EVE.holiday_interaction"
+        ]
+      ]
+    },
+    {
+      "id": "ambiguous-holiday",
+      "description": "A holiday threshold that disagrees with holidays.worked_multiplier",
+      "rules_override": {
+        "overtime": {
+          "thresholds": [
+            {
+              "basis": "daily",
+              "after_hours": 7,
+              "multiplier": 1.5
+            },
+            {
+              "basis": "daily",
+              "after_hours": 11,
+              "multiplier": 2.0
+            },
+            {
+              "basis": "weekly",
+              "after_hours": 35,
+              "multiplier": 1.5
+            },
+            {
+              "basis": "second_rest_day",
+              "after_hours": 0,
+              "multiplier": 2.0
+            },
+            {
+              "basis": "holiday",
+              "after_hours": 0,
+              "multiplier": 2.0
+            }
+          ]
+        }
+      },
+      "expected_problems": [
+        [
+          "AMBIGUOUS_HOLIDAY_MULTIPLIER",
+          "overtime.thresholds[holiday] and holidays.worked_multiplier disagree"
+        ]
+      ]
+    },
+    {
+      "id": "rule-for-undefined-source",
+      "description": "A conflict rule naming a source this version does not define is a sign of a wrong extraction",
+      "rules_override": {
+        "pay_composition": {
+          "multiplier_conflicts": {
+            "rules": [
+              {
+                "when": [
+                  "holiday",
+                  "daily"
+                ],
+                "resolution": "sum_premiums",
+                "cite": {
+                  "article": "20.04"
+                },
+                "provenance": {
+                  "extracted_by": "human",
+                  "verified": true
+                },
+                "multiplier_cap": 2.5
+              },
+              {
+                "when": [
+                  "rest_day",
+                  "daily"
+                ],
+                "resolution": "greater_of",
+                "cite": {
+                  "article": "15.06"
+                },
+                "provenance": {
+                  "extracted_by": "human",
+                  "verified": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      "expected_problems": [
+        [
+          "UNKNOWN_SOURCE",
+          "rules[1] names rest_day, which this version does not define"
+        ]
+      ]
+    },
+    {
+      "id": "first-in-order-without-order",
+      "description": "A version that resolves conflicts by first_in_order must give its evaluation_order",
+      "rules_override": {
+        "pay_composition": {
+          "evaluation_order": null,
+          "multiplier_conflicts": {
+            "default_resolution": "first_in_order"
+          }
+        }
+      },
+      "expected_problems": [
+        [
+          "UNRESOLVED_INTERACTION",
+          "default first_in_order without an order for every source"
+        ]
+      ]
+    }
+  ]
+}

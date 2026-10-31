@@ -1,0 +1,95 @@
+# CanDo domain events (AsyncAPI 3.0 style). Delivered in-process from the outbox and to customer webhooks.
+asyncapi: 3.0.0
+info:
+  title: CanDo HRIS events
+  version: 1.0.0-draft
+  description: |
+    Every event uses the same envelope. Sensitive values (SIN, banking, pay amounts, health, self-identification)
+    are never included; subscribers call the API with their own permissions for details.
+    Events for one subject are delivered in commit order. Subscribers must be idempotent on eventId.
+channels:
+  domainEvents:
+    address: cando.events
+    messages:
+      personCreated: { $ref: '#/components/messages/personCreated' }
+      personUpdated: { $ref: '#/components/messages/personUpdated' }
+      employmentHired: { $ref: '#/components/messages/employmentHired' }
+      employmentStatusChanged: { $ref: '#/components/messages/employmentStatusChanged' }
+      employmentTerminated: { $ref: '#/components/messages/employmentTerminated' }
+      assignmentChanged: { $ref: '#/components/messages/assignmentChanged' }
+      positionChanged: { $ref: '#/components/messages/positionChanged' }
+      positionVacated: { $ref: '#/components/messages/positionVacated' }
+      orgChanged: { $ref: '#/components/messages/orgChanged' }
+      rateChanged: { $ref: '#/components/messages/rateChanged' }
+      agreementVersionActivated: { $ref: '#/components/messages/agreementVersionActivated' }
+      timeApproved: { $ref: '#/components/messages/timeApproved' }
+      timeCorrected: { $ref: '#/components/messages/timeCorrected' }
+      leaveApproved: { $ref: '#/components/messages/leaveApproved' }
+      benefitEnrolled: { $ref: '#/components/messages/benefitEnrolled' }
+      payrunFinalized: { $ref: '#/components/messages/payrunFinalized' }
+      paymentReleased: { $ref: '#/components/messages/paymentReleased' }
+      retroRequested: { $ref: '#/components/messages/retroRequested' }
+      ruleEditionLoaded: { $ref: '#/components/messages/ruleEditionLoaded' }
+operations:
+  publishDomainEvents:
+    action: send
+    channel: { $ref: '#/channels/domainEvents' }
+components:
+  schemas:
+    Envelope:
+      type: object
+      required: [eventId, type, version, tenantId, occurredAt, subject, changeSetId]
+      properties:
+        eventId: { type: string, format: uuid }
+        type: { type: string }
+        version: { type: integer }
+        tenantId: { type: string, format: uuid }
+        occurredAt: { type: string, format: date-time }
+        effectiveDate: { type: string, format: date }
+        changeSetId: { type: string, format: uuid }
+        subject:
+          type: object
+          required: [type, id]
+          properties:
+            type: { type: string }
+            id: { type: string }
+            employmentId: { type: string, format: uuid }
+            personId: { type: string, format: uuid }
+        changes:
+          description: 'Changed field names with from and to values for non-sensitive fields; sensitive fields appear only as {"changed": true}'
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              from: {}
+              to: {}
+              changed: { type: boolean }
+        derived:
+          description: Derived values that changed as a consequence (taxProvince, esJurisdiction, holidayCalendar, managerAssignmentId)
+          type: object
+          additionalProperties: true
+        actor:
+          type: object
+          properties:
+            type: { enum: [user, system, assistant, integration] }
+            id: { type: string }
+  messages:
+    personCreated: { name: person.created, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Subscribers: directory, IdP sync, analytics' }
+    personUpdated: { name: person.updated, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Legal name changes also flag the current-year T4 name' }
+    employmentHired: { name: employment.hired, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Payroll setup, benefits eligibility, onboarding plan, IdP provisioning, schedule' }
+    employmentStatusChanged: { name: employment.status_changed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Probation, conversion, leave start/end; ROE trigger on interruption of earnings' }
+    employmentTerminated: { name: employment.terminated, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Final pay, ROE, coverage end, deprovisioning at the configured time' }
+    assignmentChanged: { name: assignment.changed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Payroll inputs, time approver and rules, benefits class, org chart push' }
+    positionChanged: { name: position.changed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Org chart push, workforce plan' }
+    positionVacated: { name: position.vacated, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Backfill prompt, requisition suggestion' }
+    orgChanged: { name: org.changed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Units moved or reporting lines changed; chart refresh and approval rerouting' }
+    rateChanged: { name: rate.changed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Amounts are not in the event; payroll reads the rate' }
+    agreementVersionActivated: { name: agreement.version_activated, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Rules cache invalidation; retro requests when retro_from is set' }
+    timeApproved: { name: time.approved, payload: { $ref: '#/components/schemas/Envelope' } }
+    timeCorrected: { name: time.corrected, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Locked-period correction; payroll creates a retro request' }
+    leaveApproved: { name: leave.approved, payload: { $ref: '#/components/schemas/Envelope' } }
+    benefitEnrolled: { name: benefit.enrolled, payload: { $ref: '#/components/schemas/Envelope' } }
+    payrunFinalized: { name: payrun.finalized, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'GL export, remittances, statements, analytics' }
+    paymentReleased: { name: payment.released, payload: { $ref: '#/components/schemas/Envelope' } }
+    retroRequested: { name: retro.requested, payload: { $ref: '#/components/schemas/Envelope' } }
+    ruleEditionLoaded: { name: rule_edition.loaded, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Compliance dashboard; payroll pre-run checks' }

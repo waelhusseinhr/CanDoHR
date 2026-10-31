@@ -1,0 +1,126 @@
+{
+  "id": "CA-EMPLOYER-PAYROLL-TAXES-2026",
+  "tax_year": 2026,
+  "verified_on": "2026-10-18",
+  "status_legend": {
+    "official": "Checked against the government publication named in source",
+    "secondary": "Taken from a reputable secondary source; confirm against the official guide before go-live"
+  },
+  "taxes": [
+    {
+      "code": "ON_EHT",
+      "jurisdiction": "ON",
+      "name": "Ontario Employer Health Tax",
+      "base": "Total Ontario remuneration of the employer (associated employers share one exemption)",
+      "exemption": { "amount": 1000000, "eligible_if_group_payroll_at_most": 5000000, "shared_by_associated_employers": true },
+      "rate_by_total_payroll": [
+        { "upto": 200000, "rate": 0.0098 },
+        { "upto": 230000, "rate": 0.01101 },
+        { "upto": 260000, "rate": 0.01223 },
+        { "upto": 290000, "rate": 0.01344 },
+        { "upto": 320000, "rate": 0.01465 },
+        { "upto": 350000, "rate": 0.01586 },
+        { "upto": 380000, "rate": 0.01708 },
+        { "upto": 400000, "rate": 0.01829 },
+        { "upto": null, "rate": 0.0195 }
+      ],
+      "formula": "If eligible: tax = rate(total payroll) * max(0, payroll - exemption). If group payroll > $5M: no exemption.",
+      "filing": "Instalments when payroll exceeds the threshold set by Ontario; annual return by March 15",
+      "status": "secondary",
+      "source": "https://nethris.com/legislation/employer-health-tax/"
+    },
+    {
+      "code": "BC_EHT",
+      "jurisdiction": "BC",
+      "name": "British Columbia Employer Health Tax",
+      "base": "BC remuneration",
+      "general": [
+        { "over": 0, "upto": 1000000, "formula": "0" },
+        { "over": 1000000, "upto": 1500000, "formula": "0.0585 * (payroll - 1000000)" },
+        { "over": 1500000, "upto": null, "formula": "0.0195 * payroll" }
+      ],
+      "charities_and_non_profits_per_location": [
+        { "over": 0, "upto": 1500000, "formula": "0" },
+        { "over": 1500000, "upto": 4500000, "formula": "0.02925 * (payroll - 1500000)" },
+        { "over": 4500000, "upto": null, "formula": "0.0195 * payroll" }
+      ],
+      "filing": "Quarterly instalments above the instalment threshold; annual return by March 31",
+      "status": "secondary",
+      "source": "https://blog.payworks.ca/payroll-tax-provincial-legislation-details-the-rates-exemptions-how-to-make-it-all-a-breeze"
+    },
+    {
+      "code": "MB_HE_LEVY",
+      "jurisdiction": "MB",
+      "name": "Manitoba Health and Post-Secondary Education Tax Levy",
+      "base": "Manitoba remuneration (associated employers share thresholds)",
+      "bands": [
+        { "over": 0, "upto": 2500000, "formula": "0" },
+        { "over": 2500000, "upto": 5000000, "formula": "0.043 * (payroll - 2500000)" },
+        { "over": 5000000, "upto": null, "formula": "0.0215 * payroll" }
+      ],
+      "effective_from": "2026-01-01",
+      "status": "official",
+      "source": "https://www.gov.mb.ca/finance/taxation/pubs/bulletins/2025budget.pdf"
+    },
+    {
+      "code": "NL_HAPSET",
+      "jurisdiction": "NL",
+      "name": "Newfoundland and Labrador Health and Post-Secondary Education Tax",
+      "base": "NL remuneration (associated employers allocate one exemption)",
+      "exemption": 2000000,
+      "rate": 0.02,
+      "formula": "0.02 * max(0, payroll - 2000000)",
+      "status": "secondary",
+      "source": "https://blog.payworks.ca/payroll-tax-provincial-legislation-details-the-rates-exemptions-how-to-make-it-all-a-breeze"
+    },
+    {
+      "code": "QC_HSF",
+      "jurisdiction": "QC",
+      "phase": 2,
+      "name": "Quebec Health Services Fund",
+      "rates": {
+        "primary_and_manufacturing": [
+          { "upto": 1000000, "rate_percent": "1.25" },
+          { "upto": 7499999.99, "rate_percent": "0.7869 + 0.4631 * payroll / 1000000, rounded to 2 decimals" },
+          { "upto": null, "rate_percent": "4.26" }
+        ],
+        "public_sector": [{ "upto": null, "rate_percent": "4.26" }],
+        "other_employers": [
+          { "upto": 1000000, "rate_percent": "1.65" },
+          { "upto": 7499999.99, "rate_percent": "1.2485 + 1.4015 * payroll / 1000000, rounded to 2 decimals" },
+          { "upto": null, "rate_percent": "4.26" }
+        ]
+      },
+      "status": "secondary",
+      "note": "Confirm 2026 rates and the total-payroll thresholds with Revenu Québec before Quebec payroll is switched on.",
+      "source": "https://blog.payworks.ca/payroll-tax-provincial-legislation-details-the-rates-exemptions-how-to-make-it-all-a-breeze"
+    },
+    {
+      "code": "NT_PAYROLL_TAX",
+      "jurisdiction": "NT",
+      "kind": "employee_withholding",
+      "name": "Northwest Territories payroll tax",
+      "rate": 0.02,
+      "base": "Gross remuneration for work performed in the NWT",
+      "on_t4": false,
+      "status": "secondary",
+      "source": "https://help.powerpay.ca/en/Content/YearEnd/YearEndGuide/NorthwestTerrPayrollTax.htm"
+    },
+    {
+      "code": "NU_PAYROLL_TAX",
+      "jurisdiction": "NU",
+      "kind": "employee_withholding",
+      "name": "Nunavut payroll tax",
+      "rate": 0.02,
+      "base": "Gross remuneration for work performed in Nunavut",
+      "on_t4": false,
+      "exemption_note": "Employees who normally work outside Nunavut: verify the $5,000 threshold in the Government of Nunavut payroll tax guide.",
+      "status": "secondary",
+      "source": "https://help.powerpay.ca/en/Content/YearEnd/YearEndGuide/NorthwestTerrPayrollTax.htm"
+    }
+  ],
+  "not_modelled_here": [
+    "Workers' compensation premiums: rate per industry classification per board, loaded per customer account (WSIB, WorkSafeBC, WCB-Alberta, WCB Saskatchewan, WCB Manitoba, WorkSafeNB, WCB Nova Scotia, WCB PEI, WorkplaceNL, CNESST, Yukon WCHSB, WSCC).",
+    "Quebec WSDRF 1% training rule and CNESST labour standards contribution (phase 2)."
+  ]
+}

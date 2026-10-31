@@ -1,0 +1,17 @@
+# CanDo HRIS — local Supabase (Step 0). Business data is not exposed via Data API.
+project_id = "candohr-local"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323

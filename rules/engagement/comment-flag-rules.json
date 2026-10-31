@@ -1,0 +1,94 @@
+{
+ "$comment": "Starter keyword rules that flag open survey comments and feedback-box messages to the HR contact the organization names, with the text and never the writer's identity (docs/31 §3.8). Matching is case-insensitive and on whole words or phrases. Organizations add their own terms; they cannot remove a starter term. Draft: to be reviewed with a clinical adviser (self-harm) and employment counsel (harassment and safety) before Step 17.",
+ "version": "2026-10-30",
+ "status": "draft",
+ "categories": {
+  "self_harm": {
+   "en": [
+    "suicide",
+    "suicidal",
+    "kill myself",
+    "end my life",
+    "self-harm",
+    "hurt myself",
+    "no reason to live"
+   ],
+   "fr": [
+    "suicide",
+    "suicidaire",
+    "me tuer",
+    "en finir",
+    "automutilation",
+    "me faire du mal",
+    "plus de raison de vivre"
+   ]
+  },
+  "harassment": {
+   "en": [
+    "harass",
+    "harassment",
+    "bully",
+    "bullying",
+    "assault",
+    "threaten",
+    "threatening",
+    "sexual comments",
+    "touched me"
+   ],
+   "fr": [
+    "harcèlement",
+    "harceler",
+    "intimidation",
+    "intimider",
+    "agression",
+    "menace",
+    "menacer",
+    "commentaires sexuels",
+    "m'a touché"
+   ]
+  },
+  "safety": {
+   "en": [
+    "unsafe",
+    "injury",
+    "injured",
+    "hazard",
+    "violence",
+    "violent",
+    "weapon",
+    "near miss"
+   ],
+   "fr": [
+    "dangereux",
+    "blessure",
+    "blessé",
+    "danger",
+    "violence",
+    "violent",
+    "arme",
+    "quasi-accident"
+   ]
+  }
+ },
+ "crisis_resources": [
+  {
+   "name_en": "9-8-8 Suicide Crisis Helpline",
+   "name_fr": "Ligne d'aide en cas de crise de suicide 9-8-8",
+   "contact": "Call or text 9-8-8, any time",
+   "url": "https://988.ca",
+   "status": "verify_at_load"
+  },
+  {
+   "name_en": "Hope for Wellness Help Line (First Nations, Inuit and Métis)",
+   "name_fr": "Ligne d'écoute d'espoir pour le mieux-être (Premières Nations, Inuits et Métis)",
+   "contact": "1-855-242-3310, any time",
+   "url": "https://www.hopeforwellness.ca",
+   "status": "verify_at_load"
+  }
+ ],
+ "shown_on_every_survey": [
+  "The speak-up channel (Module 13)",
+  "The crisis resources above",
+  "The organization's EAP from the wellbeing hub"
+ ]
+}

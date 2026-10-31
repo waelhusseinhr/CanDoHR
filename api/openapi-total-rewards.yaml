@@ -1,0 +1,1060 @@
+openapi: 3.1.0
+info:
+  title: CanDo HRIS API — competencies, job evaluation, salary surveys, market pricing, structures and practice benchmarking
+  version: 1.0.0-draft
+  description: |
+    Contract for docs/19. Merge these paths and component schemas into api/openapi.yaml in Step 15, in their own
+    pull request. Servers, security, the Idempotency-Key header, RFC 9457 errors and the asOf/knownAt rules are those
+    of api/openapi.yaml. Changes to jobs, positions, targets, survey matches, grades and ranges are committed through
+    /change-sets; endpoints here that propose such changes return the change set they created.
+    Survey data endpoints require the survey's access role (survey_data:<survey code>) in addition to the endpoint's
+    role; the database enforces the same rule (docs/19 §12). Amounts are decimal strings.
+servers:
+  - url: https://api.cando.example/v1
+    description: Production (Canada)
+tags:
+  - name: Competencies
+  - name: Job evaluation
+  - name: Surveys
+  - name: Market pricing
+  - name: Pay structures
+  - name: Practices
+  - name: Survey participation
+  - name: Public wages
+
+paths:
+  # ------------------------------------------------------------------ Competencies (§4)
+  /competency-frameworks:
+    get:
+      tags: [Competencies]
+      operationId: listCompetencyFrameworks
+      summary: Frameworks with their versions and statuses
+      responses:
+        '200':
+          description: Frameworks
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/CompetencyFramework' } }
+  /competency-frameworks/{frameworkCode}/versions/{label}:
+    get:
+      tags: [Competencies]
+      operationId: getCompetencyFrameworkVersion
+      summary: One version with its scale, competencies and indicators
+      parameters: [ { $ref: '#/components/parameters/FrameworkCode' }, { $ref: '#/components/parameters/Label' }, { $ref: '#/components/parameters/Lang' } ]
+      responses:
+        '200':
+          description: Version
+          content: { application/json: { schema: { $ref: '#/components/schemas/CompetencyFrameworkVersion' } } }
+        '404': { description: Unknown framework or version }
+  /competency-frameworks/{frameworkCode}/versions/{label}/publish:
+    post:
+      tags: [Competencies]
+      operationId: publishCompetencyFrameworkVersion
+      summary: Publish a draft version; refused while any competency's indicators are proposed
+      parameters: [ { $ref: '#/components/parameters/FrameworkCode' }, { $ref: '#/components/parameters/Label' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      responses:
+        '200':
+          description: Published; proposals to move targets from the previous version are returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version: { $ref: '#/components/schemas/CompetencyFrameworkVersion' }
+                  targetMoveChangeSetId: { type: [string, 'null'], format: uuid }
+        '409': { $ref: '#/components/responses/Refused' }
+  /{targetType}/{targetId}/competency-targets:
+    get:
+      tags: [Competencies]
+      operationId: listCompetencyTargets
+      summary: Effective targets of a job or position on a date, with where each comes from
+      parameters:
+        - { name: targetType, in: path, required: true, schema: { type: string, enum: [jobs, positions] } }
+        - { name: targetId, in: path, required: true, schema: { type: string, format: uuid } }
+        - $ref: '#/components/parameters/AsOf'
+      responses:
+        '200':
+          description: Targets
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/CompetencyTarget' } }
+  /jobs/{jobId}/competency-targets/propose:
+    post:
+      tags: [Competencies]
+      operationId: proposeCompetencyTargets
+      summary: Propose targets from the job's career level defaults (§4.3); nothing is active until the change set is approved
+      parameters: [ { $ref: '#/components/parameters/JobId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [frameworkCode, effectiveFrom]
+              properties:
+                frameworkCode: { type: string, examples: [UCM] }
+                effectiveFrom: { type: string, format: date }
+      responses:
+        '201':
+          description: Proposed targets in a draft change set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  changeSetId: { type: string, format: uuid }
+                  proposed: { type: array, items: { $ref: '#/components/schemas/CompetencyTarget' } }
+  /people/{personId}/competency-assessments:
+    post:
+      tags: [Competencies]
+      operationId: createCompetencyAssessment
+      summary: Record an assessment (draft or final); a correction names the assessment it supersedes
+      parameters: [ { name: personId, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CompetencyAssessmentInput' } } }
+      responses:
+        '201':
+          description: Assessment
+          content: { application/json: { schema: { $ref: '#/components/schemas/CompetencyAssessment' } } }
+        '409': { $ref: '#/components/responses/Refused' }
+  /assignments/{assignmentId}/competency-gaps:
+    get:
+      tags: [Competencies]
+      operationId: getCompetencyGaps
+      summary: Gaps against the position's targets on a date (§4.6)
+      parameters:
+        - $ref: '#/components/parameters/AssignmentId'
+        - $ref: '#/components/parameters/AsOf'
+        - { name: includeSelf, in: query, description: Count self-assessments as well, schema: { type: boolean, default: false } }
+      responses:
+        '200':
+          description: Gaps
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/CompetencyGap' } }
+
+  # ------------------------------------------------------------------ Job evaluation (§5)
+  /je-plans:
+    get:
+      tags: [Job evaluation]
+      operationId: listJobEvaluationPlans
+      summary: Plans with versions, factors, degrees and grade bands
+      responses:
+        '200':
+          description: Plans
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/JobEvaluationPlan' } }
+  /je-plans/{planCode}/versions/{label}/publish:
+    post:
+      tags: [Job evaluation]
+      operationId: publishJobEvaluationPlanVersion
+      summary: Publish a draft plan version after the validation in §5.1
+      parameters: [ { $ref: '#/components/parameters/PlanCode' }, { $ref: '#/components/parameters/Label' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                genderNeutralReview:
+                  type: object
+                  required: [reviewedOn, reviewedBy]
+                  properties:
+                    reviewedOn: { type: string, format: date }
+                    reviewedBy: { type: array, items: { type: string } }
+                    findings: { type: string }
+      responses:
+        '200': { description: Published }
+        '409': { $ref: '#/components/responses/Refused' }
+  /job-evaluations:
+    post:
+      tags: [Job evaluation]
+      operationId: createJobEvaluation
+      summary: Start an evaluation of a job (or a position) under a published plan version
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jobId, planCode, planVersion, effectiveFrom]
+              properties:
+                jobId: { type: string, format: uuid }
+                positionId: { type: string, format: uuid }
+                planCode: { type: string, examples: [CANDO-PF] }
+                planVersion: { type: string, examples: ['2026.10'] }
+                effectiveFrom: { type: string, format: date }
+                supersedesEvaluationId: { type: string, format: uuid }
+                jobDescriptionRef: { type: object, additionalProperties: true }
+                evaluatorIds: { type: array, items: { type: string, format: uuid } }
+      responses:
+        '201':
+          description: Draft evaluation with the evidence and suggested degree ranges per factor
+          content: { application/json: { schema: { $ref: '#/components/schemas/JobEvaluation' } } }
+        '409': { $ref: '#/components/responses/Refused' }
+  /job-evaluations/{evaluationId}:
+    get:
+      tags: [Job evaluation]
+      operationId: getJobEvaluation
+      summary: An evaluation with ratings, evidence and suggestions
+      parameters: [ { $ref: '#/components/parameters/EvaluationId' } ]
+      responses:
+        '200':
+          description: Evaluation
+          content: { application/json: { schema: { $ref: '#/components/schemas/JobEvaluation' } } }
+  /job-evaluations/{evaluationId}/ratings/{factorCode}:
+    put:
+      tags: [Job evaluation]
+      operationId: rateJobEvaluationFactor
+      summary: Set the degree for one factor, with a rationale (and a reason when outside the suggestion)
+      parameters: [ { $ref: '#/components/parameters/EvaluationId' }, { name: factorCode, in: path, required: true, schema: { type: string, examples: [K1] } } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [degree, rationale]
+              properties:
+                degree: { type: integer, minimum: 1 }
+                rationale: { type: string, minLength: 1 }
+                outsideReason: { type: string }
+                evidence: { type: object, additionalProperties: true }
+      responses:
+        '200':
+          description: Rating with its points
+          content: { application/json: { schema: { $ref: '#/components/schemas/FactorRating' } } }
+        '409': { $ref: '#/components/responses/Refused' }
+  /job-evaluations/{evaluationId}/submit:
+    post:
+      tags: [Job evaluation]
+      operationId: submitJobEvaluation
+      summary: Send a draft to committee review
+      parameters: [ { $ref: '#/components/parameters/EvaluationId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      responses:
+        '200': { description: In review }
+        '409': { $ref: '#/components/responses/Refused' }
+  /job-evaluations/{evaluationId}/approve:
+    post:
+      tags: [Job evaluation]
+      operationId: approveJobEvaluation
+      summary: Approve; points and grade are computed and a grade change for the job is proposed as a change set
+      parameters: [ { $ref: '#/components/parameters/EvaluationId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                committee:
+                  type: array
+                  items:
+                    type: object
+                    required: [personId, role]
+                    properties:
+                      personId: { type: string, format: uuid }
+                      role: { type: string, enum: [employer, employee, chair, adviser] }
+      responses:
+        '200':
+          description: Approved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  evaluation: { $ref: '#/components/schemas/JobEvaluation' }
+                  gradeChangeSetId: { type: [string, 'null'], format: uuid }
+        '409': { $ref: '#/components/responses/Refused' }
+
+  # ------------------------------------------------------------------ Surveys (§6)
+  /surveys:
+    get:
+      tags: [Surveys]
+      operationId: listSurveys
+      summary: The survey library with licences, editions and whether the caller holds each survey's role
+      responses:
+        '200':
+          description: Surveys
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Survey' } }
+    post:
+      tags: [Surveys]
+      operationId: createSurvey
+      summary: Add a survey; its job catalogue scheme is created with purpose salary_survey
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SurveyInput' } } }
+      responses:
+        '201':
+          description: Survey
+          content: { application/json: { schema: { $ref: '#/components/schemas/Survey' } } }
+  /surveys/{surveyCode}/editions:
+    post:
+      tags: [Surveys]
+      operationId: createSurveyEdition
+      summary: Start loading an edition
+      parameters: [ { $ref: '#/components/parameters/SurveyCode' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SurveyEditionInput' } } }
+      responses:
+        '201':
+          description: Edition in status loading
+          content: { application/json: { schema: { $ref: '#/components/schemas/SurveyEdition' } } }
+  /survey-editions/{editionId}/imports:
+    post:
+      tags: [Surveys]
+      operationId: importSurveyFile
+      summary: Upload one file with an import profile; dryRun validates without loading
+      parameters: [ { $ref: '#/components/parameters/EditionId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, profile, locale]
+              properties:
+                file: { type: string, contentEncoding: binary }
+                profile: { type: string, enum: [wide_stats, long_stats, job_catalogue, cut_dictionary, practice_prevalence] }
+                columnMap: { type: string, description: JSON object overriding the proposed column mapping }
+                locale: { type: string, description: Locale of the file's numbers and dates (BCP 47, for example en-CA or fr-CA), examples: [en-CA, fr-CA] }
+                dryRun: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Import report
+          content: { application/json: { schema: { $ref: '#/components/schemas/ImportReport' } } }
+  /survey-editions/{editionId}/publish:
+    post:
+      tags: [Surveys]
+      operationId: publishSurveyEdition
+      summary: Publish a loaded edition; it becomes read-only and runs on the previous edition are marked stale
+      parameters: [ { $ref: '#/components/parameters/EditionId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      responses:
+        '200': { description: Published }
+        '409': { $ref: '#/components/responses/Refused' }
+  /survey-editions/{editionId}/market-data:
+    get:
+      tags: [Surveys]
+      operationId: listMarketData
+      summary: Published statistics for survey jobs (needs the survey's role); masked values are null
+      parameters:
+        - $ref: '#/components/parameters/EditionId'
+        - { name: jobCode, in: query, schema: { type: string } }
+        - { name: cut, in: query, schema: { type: string } }
+        - { name: element, in: query, schema: { $ref: '#/components/schemas/Element' } }
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Rows
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/MarketDataRow' } }
+        '403': { description: 'SURVEY_ROLE_REQUIRED' }
+  /benchmark-coverage:
+    get:
+      tags: [Surveys]
+      operationId: getBenchmarkCoverage
+      summary: Share of benchmark jobs, positions and incumbents matched, by survey, family and level (§6.3)
+      parameters: [ { $ref: '#/components/parameters/AsOf' }, { name: surveyCode, in: query, schema: { type: string } } ]
+      responses:
+        '200':
+          description: Coverage
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    surveyCode: { type: string }
+                    family: { type: string }
+                    level: { type: string }
+                    jobs: { type: integer }
+                    jobsMatched: { type: integer }
+                    positionsMatched: { type: integer }
+                    incumbentsMatched: { type: integer }
+
+  # ------------------------------------------------------------------ Market pricing (§7)
+  /market-definitions:
+    get:
+      tags: [Market pricing]
+      operationId: listMarketDefinitions
+      summary: Market definitions with their sources
+      responses:
+        '200':
+          description: Definitions
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/MarketDefinition' } }
+    post:
+      tags: [Market pricing]
+      operationId: createMarketDefinition
+      summary: Create a market definition
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/MarketDefinition' } } }
+      responses:
+        '201': { description: Created }
+  /market-pricing-runs:
+    post:
+      tags: [Market pricing]
+      operationId: createMarketPricingRun
+      summary: Price the definition's jobs at a common date; runs in the background
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [definitionCode, asOf]
+              properties:
+                definitionCode: { type: string }
+                asOf: { type: string, format: date }
+                jobIds: { type: array, items: { type: string, format: uuid }, description: Defaults to every job the definition applies to }
+      responses:
+        '202':
+          description: Run created in status draft; poll the run
+          content: { application/json: { schema: { $ref: '#/components/schemas/PricingRun' } } }
+  /market-pricing-runs/{runId}:
+    get:
+      tags: [Market pricing]
+      operationId: getMarketPricingRun
+      summary: Run with per-job results and lineage
+      parameters: [ { $ref: '#/components/parameters/RunId' } ]
+      responses:
+        '200':
+          description: Run
+          content: { application/json: { schema: { $ref: '#/components/schemas/PricingRun' } } }
+  /market-pricing-runs/{runId}/approve:
+    post:
+      tags: [Market pricing]
+      operationId: approveMarketPricingRun
+      summary: Approve a run; the previous approved run of the definition is superseded
+      parameters: [ { $ref: '#/components/parameters/RunId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      responses:
+        '200': { description: Approved }
+        '409': { $ref: '#/components/responses/Refused' }
+
+  # ------------------------------------------------------------------ Pay structures (§7.6 to §7.9)
+  /pay-structures/{structureCode}/versions:
+    post:
+      tags: [Pay structures]
+      operationId: draftPayStructureVersion
+      summary: Draft a version from an approved pricing run and a plan version (market line, grades, ranges), or from market slotting
+      parameters: [ { name: structureCode, in: path, required: true, schema: { type: string } }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [label, validFrom, method]
+              properties:
+                label: { type: string }
+                validFrom: { type: string, format: date }
+                validTo: { type: string, format: date }
+                method: { type: string, enum: [market_line, market_slotting, copy_previous] }
+                pricingRunId: { type: string, format: uuid }
+                planCode: { type: string }
+                planVersion: { type: string }
+                spreads: { type: object, additionalProperties: { $ref: '#/components/schemas/Decimal' }, description: Spread percentage by grade }
+                rounding: { $ref: '#/components/schemas/Decimal' }
+                outlierPct: { $ref: '#/components/schemas/Decimal' }
+                excludeJobs:
+                  type: array
+                  items: { type: object, required: [jobId, reason], properties: { jobId: { type: string, format: uuid }, reason: { type: string } } }
+      responses:
+        '201':
+          description: Draft version with the line, residuals, grades and modelling
+          content: { application/json: { schema: { $ref: '#/components/schemas/PayStructureVersion' } } }
+  /pay-structure-versions/{versionId}/approve:
+    post:
+      tags: [Pay structures]
+      operationId: approvePayStructureVersion
+      summary: Approve; salary ranges are written, compa-ratios recomputed and open requisitions flagged
+      parameters: [ { name: versionId, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      responses:
+        '200': { description: Approved }
+        '409': { $ref: '#/components/responses/Refused' }
+  /assignments/{assignmentId}/pay-position:
+    get:
+      tags: [Pay structures]
+      operationId: getPayPosition
+      summary: Position in range and against the market for an assignment
+      parameters: [ { $ref: '#/components/parameters/AssignmentId' }, { $ref: '#/components/parameters/AsOf' } ]
+      responses:
+        '200':
+          description: Pay position
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  grade: { type: string }
+                  annualRate: { $ref: '#/components/schemas/Decimal' }
+                  minimum: { $ref: '#/components/schemas/Decimal' }
+                  midpoint: { $ref: '#/components/schemas/Decimal' }
+                  maximum: { $ref: '#/components/schemas/Decimal' }
+                  compaRatio: { $ref: '#/components/schemas/Decimal' }
+                  penetration: { $ref: '#/components/schemas/Decimal' }
+                  quartile: { type: string, enum: [below_minimum, Q1, Q2, Q3, Q4, above_maximum] }
+                  marketRatio: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+
+  # ------------------------------------------------------------------ Practices (§8)
+  /practice-scorecard:
+    get:
+      tags: [Practices]
+      operationId: getPracticeScorecard
+      summary: Own values against market practice for a population (benefit class or agreement)
+      parameters:
+        - { name: population, in: query, required: true, schema: { type: string, examples: [NONUNION] } }
+        - { name: editionId, in: query, schema: { type: string, format: uuid } }
+        - { name: cut, in: query, schema: { type: string } }
+        - $ref: '#/components/parameters/AsOf'
+      responses:
+        '200':
+          description: Scorecard
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/PracticeComparison' } }
+
+  # ------------------------------------------------------------------ Survey participation (§10)
+  /survey-submissions:
+    post:
+      tags: [Survey participation]
+      operationId: prepareSurveySubmission
+      summary: Prepare a submission for a survey's next edition from effective matches, pay and practice values
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [surveyCode, editionLabel, asOf]
+              properties:
+                surveyCode: { type: string }
+                editionLabel: { type: string }
+                asOf: { type: string, format: date }
+                includedFields: { type: array, items: { type: string, examples: [hire_year, bargaining_unit] } }
+                includeVacant: { type: boolean, default: false }
+                privacyApproval: { type: object, additionalProperties: true }
+      responses:
+        '201':
+          description: Draft submission
+          content: { application/json: { schema: { $ref: '#/components/schemas/SurveySubmission' } } }
+        '409': { $ref: '#/components/responses/Refused' }
+  /survey-submissions/{submissionId}:
+    get:
+      tags: [Survey participation]
+      operationId: getSurveySubmission
+      summary: Submission with its rows (pseudonyms only)
+      parameters: [ { $ref: '#/components/parameters/SubmissionId' } ]
+      responses:
+        '200':
+          description: Submission
+          content: { application/json: { schema: { $ref: '#/components/schemas/SurveySubmission' } } }
+  /survey-submissions/{submissionId}/approve:
+    post:
+      tags: [Survey participation]
+      operationId: approveSurveySubmission
+      summary: Approve; rows are frozen
+      parameters: [ { $ref: '#/components/parameters/SubmissionId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      responses:
+        '200': { description: Approved }
+        '409': { $ref: '#/components/responses/Refused' }
+  /survey-submissions/{submissionId}/export:
+    post:
+      tags: [Survey participation]
+      operationId: exportSurveySubmission
+      summary: Produce the file in the survey's requested layout and record its hash
+      parameters:
+        - $ref: '#/components/parameters/SubmissionId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - { name: format, in: query, schema: { type: string, enum: [csv, xlsx], default: xlsx } }
+      responses:
+        '200':
+          description: File
+          headers:
+            X-Content-SHA256: { schema: { type: string } }
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet: { schema: { type: string, contentEncoding: binary } }
+            text/csv: { schema: { type: string } }
+
+  # ------------------------------------------------------------------ Public wages (§6.5)
+  /public-wages:
+    get:
+      tags: [Public wages]
+      operationId: listPublicWages
+      summary: Public wage rows for a NOC code in the latest published edition (or a given one)
+      parameters:
+        - { name: noc, in: query, required: true, schema: { type: string, pattern: '^[0-9]{5}$' } }
+        - { name: geo, in: query, description: Statistics Canada geography code, schema: { type: string, examples: [CA, '59', '5920'] } }
+        - { name: editionId, in: query, schema: { type: string, examples: [JOBBANK-2025-11] } }
+      responses:
+        '200':
+          description: Rows
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/PublicWage' } }
+
+components:
+  parameters:
+    AsOf: { name: asOf, in: query, description: Business date for the read, schema: { type: string, format: date } }
+    Cursor: { name: cursor, in: query, schema: { type: string } }
+    Limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+    Lang: { name: lang, in: query, required: true, description: "One of the organization's data languages (BCP 47); no language is assumed (docs/22 §4)", schema: { type: string, pattern: '^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$' } }
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, maxLength: 200 } }
+    FrameworkCode: { name: frameworkCode, in: path, required: true, schema: { type: string, examples: [UCM] } }
+    PlanCode: { name: planCode, in: path, required: true, schema: { type: string, examples: [CANDO-PF] } }
+    Label: { name: label, in: path, required: true, schema: { type: string } }
+    JobId: { name: jobId, in: path, required: true, schema: { type: string, format: uuid } }
+    AssignmentId: { name: assignmentId, in: path, required: true, schema: { type: string, format: uuid } }
+    EvaluationId: { name: evaluationId, in: path, required: true, schema: { type: string, format: uuid } }
+    SurveyCode: { name: surveyCode, in: path, required: true, schema: { type: string } }
+    EditionId: { name: editionId, in: path, required: true, schema: { type: string, format: uuid } }
+    RunId: { name: runId, in: path, required: true, schema: { type: string, format: uuid } }
+    SubmissionId: { name: submissionId, in: path, required: true, schema: { type: string, format: uuid } }
+
+  responses:
+    Refused:
+      description: Refused by a rule; the problem detail carries the code (for example FRAMEWORK_INDICATORS_PROPOSED, JE_PLAN_GROUP_MISSING, EVALUATION_INCOMPLETE, OUTSIDE_SUGGESTION_NEEDS_REASON, EDITION_IMMUTABLE)
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            required: [type, title, code]
+            properties:
+              type: { type: string }
+              title: { type: string }
+              code: { type: string }
+              params: { type: object, additionalProperties: true }
+
+  schemas:
+    Decimal: { type: string, pattern: '^-?[0-9]+(\.[0-9]+)?$', examples: ['54271.75'] }
+    Statistic: { type: string, enum: [mean, p10, p25, p50, p75, p90] }
+    Element:
+      type: string
+      enum: [base_salary, hourly_rate, range_min, range_mid, range_max, sti_target_pct, sti_actual, sti_actual_pct, sti_eligible, allowances, total_cash, total_direct]
+    Lineage:
+      type: object
+      required: [source, used]
+      properties:
+        source: { type: string }
+        used: { type: boolean }
+        reason: { type: string, enum: [NOT_MATCHED, NO_USABLE_CUT, NO_NOC_CODE, NO_USABLE_GEOGRAPHY, STAT_NOT_PUBLISHED] }
+        cut: { type: string }
+        geo: { type: string }
+        components:
+          type: array
+          items: { type: object, properties: { code: { type: string }, share: { type: number }, nOrgs: { type: integer }, value: { $ref: '#/components/schemas/Decimal' } } }
+        months: { $ref: '#/components/schemas/Decimal' }
+        ageingFactor: { $ref: '#/components/schemas/Decimal' }
+        geoFactor: { $ref: '#/components/schemas/Decimal' }
+        agedTarget: { $ref: '#/components/schemas/Decimal' }
+        weight: { type: number }
+        effectiveWeightPct: { $ref: '#/components/schemas/Decimal' }
+
+    CompetencyFramework:
+      type: object
+      required: [code, nameEn, versions]
+      properties:
+        code: { type: string }
+        nameEn: { type: string }
+        nameFr: { type: [string, 'null'] }
+        versions:
+          type: array
+          items: { type: object, properties: { label: { type: string }, status: { type: string, enum: [draft, published, retired] }, publishedAt: { type: [string, 'null'], format: date-time } } }
+    CompetencyFrameworkVersion:
+      type: object
+      required: [frameworkCode, label, status, scale, competencies]
+      properties:
+        frameworkCode: { type: string }
+        label: { type: string }
+        status: { type: string, enum: [draft, published, retired] }
+        scale:
+          type: array
+          items: { type: object, properties: { level: { type: integer }, code: { type: string }, name: { type: string }, descriptor: { type: string } } }
+        domains: { type: array, items: { type: object, properties: { code: { type: string }, name: { type: string } } } }
+        competencies:
+          type: array
+          items:
+            type: object
+            properties:
+              code: { type: string }
+              domain: { type: string }
+              name: { type: string }
+              definition: { type: string }
+              indicatorsStatus: { type: string, enum: [as_provided, proposed, reviewed] }
+              levels:
+                type: array
+                items: { type: object, properties: { level: { type: integer }, indicators: { type: array, items: { type: string } } } }
+    CompetencyTarget:
+      type: object
+      required: [frameworkCode, competencyCode, requiredLevel, criticality, from]
+      properties:
+        frameworkCode: { type: string }
+        competencyCode: { type: string }
+        requiredLevel: { type: integer }
+        entryLevel: { type: [integer, 'null'] }
+        criticality: { type: string, enum: [critical, important, useful] }
+        status: { type: string, enum: [proposed, active] }
+        source: { type: string, enum: [career_level_default, job, position, manual, assistant] }
+        from: { type: string, enum: [job, position] }
+        reason: { type: [string, 'null'] }
+        validFrom: { type: string, format: date }
+    CompetencyAssessmentInput:
+      type: object
+      required: [frameworkCode, frameworkVersion, competencyCode, assessedLevel, source, context, assessedOn]
+      properties:
+        frameworkCode: { type: string }
+        frameworkVersion: { type: string }
+        competencyCode: { type: string }
+        assessedLevel: { type: integer, minimum: 1 }
+        source: { type: string, enum: [self, manager, peer_360, assessment, evidence, calibrated] }
+        context: { type: string, enum: [performance_review, development, promotion, succession, selection, probation, other] }
+        assessedOn: { type: string, format: date }
+        reviewId: { type: string, format: uuid }
+        evidence: { type: array, items: { type: object, additionalProperties: true } }
+        comment: { type: string }
+        final: { type: boolean, default: false }
+        supersedesAssessmentId: { type: string, format: uuid }
+    CompetencyAssessment:
+      allOf:
+        - $ref: '#/components/schemas/CompetencyAssessmentInput'
+        - type: object
+          properties:
+            assessmentId: { type: string, format: uuid }
+            status: { type: string, enum: [draft, final, superseded] }
+            finalizedAt: { type: [string, 'null'], format: date-time }
+    CompetencyGap:
+      type: object
+      required: [competencyCode, requiredLevel]
+      properties:
+        frameworkCode: { type: string }
+        competencyCode: { type: string }
+        requiredLevel: { type: integer }
+        entryLevel: { type: [integer, 'null'] }
+        criticality: { type: string }
+        targetFrom: { type: string, enum: [job, position] }
+        assessedLevel: { type: [integer, 'null'] }
+        assessedOn: { type: [string, 'null'], format: date }
+        assessmentSource: { type: [string, 'null'] }
+        selfLevel: { type: [integer, 'null'] }
+        gap: { type: [integer, 'null'] }
+
+    JobEvaluationPlan:
+      type: object
+      required: [code, method, purposes, versions]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        method: { type: string, enum: [point_factor, classification, ranking, market_slotting] }
+        purposes: { type: array, items: { type: string, enum: [grading, pay_equity] } }
+        versions:
+          type: array
+          items:
+            type: object
+            properties:
+              label: { type: string }
+              status: { type: string, enum: [draft, published, retired] }
+              maxPoints: { type: integer }
+              gradeBands: { type: array, items: { type: object, properties: { grade: { type: string }, min: { type: integer }, max: { type: integer } } } }
+              factors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code: { type: string }
+                    group: { type: string, enum: [skill, effort, responsibility, working_conditions] }
+                    name: { type: string }
+                    maxPoints: { type: integer }
+                    degrees: { type: array, items: { type: object, properties: { degree: { type: integer }, points: { type: integer }, descriptor: { type: string } } } }
+    FactorRating:
+      type: object
+      required: [factorCode, degree, points, rationale]
+      properties:
+        factorCode: { type: string }
+        degree: { type: integer }
+        points: { type: integer }
+        rationale: { type: string }
+        suggested: { type: [array, 'null'], items: { type: integer }, minItems: 2, maxItems: 2 }
+        outsideReason: { type: [string, 'null'] }
+        evidence: { type: object, additionalProperties: true }
+    JobEvaluation:
+      type: object
+      required: [evaluationId, jobId, planCode, planVersion, status]
+      properties:
+        evaluationId: { type: string, format: uuid }
+        jobId: { type: string, format: uuid }
+        positionId: { type: [string, 'null'], format: uuid }
+        planCode: { type: string }
+        planVersion: { type: string }
+        status: { type: string, enum: [draft, in_review, approved, superseded, withdrawn] }
+        effectiveFrom: { type: string, format: date }
+        totalPoints: { type: [integer, 'null'] }
+        grade: { type: [string, 'null'] }
+        ratings: { type: array, items: { $ref: '#/components/schemas/FactorRating' } }
+        evidence:
+          type: object
+          description: NOC code and TEER, career level, competency targets, requirements and reports shown beside the factors
+          additionalProperties: true
+        reviewFlag: { type: [string, 'null'] }
+        supersedesEvaluationId: { type: [string, 'null'], format: uuid }
+
+    SurveyInput:
+      type: object
+      required: [code, name, publisher, derivedResultsRestricted]
+      properties:
+        code: { type: string, pattern: '^[A-Z0-9_]{2,30}$' }
+        name: { type: string }
+        publisher: { type: string }
+        licence:
+          type: object
+          properties:
+            licensee: { type: string }
+            allowedUses: { type: array, items: { type: string, enum: [internal_pricing, combine_with_other_sources, aggregate_reporting] } }
+            employeesMaySee: { type: boolean, default: false }
+            expiresOn: { type: string, format: date }
+            deleteOnExpiry: { type: boolean, default: false }
+        derivedResultsRestricted: { type: boolean, description: What the licence says about results derived from this survey; stated for every survey (docs/22 §3.2) }
+        dutiesMatchThreshold: { type: number, minimum: 0, maximum: 100, description: When not given, the organization's setting surveys.duties_match_threshold }
+        participates: { type: boolean, default: false }
+    Survey:
+      allOf:
+        - $ref: '#/components/schemas/SurveyInput'
+        - type: object
+          properties:
+            surveyId: { type: string, format: uuid }
+            schemeCode: { type: string }
+            accessRole: { type: string, examples: ['survey_data:SVY_A'] }
+            callerHasAccess: { type: boolean }
+            status: { type: string, enum: [active, expired, retired] }
+            editions: { type: array, items: { $ref: '#/components/schemas/SurveyEdition' } }
+    SurveyEditionInput:
+      type: object
+      required: [label, effectiveDate]
+      properties:
+        label: { type: string, examples: ['2025'] }
+        effectiveDate: { type: string, format: date }
+        publishedOn: { type: string, format: date }
+        currency: { type: string, description: When not given, the organization's setting money.currency }
+        participants: { type: integer }
+        hoursBasis: { $ref: '#/components/schemas/Decimal' }
+        masking: { type: object, additionalProperties: true, examples: [ { p50: { nOrgs: 4 }, p25: { nOrgs: 5 } } ] }
+        weightings: { type: array, items: { type: string, enum: [organization, incumbent, single] } }
+    SurveyEdition:
+      allOf:
+        - $ref: '#/components/schemas/SurveyEditionInput'
+        - type: object
+          properties:
+            editionId: { type: string, format: uuid }
+            status: { type: string, enum: [loading, published, retired] }
+            files: { type: array, items: { type: object, properties: { name: { type: string }, sha256: { type: string }, profile: { type: string } } } }
+    ImportReport:
+      type: object
+      required: [profile, dryRun, rows, errors, warnings]
+      properties:
+        profile: { type: string }
+        dryRun: { type: boolean }
+        columnMap: { type: object, additionalProperties: { type: string } }
+        rows: { type: integer }
+        loaded: { type: integer }
+        sha256: { type: string }
+        errors:
+          type: array
+          items: { type: object, properties: { code: { type: string }, row: { type: integer }, column: { type: string }, params: { type: object, additionalProperties: true } } }
+        warnings:
+          type: array
+          items: { type: object, properties: { code: { type: string }, row: { type: integer }, column: { type: string }, params: { type: object, additionalProperties: true } } }
+    MarketDataRow:
+      type: object
+      required: [jobCode, cut, weighting, element, nOrgs]
+      properties:
+        jobCode: { type: string }
+        cut: { type: string }
+        weighting: { type: string, enum: [organization, incumbent, single] }
+        element: { $ref: '#/components/schemas/Element' }
+        nOrgs: { type: integer }
+        nIncumbents: { type: [integer, 'null'] }
+        mean: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        p10: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        p25: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        p50: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        p75: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        p90: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        maskedFields: { type: array, items: { $ref: '#/components/schemas/Statistic' } }
+
+    MarketDefinition:
+      type: object
+      required: [code, name, statistic, sources]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        appliesTo: { type: object, additionalProperties: true }
+        isDefault: { type: boolean }
+        statistic: { $ref: '#/components/schemas/Statistic' }
+        statistics: { type: array, items: { $ref: '#/components/schemas/Statistic' } }
+        adjustPct: { $ref: '#/components/schemas/Decimal' }
+        minimum: { type: object, properties: { nOrgs: { type: integer }, nIncumbents: { type: integer } } }
+        minSources: { type: integer, minimum: 1, description: When not given, the organization's setting market.default_min_sources }
+        ageing:
+          type: object
+          required: [method]
+          properties:
+            method: { type: string, enum: [none, simple, compound] }
+            annualRate: { $ref: '#/components/schemas/Decimal' }
+        sources:
+          type: array
+          items:
+            type: object
+            required: [kind, weight]
+            properties:
+              kind: { type: string, enum: [survey, public_wage] }
+              editionId: { type: string, format: uuid }
+              publicEditionId: { type: string }
+              weighting: { type: string, enum: [organization, incumbent, single] }
+              element: { $ref: '#/components/schemas/Element' }
+              cutChain: { type: array, items: { type: string } }
+              geoChain: { type: array, items: { type: string } }
+              hoursBasis: { $ref: '#/components/schemas/Decimal' }
+              weight: { type: number, exclusiveMinimum: 0 }
+              geoDifferentialPct: { $ref: '#/components/schemas/Decimal' }
+    PricingRun:
+      type: object
+      required: [runId, definitionCode, asOf, status]
+      properties:
+        runId: { type: string, format: uuid }
+        definitionCode: { type: string }
+        asOf: { type: string, format: date }
+        status: { type: string, enum: [draft, approved, superseded] }
+        stale: { type: boolean }
+        progress: { type: object, properties: { done: { type: integer }, total: { type: integer } } }
+        results:
+          type: array
+          items:
+            type: object
+            required: [jobId, status]
+            properties:
+              jobId: { type: string, format: uuid }
+              status: { type: string, enum: [priced, insufficient_data] }
+              market: { type: object, additionalProperties: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] } }
+              target: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+              lineage: { type: array, items: { $ref: '#/components/schemas/Lineage' } }
+    PayStructureVersion:
+      type: object
+      required: [versionId, structureCode, label, status, grades]
+      properties:
+        versionId: { type: string, format: uuid }
+        structureCode: { type: string }
+        label: { type: string }
+        validFrom: { type: string, format: date }
+        validTo: { type: [string, 'null'], format: date }
+        status: { type: string, enum: [draft, approved, superseded] }
+        marketLine:
+          type: [object, 'null']
+          properties:
+            a: { $ref: '#/components/schemas/Decimal' }
+            b: { $ref: '#/components/schemas/Decimal' }
+            r2: { $ref: '#/components/schemas/Decimal' }
+            progressionPer100Points: { $ref: '#/components/schemas/Decimal' }
+            residuals:
+              type: array
+              items: { type: object, properties: { jobId: { type: string, format: uuid }, points: { type: integer }, value: { $ref: '#/components/schemas/Decimal' }, predicted: { $ref: '#/components/schemas/Decimal' }, residualPct: { $ref: '#/components/schemas/Decimal' }, outlier: { type: boolean } } }
+        grades:
+          type: array
+          items:
+            type: object
+            properties:
+              grade: { type: string }
+              pointsMin: { type: [integer, 'null'] }
+              pointsMax: { type: [integer, 'null'] }
+              minimum: { $ref: '#/components/schemas/Decimal' }
+              midpoint: { $ref: '#/components/schemas/Decimal' }
+              maximum: { $ref: '#/components/schemas/Decimal' }
+              spreadPct: { $ref: '#/components/schemas/Decimal' }
+              progressionPct: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+              overlapWithLowerPct: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        modelling:
+          type: object
+          properties:
+            belowMinimum: { type: integer }
+            aboveMaximum: { type: integer }
+            costToMinimum: { $ref: '#/components/schemas/Decimal' }
+
+    PracticeComparison:
+      type: object
+      required: [practiceCode, result]
+      properties:
+        practiceCode: { type: string }
+        category: { type: string }
+        name: { type: string }
+        unit: { type: [string, 'null'] }
+        own: { description: The population's value in the practice's unit }
+        market:
+          type: [object, 'null']
+          properties:
+            nOrgs: { type: integer }
+            prevalencePct: { $ref: '#/components/schemas/Decimal' }
+            p25: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+            p50: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+            p75: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+            mode: { type: [string, 'null'] }
+        result: { type: string, enum: [richer, at_market, leaner, not_compared, no_market_data] }
+
+    SurveySubmission:
+      type: object
+      required: [submissionId, surveyCode, editionLabel, asOf, status]
+      properties:
+        submissionId: { type: string, format: uuid }
+        surveyCode: { type: string }
+        editionLabel: { type: string }
+        asOf: { type: string, format: date }
+        status: { type: string, enum: [draft, in_review, approved, exported, withdrawn] }
+        orgProfile: { type: object, additionalProperties: true }
+        includedFields: { type: array, items: { type: string } }
+        rowCount: { type: [integer, 'null'] }
+        fileSha256: { type: [string, 'null'] }
+        rows:
+          type: array
+          items:
+            type: object
+            properties:
+              pseudonym: { type: [string, 'null'] }
+              vacant: { type: boolean }
+              jobCode: { type: string }
+              matchQuality: { type: string, enum: [exact, close, partial] }
+              fte: { $ref: '#/components/schemas/Decimal' }
+              annualBase: { $ref: '#/components/schemas/Decimal' }
+              hourlyRate: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+              stiEligible: { type: [boolean, 'null'] }
+              stiTargetPct: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+              stiPaid: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+              locationCode: { type: [string, 'null'] }
+              extra: { type: object, additionalProperties: true }
+
+    PublicWage:
+      type: object
+      required: [editionId, nocCode, geoCode, basis]
+      properties:
+        editionId: { type: string }
+        referencePeriod: { type: string }
+        nocCode: { type: string }
+        geoCode: { type: string }
+        geoLevel: { type: string, enum: [national, province, region] }
+        geoName: { type: string }
+        basis: { type: string, enum: [hourly, annual] }
+        low: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        median: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        high: { oneOf: [ { $ref: '#/components/schemas/Decimal' }, { type: 'null' } ] }
+        estimation: { type: string, enum: [direct, small_area, other_geography, other_source] }
+        dataSource: { type: [string, 'null'] }

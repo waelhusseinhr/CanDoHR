@@ -1,0 +1,125 @@
+{
+  "agreement": {
+    "id": "EXAMPLE-MUNI-0001",
+    "name": "Example Municipality and Example Municipal Workers' Union (fictional test data)",
+    "union": "Example Municipal Workers' Union",
+    "local": "0001",
+    "bargaining_unit_codes": ["INSIDE", "OUTSIDE"],
+    "employer_entity_ids": ["ENT-EXAMPLE-CITY"],
+    "jurisdiction": "ON",
+    "term": { "start": "2025-01-01", "end": "2028-12-31" },
+    "status": "in_force",
+    "languages": ["en", "fr"],
+    "source_document": {
+      "registry": "signed_copy",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "retrieved_on": "2026-10-18"
+    }
+  },
+  "versions": [
+    {
+      "version": 1,
+      "effective_from": "2025-01-01",
+      "effective_to": "2026-03-31",
+      "ratified_on": "2025-03-14",
+      "retro_from": "2025-01-01",
+      "rules": {
+        "wage_grids": [
+          {
+            "classification_code": "CLK2",
+            "classification_title": { "en": "Clerk 2", "fr": "Commis 2" },
+            "unit": "hour",
+            "steps": [{ "step": 1, "rate": 28.4 }, { "step": 2, "rate": 29.6 }, { "step": 3, "rate": 30.85 }, { "step": 4, "rate": 32.1 }],
+            "progression": { "basis": "hours_paid", "every": 1820, "requires_satisfactory_review": false },
+            "cite": { "article": "Schedule A" },
+            "provenance": { "extracted_by": "human", "verified": true, "verified_by": "test", "verified_at": "2026-10-18T00:00:00Z" }
+          },
+          {
+            "classification_code": "OPR3",
+            "classification_title": { "en": "Equipment Operator 3", "fr": "Opérateur d'équipement 3" },
+            "unit": "hour",
+            "steps": [{ "step": 1, "rate": 33.2 }, { "step": 2, "rate": 34.75 }, { "step": 3, "rate": 36.3 }],
+            "progression": { "basis": "months_service", "every": 12, "requires_satisfactory_review": false },
+            "cite": { "article": "Schedule A" },
+            "provenance": { "extracted_by": "ai", "verified": true, "verified_by": "test", "verified_at": "2026-10-18T00:00:00Z" }
+          }
+        ],
+        "general_increases": [
+          { "effective_from": "2025-01-01", "percent": 3.0, "cite": { "article": "18.01" }, "provenance": { "extracted_by": "human", "verified": true } }
+        ],
+        "hours_of_work": { "normal_daily_hours": 7, "normal_weekly_hours": 35, "cite": { "article": "14.01" }, "provenance": { "extracted_by": "human", "verified": true } },
+        "overtime": {
+          "thresholds": [
+            { "basis": "daily", "after_hours": 7, "multiplier": 1.5 },
+            { "basis": "daily", "after_hours": 11, "multiplier": 2.0 },
+            { "basis": "weekly", "after_hours": 35, "multiplier": 1.5 },
+            { "basis": "second_rest_day", "after_hours": 0, "multiplier": 2.0 }
+          ],
+          "distribution": "rotation",
+          "time_off_in_lieu": { "allowed": true, "bank_rate": 1.5, "bank_max_hours": 70, "payout": "calendar_year_end" },
+          "cite": { "article": "15" },
+          "provenance": { "extracted_by": "ai", "verified": true }
+        },
+        "premiums": [
+          { "code": "SHIFT_EVE", "type": "shift_evening", "condition": { "hours_between": ["16:00", "24:00"], "majority_of_shift": true }, "amount": { "per_hour": 1.25 }, "in_regular_rate": false, "overtime_interaction": "flat", "holiday_interaction": "flat", "cite": { "article": "16.01" }, "provenance": { "extracted_by": "ai", "verified": true } },
+          { "code": "SHIFT_NIGHT", "type": "shift_night", "condition": { "hours_between": ["00:00", "08:00"], "majority_of_shift": true }, "amount": { "per_hour": 1.75 }, "in_regular_rate": false, "overtime_interaction": "flat", "holiday_interaction": "flat", "cite": { "article": "16.02" }, "provenance": { "extracted_by": "ai", "verified": true } },
+          { "code": "STANDBY", "type": "standby", "amount": { "per_shift": 40.0 }, "cite": { "article": "16.05" }, "provenance": { "extracted_by": "human", "verified": true } },
+          { "code": "CALLBACK", "type": "call_back", "amount": { "minimum_hours_at_rate": 3, "multiplier": 1.5 }, "cite": { "article": "16.06" }, "provenance": { "extracted_by": "human", "verified": true } }
+        ],
+        "pay_composition": {
+          "premium_stacking": "all",
+          "exclusive_groups": [{ "codes": ["SHIFT_EVE", "SHIFT_NIGHT"], "cite": { "article": "16.03" } }],
+          "multiplier_conflicts": {
+            "default_resolution": "greater_of",
+            "default_cite": { "article": "15.07", "quote": "There shall be no pyramiding of overtime or premium rates." },
+            "rules": [
+              { "when": ["holiday", "daily"], "resolution": "sum_premiums", "multiplier_cap": 2.5, "cite": { "article": "20.04" }, "provenance": { "extracted_by": "human", "verified": true } }
+            ]
+          },
+          "evaluation_order": ["holiday", "second_rest_day", "rest_day", "daily", "consecutive_days", "weekly"],
+          "hours_counting": { "daily_overtime_counts_toward_weekly": false, "paid_holidays_count_as_worked": true, "paid_leave_counts_as_worked": false, "call_back_counts_toward_overtime": false, "cite": { "article": "15.02" } },
+          "cite": { "article": "15.07" },
+          "provenance": { "extracted_by": "human", "verified": true }
+        },
+        "holidays": { "extra_days": ["Civic Holiday", "Boxing Day"], "floaters": 1, "worked_multiplier": 1.5, "plus_lieu_day": true, "cite": { "article": "20" }, "provenance": { "extracted_by": "human", "verified": true } },
+        "vacation": {
+          "tiers": [{ "service_years": 1, "days": 15 }, { "service_years": 5, "days": 20 }, { "service_years": 12, "days": 25 }, { "service_years": 20, "days": 30 }],
+          "service_basis": "continuous_service_date",
+          "carryover_max_days": 5,
+          "cite": { "article": "21" },
+          "provenance": { "extracted_by": "ai", "verified": true }
+        },
+        "leaves": [
+          { "code": "SICK", "entitlement": "18 days per year at 1.5 days per month of service", "accrual": "per_month_service", "paid_percent": 100, "carryover": "Unused days carry over to a 150-day maximum", "cite": { "article": "22.01" }, "provenance": { "extracted_by": "ai", "verified": true } },
+          { "code": "BEREAVEMENT", "entitlement": "5 working days for immediate family", "accrual": "none", "paid_percent": 100, "cite": { "article": "23.02" }, "provenance": { "extracted_by": "human", "verified": true } }
+        ],
+        "probation": { "months": 6, "extension_allowed": true, "cite": { "article": "9.01" }, "provenance": { "extracted_by": "human", "verified": true } },
+        "seniority": {
+          "types": ["bargaining_unit"],
+          "accrual": "calendar_date",
+          "tie_breakers": ["hire_date", "lot"],
+          "lost_on": ["resignation", "dismissal_for_cause_not_reversed", "layoff_beyond_recall_period", "absence_without_leave_3_days"],
+          "list_posting": { "frequency": "every January and July", "challenge_days": 30 },
+          "cite": { "article": "11" },
+          "provenance": { "extracted_by": "ai", "verified": true }
+        },
+        "job_posting": { "internal_posting_days": 7, "selection": "relatively_equal_then_seniority", "trial_period_days": 60, "cite": { "article": "12" }, "provenance": { "extracted_by": "human", "verified": true } },
+        "layoff_recall": { "notice_weeks": 4, "bumping": true, "recall_months": 18, "cite": { "article": "13" }, "provenance": { "extracted_by": "human", "verified": true } },
+        "union_dues": { "method": "percent_of_gross", "rate": 1.5, "max_per_period": null, "initiation_fee": null, "remit_to": "Example Municipal Workers' Union Local 0001", "cite": { "article": "5.02" }, "provenance": { "extracted_by": "human", "verified": true } },
+        "retro": { "applies_to_pay_codes": ["REG", "OT15", "OT20", "STAT", "VACPAY", "SHIFT_EVE", "SHIFT_NIGHT"], "eligible_population": "active_on_ratification_and_terminated_after_retro_from", "interest": false, "cite": { "article": "Letter of Understanding 3" }, "provenance": { "extracted_by": "human", "verified": true } }
+      }
+    },
+    {
+      "version": 2,
+      "effective_from": "2026-04-01",
+      "effective_to": null,
+      "ratified_on": "2026-09-22",
+      "retro_from": "2026-04-01",
+      "rules": {
+        "general_increases": [
+          { "effective_from": "2026-04-01", "percent": 3.25, "cite": { "article": "18.01 (amended)" }, "provenance": { "extracted_by": "human", "verified": true } }
+        ]
+      }
+    }
+  ]
+}

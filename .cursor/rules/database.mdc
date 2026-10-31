@@ -1,0 +1,15 @@
+---
+description: Rules for database migrations, schema and data access
+globs: supabase/**,schema/**,packages/db/**,tests/schema/**
+alwaysApply: false
+---
+
+Follow `AGENTS.md` rules 1, 2, 8, 23, 25 and 28, and `docs/03` and `docs/02` §Multi-tenancy.
+
+- Migrations are new files created with `supabase migration new`. Never edit a migration that has been merged. Never run a migration against staging or production; GitHub Actions does that.
+- `schema/` and `tests/schema/` are protected. If you believe a table design is wrong, stop and open a separate pull request with the reason.
+- Every tenant table has `tenant_id`, row-level security enabled and forced, and the `tenant_isolation` policy. A new tenant table without them fails review.
+- Effective-dated tables use `valid_period` and `sys_period` with the exclusion constraint on current rows. Never update a business row in place; close it in system time and insert a new version.
+- Revoke all privileges on CanDo schemas from `anon` and `authenticated`, including default privileges. Never add a CanDo schema to the Data API's exposed schemas.
+- Keep Supabase's `extensions` schema on the `search_path` of `cando_app` and `cando_sealer`.
+- Application code connects through `withTenant` over Hyperdrive as `cando_app`. Never as `postgres`, never with `BYPASSRLS`.

@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "candohr-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-30",
+  "compatibility_flags": ["nodejs_compat"],
+  // Place Workers close to Supabase ca-central-1 (verify identifier in Cloudflare placement docs).
+  "placement": { "mode": "smart", "region": "aws:ca-central-1" },
+  // Step 1+: bind Hyperdrive (caching disabled), e.g.:
+  // wrangler hyperdrive create candohr-app --connection-string="..." --caching-disabled
+}

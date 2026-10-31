@@ -1,0 +1,14 @@
+---
+description: Rules for the React web app
+globs: apps/web/**
+alwaysApply: false
+---
+
+Follow `AGENTS.md` rules 10, 11, 14 and 23, and `docs/13`.
+
+- The web app calls only the CanDo API. Use `supabase-js` for sign-in and session handling only, never for data.
+- Every user-facing string lives in `en-CA` and `fr-CA` resource files. Dates, numbers and currency use the user's locale (`1 234,56 $` in French).
+- Every screen works by keyboard and screen reader (WCAG 2.1 AA), including the org chart's "Move to…" alternative to drag and drop.
+- Every screen honours the as-of date control.
+- Never show data the API did not return for this user. Live-update messages only trigger a refetch.
+- Use the Lovable demo's layouts as the visual reference.

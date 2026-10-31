@@ -1,0 +1,87 @@
+{
+ "$comment": "Payroll values from the law for docs/24 and migration 0010. Merge into the employment standards edition in Step 7 with the other additions files. Every entry is verify_at_load until checked against the statute; a jurisdiction an organization uses with no entry stops with JURISDICTION_RULE_MISSING when the value is needed.",
+ "version": "2026-10-27",
+ "source_decisions": "claude/review/03-payroll-decisions.md; docs/24",
+ "keys": {
+  "garnishment_protection": "Share of wages protected from garnishment (exempt_percent), the share protected from a support order where it differs, and minimum protected amounts. CanDo works out the deduction from the order and this rule; payroll confirms the first deduction (docs/24 §6.3).",
+  "banked_time": "Limits on banked overtime (time off in lieu): when it must be used or paid out (docs/24 §5.3).",
+  "vacation_pay_each_cheque": "Whether vacation pay may be paid on each cheque and what it needs (the employee's written agreement, a collective agreement) (docs/24 §5.1).",
+  "tax_slip_delivery": "How tax slips reach employees: the due date, when a secure portal needs no consent, when consent is needed, email, and paper copies (CRA; nationwide).",
+  "pay_statement_electronic": "Whether a pay statement may be given electronically and what the employee must be able to do with it (province)."
+ },
+ "nationwide": {
+  "$comment": "Rules that apply to every employer in Canada.",
+  "tax_slip_delivery": {
+   "due": "last day of February of the year after the slips' year",
+   "secure_portal_without_consent": true,
+   "consent_needed_when": [
+    "employee_requested_paper",
+    "cannot_reasonably_access_electronically",
+    "t4_former_employee_when_issued",
+    "t4_extended_leave_when_issued"
+   ],
+   "portal_must_allow_printing": true,
+   "paper_option_offered": true,
+   "email_requires_consent": true,
+   "paper_copies": 2,
+   "cite": "CRA, Distribute the slips (canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/file-information-returns-slip-summaries/distribute-slips.html); Income Tax Regulations s. 209",
+   "checked_on": "2026-10-27",
+   "status": "secondary"
+  }
+ },
+ "jurisdictions": {
+  "ON": {
+   "garnishment_protection": {
+    "exempt_percent": 80,
+    "support_exempt_percent": 50,
+    "cite": "Wages Act (Ontario), s. 7",
+    "status": "verify_at_load"
+   },
+   "banked_time": {
+    "use_within_months": 3,
+    "use_within_months_with_agreement": 12,
+    "cite": "Employment Standards Act, 2000 (Ontario), s. 22(7)",
+    "status": "verify_at_load"
+   },
+   "vacation_pay_each_cheque": {
+    "allowed": true,
+    "requires": "employee_written_agreement",
+    "cite": "Employment Standards Act, 2000 (Ontario), s. 36(3)",
+    "status": "verify_at_load"
+   },
+   "pay_statement_electronic": {
+    "allowed": true,
+    "requires": "employee_can_make_paper_copy",
+    "cite": "Employment Standards Act, 2000 (Ontario), s. 12",
+    "status": "verify_at_load"
+   }
+  },
+  "BC": {
+   "garnishment_protection": {
+    "exempt_percent": 70,
+    "min_exempt_monthly": 100,
+    "min_exempt_monthly_with_dependants": 200,
+    "cite": "Court Order Enforcement Act (BC), s. 3",
+    "status": "verify_at_load"
+   },
+   "banked_time": {
+    "payout_on_request": true,
+    "payout_at_year_end_or_termination": true,
+    "cite": "Employment Standards Act (BC), s. 42",
+    "status": "verify_at_load"
+   },
+   "vacation_pay_each_cheque": {
+    "allowed": true,
+    "requires": "written_agreement_or_collective_agreement",
+    "cite": "Employment Standards Act (BC), s. 58",
+    "status": "verify_at_load"
+   },
+   "pay_statement_electronic": {
+    "allowed": true,
+    "requires": "confidential_access_and_means_to_print",
+    "cite": "Employment Standards Act (BC), s. 27",
+    "status": "verify_at_load"
+   }
+  }
+ }
+}

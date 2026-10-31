@@ -1,0 +1,940 @@
+{
+ "description": "Catalogue of benefits, time-off, work-arrangement, allowance and pay practices that CanDo can benchmark (docs/19 §8). Each practice says how the tenant's own value is read from its configuration, so a benchmark compares like with like without retyping plans. Loaded into ref.reward_practice; tenants enable the ones they use and may add their own.",
+ "version": "2026.10",
+ "value_types": {
+  "boolean": "true or false",
+  "money": "amount in the unit shown",
+  "multiple_of_salary": "multiple of annual base salary",
+  "percent": "0 to 100",
+  "days": "working days",
+  "weeks": "weeks",
+  "months": "months",
+  "count": "a number",
+  "enum": "one of enum_values",
+  "text": "free text, not compared"
+ },
+ "richer_when": {
+  "higher": "a larger value is richer",
+  "lower": "a smaller value is richer (waiting periods)",
+  "yes": "offering it is richer",
+  "none": "no richer or leaner direction; shown for information"
+ },
+ "comparison": {
+  "tolerance": {
+   "money": 0.05,
+   "percent": 0,
+   "multiple_of_salary": 0,
+   "days": 0,
+   "weeks": 0,
+   "months": 0,
+   "count": 0
+  },
+  "boolean_common_at_pct": 50,
+  "rule": "Compare the tenant value with the market median (or the most common value for booleans and enums; a yes/no practice is common when at least boolean_common_at_pct per cent of organizations have it). Within tolerance is at market; otherwise richer or leaner by richer_when. Prevalence is always shown beside the comparison."
+ },
+ "plan_design_keys": "designPath values point into benefits.plan.design (added in migration 0005), a JSON object with these keys per plan kind. The Module 05 plan setup screen writes them; values are in the units shown here.",
+ "categories": [
+  {
+   "code": "health_dental",
+   "name_en": "Health and dental",
+   "name_fr": "Santé et soins dentaires"
+  },
+  {
+   "code": "spending_accounts",
+   "name_en": "Spending accounts",
+   "name_fr": "Comptes de dépenses"
+  },
+  {
+   "code": "life_disability",
+   "name_en": "Life and disability",
+   "name_fr": "Vie et invalidité"
+  },
+  {
+   "code": "retirement",
+   "name_en": "Retirement and savings",
+   "name_fr": "Retraite et épargne"
+  },
+  {
+   "code": "time_off",
+   "name_en": "Time off and leave",
+   "name_fr": "Congés"
+  },
+  {
+   "code": "wellness",
+   "name_en": "Wellness",
+   "name_fr": "Mieux-être"
+  },
+  {
+   "code": "learning",
+   "name_en": "Learning",
+   "name_fr": "Apprentissage"
+  },
+  {
+   "code": "work_arrangements",
+   "name_en": "Work arrangements",
+   "name_fr": "Modalités de travail"
+  },
+  {
+   "code": "allowances",
+   "name_en": "Allowances",
+   "name_fr": "Allocations"
+  },
+  {
+   "code": "pay_practices",
+   "name_en": "Pay practices",
+   "name_fr": "Pratiques salariales"
+  }
+ ],
+ "practices": [
+  {
+   "code": "HLT_EXT_HEALTH",
+   "category": "health_dental",
+   "name_en": "Extended health plan",
+   "name_fr": "Régime d’assurance maladie complémentaire",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "yes",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "field": "offered"
+   },
+   "display_order": 10
+  },
+  {
+   "code": "HLT_EMPLOYER_SHARE",
+   "category": "health_dental",
+   "name_en": "Employer share of health and dental premiums",
+   "name_fr": "Part de l’employeur des primes santé et dentaires",
+   "value_type": "percent",
+   "unit": "%",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "designPath": "employerSharePct"
+   },
+   "display_order": 20
+  },
+  {
+   "code": "HLT_WAITING_MONTHS",
+   "category": "health_dental",
+   "name_en": "Waiting period before coverage starts",
+   "name_fr": "Délai d’attente avant le début de la couverture",
+   "value_type": "months",
+   "unit": "months",
+   "richer_when": "lower",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "designPath": "waitingMonths"
+   },
+   "display_order": 30
+  },
+  {
+   "code": "HLT_DRUG_PCT",
+   "category": "health_dental",
+   "name_en": "Prescription drug reimbursement",
+   "name_fr": "Remboursement des médicaments sur ordonnance",
+   "value_type": "percent",
+   "unit": "%",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "designPath": "drug.coinsurancePct"
+   },
+   "display_order": 40
+  },
+  {
+   "code": "HLT_DRUG_CARD",
+   "category": "health_dental",
+   "name_en": "Pay-direct drug card",
+   "name_fr": "Carte de paiement direct des médicaments",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "yes",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "designPath": "drug.payDirect"
+   },
+   "display_order": 50
+  },
+  {
+   "code": "HLT_PARAMED_MAX",
+   "category": "health_dental",
+   "name_en": "Paramedical maximum per practitioner type per year",
+   "name_fr": "Maximum par type de praticien paramédical par année",
+   "value_type": "money",
+   "unit": "CAD/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "designPath": "paramedical.perPractitionerMax"
+   },
+   "display_order": 60
+  },
+  {
+   "code": "HLT_MENTAL_MAX",
+   "category": "health_dental",
+   "name_en": "Mental health practitioner maximum per year",
+   "name_fr": "Maximum annuel pour les praticiens en santé mentale",
+   "value_type": "money",
+   "unit": "CAD/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "designPath": "mentalHealth.annualMax"
+   },
+   "display_order": 70
+  },
+  {
+   "code": "HLT_VISION_MAX",
+   "category": "health_dental",
+   "name_en": "Vision care maximum per 24 months",
+   "name_fr": "Maximum pour les soins de la vue par période de 24 mois",
+   "value_type": "money",
+   "unit": "CAD/24 months",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "designPath": "vision.max"
+   },
+   "display_order": 80
+  },
+  {
+   "code": "HLT_VIRTUAL_CARE",
+   "category": "health_dental",
+   "name_en": "Virtual health care service",
+   "name_fr": "Service de soins de santé virtuels",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "yes",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "designPath": "virtualCare"
+   },
+   "display_order": 90
+  },
+  {
+   "code": "DEN_BASIC_PCT",
+   "category": "health_dental",
+   "name_en": "Dental basic services reimbursement",
+   "name_fr": "Remboursement des soins dentaires de base",
+   "value_type": "percent",
+   "unit": "%",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "dental",
+    "designPath": "basicPct"
+   },
+   "display_order": 100
+  },
+  {
+   "code": "DEN_MAJOR_PCT",
+   "category": "health_dental",
+   "name_en": "Dental major services reimbursement",
+   "name_fr": "Remboursement des soins dentaires majeurs",
+   "value_type": "percent",
+   "unit": "%",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "dental",
+    "designPath": "majorPct"
+   },
+   "display_order": 110
+  },
+  {
+   "code": "DEN_ORTHO_MAX",
+   "category": "health_dental",
+   "name_en": "Orthodontic lifetime maximum",
+   "name_fr": "Maximum viager pour l’orthodontie",
+   "value_type": "money",
+   "unit": "CAD",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "dental",
+    "designPath": "orthoLifetimeMax"
+   },
+   "display_order": 120
+  },
+  {
+   "code": "HLT_RETIREE",
+   "category": "health_dental",
+   "name_en": "Retiree health benefits",
+   "name_fr": "Avantages santé pour les retraités",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "yes",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "health",
+    "designPath": "retireeCoverage"
+   },
+   "display_order": 130
+  },
+  {
+   "code": "ACC_HSA",
+   "category": "spending_accounts",
+   "name_en": "Health spending account",
+   "name_fr": "Compte gestion santé",
+   "value_type": "money",
+   "unit": "CAD/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "hsa",
+    "designPath": "annualCredit"
+   },
+   "display_order": 140
+  },
+  {
+   "code": "ACC_WSA",
+   "category": "spending_accounts",
+   "name_en": "Wellness or lifestyle spending account",
+   "name_fr": "Compte mieux-être ou mode de vie",
+   "value_type": "money",
+   "unit": "CAD/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "other",
+    "designPath": "wellnessAccount.annualCredit"
+   },
+   "display_order": 150
+  },
+  {
+   "code": "LIF_BASIC_MULT",
+   "category": "life_disability",
+   "name_en": "Basic life insurance",
+   "name_fr": "Assurance vie de base",
+   "value_type": "multiple_of_salary",
+   "unit": "x salary",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "life",
+    "designPath": "multiple"
+   },
+   "display_order": 160
+  },
+  {
+   "code": "LIF_ADD_MULT",
+   "category": "life_disability",
+   "name_en": "Accidental death and dismemberment",
+   "name_fr": "Décès et mutilation par accident",
+   "value_type": "multiple_of_salary",
+   "unit": "x salary",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "add",
+    "designPath": "multiple"
+   },
+   "display_order": 170
+  },
+  {
+   "code": "LIF_OPTIONAL",
+   "category": "life_disability",
+   "name_en": "Optional life insurance available",
+   "name_fr": "Assurance vie facultative offerte",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "yes",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "life",
+    "designPath": "optionalAvailable"
+   },
+   "display_order": 180
+  },
+  {
+   "code": "LIF_DEPENDENT",
+   "category": "life_disability",
+   "name_en": "Dependent life insurance for a spouse",
+   "name_fr": "Assurance vie des personnes à charge (conjoint)",
+   "value_type": "money",
+   "unit": "CAD",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "life",
+    "designPath": "dependent.spouse"
+   },
+   "display_order": 190
+  },
+  {
+   "code": "STD_WAIT_DAYS",
+   "category": "life_disability",
+   "name_en": "Short-term disability waiting period (illness)",
+   "name_fr": "Délai de carence de l’invalidité de courte durée (maladie)",
+   "value_type": "days",
+   "unit": "days",
+   "richer_when": "lower",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "std",
+    "designPath": "waitingDays"
+   },
+   "display_order": 200
+  },
+  {
+   "code": "STD_BENEFIT_PCT",
+   "category": "life_disability",
+   "name_en": "Short-term disability benefit",
+   "name_fr": "Prestation d’invalidité de courte durée",
+   "value_type": "percent",
+   "unit": "% of pay",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "std",
+    "designPath": "benefitPct"
+   },
+   "display_order": 210
+  },
+  {
+   "code": "STD_WEEKS",
+   "category": "life_disability",
+   "name_en": "Short-term disability maximum duration",
+   "name_fr": "Durée maximale de l’invalidité de courte durée",
+   "value_type": "weeks",
+   "unit": "weeks",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "std",
+    "designPath": "durationWeeks"
+   },
+   "display_order": 220
+  },
+  {
+   "code": "LTD_BENEFIT_PCT",
+   "category": "life_disability",
+   "name_en": "Long-term disability benefit",
+   "name_fr": "Prestation d’invalidité de longue durée",
+   "value_type": "percent",
+   "unit": "% of pay",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "ltd",
+    "designPath": "benefitPct"
+   },
+   "display_order": 230
+  },
+  {
+   "code": "LTD_ELIM_DAYS",
+   "category": "life_disability",
+   "name_en": "Long-term disability elimination period",
+   "name_fr": "Délai de carence de l’invalidité de longue durée",
+   "value_type": "days",
+   "unit": "days",
+   "richer_when": "lower",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "ltd",
+    "designPath": "eliminationDays"
+   },
+   "display_order": 240
+  },
+  {
+   "code": "LTD_EMPLOYEE_PAID",
+   "category": "life_disability",
+   "name_en": "Long-term disability premiums paid by employees (benefit not taxable)",
+   "name_fr": "Primes d’invalidité de longue durée payées par les employés (prestation non imposable)",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "none",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "ltd",
+    "designPath": "employeePaid"
+   },
+   "display_order": 250
+  },
+  {
+   "code": "RET_PLAN_TYPE",
+   "category": "retirement",
+   "name_en": "Retirement plan type",
+   "name_fr": "Type de régime de retraite",
+   "value_type": "enum",
+   "unit": null,
+   "richer_when": "none",
+   "own_value_source": {
+    "module": "05",
+    "planKinds": [
+     "pension_db",
+     "pension_dc",
+     "group_rrsp"
+    ],
+    "field": "kind"
+   },
+   "display_order": 260,
+   "enum_values": [
+    "pension_db",
+    "pension_dc",
+    "group_rrsp_dpsp",
+    "group_rrsp",
+    "tfsa",
+    "none"
+   ]
+  },
+  {
+   "code": "RET_EMPLOYER_PCT",
+   "category": "retirement",
+   "name_en": "Employer retirement contribution",
+   "name_fr": "Cotisation de l’employeur à la retraite",
+   "value_type": "percent",
+   "unit": "% of pay",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "05",
+    "planKinds": [
+     "pension_dc",
+     "group_rrsp"
+    ],
+    "designPath": "employerContributionPct"
+   },
+   "display_order": 270
+  },
+  {
+   "code": "RET_WAIT_MONTHS",
+   "category": "retirement",
+   "name_en": "Waiting period to join the retirement plan",
+   "name_fr": "Délai d’attente pour adhérer au régime de retraite",
+   "value_type": "months",
+   "unit": "months",
+   "richer_when": "lower",
+   "own_value_source": {
+    "module": "05",
+    "planKinds": [
+     "pension_db",
+     "pension_dc",
+     "group_rrsp"
+    ],
+    "designPath": "waitingMonths"
+   },
+   "display_order": 280
+  },
+  {
+   "code": "TOF_VAC_START_WEEKS",
+   "category": "time_off",
+   "name_en": "Vacation at hire",
+   "name_fr": "Vacances à l’embauche",
+   "value_type": "weeks",
+   "unit": "weeks/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "vacation_weeks",
+    "at": "hire"
+   },
+   "display_order": 290
+  },
+  {
+   "code": "TOF_VAC_MAX_WEEKS",
+   "category": "time_off",
+   "name_en": "Maximum vacation",
+   "name_fr": "Vacances maximales",
+   "value_type": "weeks",
+   "unit": "weeks/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "vacation_weeks",
+    "at": "maximum"
+   },
+   "display_order": 300
+  },
+  {
+   "code": "TOF_VAC_YEARS_TO_MAX",
+   "category": "time_off",
+   "name_en": "Years of service to reach maximum vacation",
+   "name_fr": "Années de service pour atteindre les vacances maximales",
+   "value_type": "count",
+   "unit": "years",
+   "richer_when": "lower",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "vacation_years_to_max"
+   },
+   "display_order": 310
+  },
+  {
+   "code": "TOF_SICK_DAYS",
+   "category": "time_off",
+   "name_en": "Paid sick days",
+   "name_fr": "Jours de maladie payés",
+   "value_type": "days",
+   "unit": "days/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "paid_days",
+    "category": "sick"
+   },
+   "display_order": 320
+  },
+  {
+   "code": "TOF_PERSONAL_DAYS",
+   "category": "time_off",
+   "name_en": "Paid personal or family days",
+   "name_fr": "Jours personnels ou familiaux payés",
+   "value_type": "days",
+   "unit": "days/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "paid_days",
+    "category": "personal"
+   },
+   "display_order": 330
+  },
+  {
+   "code": "TOF_EXTRA_HOLIDAYS",
+   "category": "time_off",
+   "name_en": "Paid holidays beyond the statutory list",
+   "name_fr": "Jours fériés payés en plus des jours prévus par la loi",
+   "value_type": "days",
+   "unit": "days/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "extra_holidays"
+   },
+   "display_order": 340
+  },
+  {
+   "code": "TOF_WINTER_CLOSURE",
+   "category": "time_off",
+   "name_en": "Paid winter closure",
+   "name_fr": "Fermeture payée pendant la période des Fêtes",
+   "value_type": "days",
+   "unit": "days/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "paid_closure_days"
+   },
+   "display_order": 350
+  },
+  {
+   "code": "TOF_PARENTAL_TOPUP_PCT",
+   "category": "time_off",
+   "name_en": "Parental leave top-up",
+   "name_fr": "Supplément au congé parental",
+   "value_type": "percent",
+   "unit": "% of pay",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "leave_topup",
+    "category": "parental",
+    "field": "pct"
+   },
+   "display_order": 360
+  },
+  {
+   "code": "TOF_PARENTAL_TOPUP_WEEKS",
+   "category": "time_off",
+   "name_en": "Parental leave top-up duration",
+   "name_fr": "Durée du supplément au congé parental",
+   "value_type": "weeks",
+   "unit": "weeks",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "leave_topup",
+    "category": "parental",
+    "field": "weeks"
+   },
+   "display_order": 370
+  },
+  {
+   "code": "TOF_SABBATICAL",
+   "category": "time_off",
+   "name_en": "Sabbatical or deferred salary leave",
+   "name_fr": "Congé sabbatique ou à traitement différé",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "yes",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "leave_type_exists",
+    "category": "sabbatical"
+   },
+   "display_order": 380
+  },
+  {
+   "code": "WEL_EAP",
+   "category": "wellness",
+   "name_en": "Employee and family assistance program",
+   "name_fr": "Programme d’aide aux employés et à la famille",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "yes",
+   "own_value_source": {
+    "module": "05",
+    "planKind": "eap",
+    "field": "offered"
+   },
+   "display_order": 390
+  },
+  {
+   "code": "LRN_DUES",
+   "category": "learning",
+   "name_en": "Professional dues paid",
+   "name_fr": "Cotisations professionnelles payées",
+   "value_type": "enum",
+   "unit": null,
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "08",
+    "resolver": "policy",
+    "key": "professionalDues"
+   },
+   "display_order": 400,
+   "enum_values": [
+    "none",
+    "partial",
+    "full"
+   ],
+   "enum_order": "enum_values are listed from leanest to richest"
+  },
+  {
+   "code": "LRN_EDU_ASSIST",
+   "category": "learning",
+   "name_en": "Education assistance",
+   "name_fr": "Aide aux études",
+   "value_type": "money",
+   "unit": "CAD/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "08",
+    "resolver": "policy",
+    "key": "educationAssistanceAnnualMax"
+   },
+   "display_order": 410
+  },
+  {
+   "code": "LRN_PD_DAYS",
+   "category": "learning",
+   "name_en": "Professional development days",
+   "name_fr": "Jours de perfectionnement professionnel",
+   "value_type": "days",
+   "unit": "days/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "08",
+    "resolver": "policy",
+    "key": "developmentDays"
+   },
+   "display_order": 420
+  },
+  {
+   "code": "WRK_HYBRID",
+   "category": "work_arrangements",
+   "name_en": "Remote or hybrid work",
+   "name_fr": "Télétravail ou travail hybride",
+   "value_type": "enum",
+   "unit": null,
+   "richer_when": "none",
+   "own_value_source": {
+    "module": "01",
+    "resolver": "policy",
+    "key": "remoteWork"
+   },
+   "display_order": 430,
+   "enum_values": [
+    "none",
+    "occasional",
+    "hybrid",
+    "mostly_remote",
+    "fully_remote"
+   ]
+  },
+  {
+   "code": "WRK_FLEX_HOURS",
+   "category": "work_arrangements",
+   "name_en": "Flexible hours",
+   "name_fr": "Horaires flexibles",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "yes",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "policy",
+    "key": "flexibleHours"
+   },
+   "display_order": 440
+  },
+  {
+   "code": "WRK_COMPRESSED",
+   "category": "work_arrangements",
+   "name_en": "Compressed work week",
+   "name_fr": "Semaine de travail comprimée",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "yes",
+   "own_value_source": {
+    "module": "06",
+    "resolver": "policy",
+    "key": "compressedWeek"
+   },
+   "display_order": 450
+  },
+  {
+   "code": "ALW_HOME_OFFICE",
+   "category": "allowances",
+   "name_en": "Home office allowance",
+   "name_fr": "Allocation pour bureau à domicile",
+   "value_type": "money",
+   "unit": "CAD/year",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "03",
+    "resolver": "recurring_allowance",
+    "code": "HOME_OFFICE"
+   },
+   "display_order": 460
+  },
+  {
+   "code": "ALW_PHONE",
+   "category": "allowances",
+   "name_en": "Phone or internet allowance",
+   "name_fr": "Allocation pour téléphone ou Internet",
+   "value_type": "money",
+   "unit": "CAD/month",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "03",
+    "resolver": "recurring_allowance",
+    "code": "PHONE"
+   },
+   "display_order": 470
+  },
+  {
+   "code": "ALW_MILEAGE",
+   "category": "allowances",
+   "name_en": "Kilometre rate for use of own vehicle",
+   "name_fr": "Taux au kilomètre pour l’utilisation d’un véhicule personnel",
+   "value_type": "money",
+   "unit": "CAD/km",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "03",
+    "resolver": "expense_rate",
+    "code": "MILEAGE"
+   },
+   "display_order": 480
+  },
+  {
+   "code": "ALW_TRANSIT",
+   "category": "allowances",
+   "name_en": "Transit subsidy",
+   "name_fr": "Subvention au transport en commun",
+   "value_type": "money",
+   "unit": "CAD/month",
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "03",
+    "resolver": "recurring_allowance",
+    "code": "TRANSIT"
+   },
+   "display_order": 490
+  },
+  {
+   "code": "ALW_PARKING",
+   "category": "allowances",
+   "name_en": "Parking",
+   "name_fr": "Stationnement",
+   "value_type": "enum",
+   "unit": null,
+   "richer_when": "higher",
+   "own_value_source": {
+    "module": "01",
+    "resolver": "policy",
+    "key": "parking"
+   },
+   "display_order": 500,
+   "enum_values": [
+    "none",
+    "subsidized",
+    "free"
+   ],
+   "enum_order": "enum_values are listed from leanest to richest"
+  },
+  {
+   "code": "PAY_INCREASE_BUDGET",
+   "category": "pay_practices",
+   "name_en": "Salary increase budget",
+   "name_fr": "Budget d’augmentation salariale",
+   "value_type": "percent",
+   "unit": "% of payroll",
+   "richer_when": "none",
+   "own_value_source": {
+    "module": "04",
+    "resolver": "cycle_budget"
+   },
+   "display_order": 510
+  },
+  {
+   "code": "PAY_STI_PREVALENCE",
+   "category": "pay_practices",
+   "name_en": "Share of staff eligible for short-term incentives",
+   "name_fr": "Proportion du personnel admissible aux primes incitatives à court terme",
+   "value_type": "percent",
+   "unit": "% of staff",
+   "richer_when": "none",
+   "own_value_source": {
+    "module": "04",
+    "resolver": "incentive_eligibility"
+   },
+   "display_order": 520
+  },
+  {
+   "code": "PAY_RANGES_POSTED",
+   "category": "pay_practices",
+   "name_en": "Pay ranges shown in job postings",
+   "name_fr": "Échelles salariales indiquées dans les offres d’emploi",
+   "value_type": "boolean",
+   "unit": null,
+   "richer_when": "none",
+   "own_value_source": {
+    "module": "02",
+    "resolver": "posting_policy",
+    "key": "showRange"
+   },
+   "display_order": 530
+  },
+  {
+   "code": "PAY_STRUCTURE_REVIEW",
+   "category": "pay_practices",
+   "name_en": "How often salary ranges are reviewed",
+   "name_fr": "Fréquence de révision des échelles salariales",
+   "value_type": "enum",
+   "unit": null,
+   "richer_when": "none",
+   "own_value_source": {
+    "module": "04",
+    "resolver": "structure_review_frequency"
+   },
+   "display_order": 540,
+   "enum_values": [
+    "annual",
+    "every_two_years",
+    "less_often",
+    "no_structure"
+   ]
+  }
+ ]
+}

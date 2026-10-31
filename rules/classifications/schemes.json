@@ -1,0 +1,128 @@
+{
+ "description": "Code scheme catalogue for CanDo HRIS (docs/18). Published schemes and their versions are loaded into ref.code_scheme and ref.code_scheme_version; tenant templates are offered when a tenant sets up its schemes; similarity profiles are the defaults for core.similarity_profile; each profile is complete (weights, proximity, strength weights, internal schemes, filters), because the scorer reads only the profile it is given. The loader checks every data file against its sha256 before loading and refuses a mismatch.",
+ "version": "2026-10-24",
+ "published_schemes": [
+  {
+   "scheme_code": "NOC",
+   "name_en": "National Occupational Classification",
+   "name_fr": "Classification nationale des professions",
+   "publisher": "Statistics Canada and Employment and Social Development Canada",
+   "country": "CA",
+   "purpose": "occupation",
+   "structure": "hierarchical",
+   "code_pattern": "^[0-9]{1,5}$",
+   "versions": [
+    {
+     "version_id": "NOC-2021-1.0",
+     "label": "2021 Version 1.0",
+     "status": "published",
+     "release_date": "2021-09-21",
+     "source": "Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, Catalogue no. 12-583-X (PDF published 2022-11-02)",
+     "licence": "Statistics Canada Open Licence. Source: Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0. Adapted: structured into JSON; requirement kinds and strengths are derived tags. This does not constitute an endorsement by Statistics Canada of this product.",
+     "levels": [
+      {"level": "broad_category", "depth": 1, "count": 10},
+      {"level": "major_group", "depth": 2, "count": 45},
+      {"level": "sub_major_group", "depth": 3, "count": 89},
+      {"level": "minor_group", "depth": 4, "count": 162},
+      {"level": "unit_group", "depth": 5, "count": 516}
+     ],
+     "attributes": {"teer": "second digit of every code from depth 2 down (0 to 5)", "broadCategory": "first digit"},
+     "assignable_levels": ["unit_group"],
+     "files": {
+      "noc-2021-v1.0-structure.json": {"sha256": "ca1377741a9529c4dd115fa608cc62e5f84dc98f478e115e4cefb37587b6ab45", "contents": "822 items: code, level, depth, parent, English title, TEER, cross-references"},
+      "noc-2021-v1.0.json": {"sha256": "3fb4e8cf5240a8aff85a1ba69bce9ba010f08f7f5b00af1277e28b4476337478", "contents": "822 items with definitions; for the 516 unit groups also example titles, inclusions, exclusions, main duties, 2,063 employment requirement statements and additional information"},
+      "noc-2021-v1.0-index-titles.json": {"sha256": "8774384c6880ed2201236e3f27cd36709f95ba782dbb28d733d2bea529ebc802", "contents": "28,012 job titles from the alphabetical index, each with its unit group"}
+     },
+     "french": {"status": "to_load", "source": "Classification nationale des professions (CNP) 2021 Version 1.0, Statistique Canada, no 12-583-X au catalogue (French edition)", "note": "French titles are proper to French usage, not translations; load them into title_fr and definition_fr before any French-speaking tenant goes live"}
+    },
+    {
+     "version_id": "NOC-2026-1.0",
+     "label": "2026 Version 1.0",
+     "status": "announced",
+     "expected_release": "December 2026",
+     "supersedes": "NOC-2021-1.0",
+     "assignable_levels": ["unit_group"],
+     "source": "Statistics Canada, Revising the National Occupational Classification (NOC) 2021 Version 1.0 to NOC 2026 Version 1.0 (consultation results report)",
+     "announced_changes": {"unit_groups_affected": 165, "real_changes": 18, "virtual_changes": 147, "correspondence_table": "NOC 2021 V1.0 to NOC 2026 V1.0, to be released with the classification"},
+     "note": "Not released yet. Load the classification and the official correspondence table when Statistics Canada publishes them, then run a recoding campaign (docs/18 §8)."
+    }
+   ]
+  },
+  {
+   "scheme_code": "EEOG",
+   "name_en": "Employment Equity Occupational Groups",
+   "name_fr": "Groupes professionnels de l'équité en matière d'emploi",
+   "publisher": "Employment and Social Development Canada (Labour Program)",
+   "country": "CA",
+   "purpose": "employment_equity",
+   "structure": "flat",
+   "versions": [],
+   "note": "The 14 groups used in federal employment equity reporting, derived from NOC through ESDC's correspondence. Load the official list and the NOC 2021 correspondence before Step 18 (docs/16 Q25)."
+  },
+  {"scheme_code": "ISCO", "name_en": "International Standard Classification of Occupations", "publisher": "International Labour Organization", "country": "INT", "purpose": "occupation", "structure": "hierarchical", "versions": [], "note": "Load ISCO-08 and Statistics Canada's NOC 2021 to ISCO-08 correspondence when a tenant needs it (international hires, foreign credentials)."},
+  {"scheme_code": "US_SOC", "name_en": "Standard Occupational Classification (United States)", "publisher": "U.S. Bureau of Labor Statistics", "country": "US", "purpose": "occupation", "structure": "hierarchical", "versions": [], "note": "Load when a tenant employs staff in the United States or matches to U.S. salary surveys."},
+  {"scheme_code": "UK_SOC", "name_en": "Standard Occupational Classification (United Kingdom)", "publisher": "Office for National Statistics", "country": "GB", "purpose": "occupation", "structure": "hierarchical", "versions": [], "note": "Load for tenants operating in the United Kingdom (requirements/00, Europe readiness)."}
+ ],
+ "tenant_scheme_templates": [
+  {"code": "NOC", "name_en": "NOC", "name_fr": "CNP", "source": "published", "ref_scheme_code": "NOC", "current_version_id": "NOC-2021-1.0", "purpose": "occupation", "country": "CA", "structure": "hierarchical", "ordering": "hierarchy", "applies_to": ["job", "position", "assignment", "requisition"], "required_on": ["job"], "values_per_target": "one", "inherit": "down", "override_needs_reason": true, "display_order": 10},
+  {"code": "EEOG", "name_en": "Employment equity occupational group", "name_fr": "Groupe professionnel de l'équité en matière d'emploi", "source": "derived", "ref_scheme_code": "EEOG", "purpose": "employment_equity", "country": "CA", "derived_from": {"schemeCode": "NOC", "mapping": "ref"}, "applies_to": ["job", "position", "assignment"], "values_per_target": "one", "inherit": "down", "display_order": 20, "status_note": "available once the EEOG list and correspondence are loaded"},
+  {"code": "JOB_FAMILY", "name_en": "Job family", "name_fr": "Famille d'emplois", "source": "tenant", "purpose": "job_family", "structure": "hierarchical", "ordering": "alpha_title", "values_mode": "list", "applies_to": ["job", "position"], "required_on": ["job"], "values_per_target": "one", "inherit": "down", "display_order": 30},
+  {"code": "JOB_LEVEL", "name_en": "Career level", "name_fr": "Niveau de carrière", "source": "tenant", "purpose": "job_level", "ordering": "custom_rank", "values_mode": "list", "applies_to": ["job"], "values_per_target": "one", "inherit": "down", "display_order": 40},
+  {"code": "GRADE", "name_en": "Pay grade", "name_fr": "Échelon salarial", "source": "tenant", "purpose": "pay_grade", "ordering": "custom_rank", "values_mode": "list", "applies_to": ["job", "position"], "values_per_target": "one", "inherit": "down", "display_order": 50, "note": "Values match comp.salary_range.grade; agreement classifications and steps stay in the agreement library (docs/17 §2)"},
+  {"code": "SURVEY_<PROVIDER>", "name_en": "Salary survey match: <provider>", "name_fr": "Correspondance d'enquête salariale : <fournisseur>", "source": "tenant", "purpose": "salary_survey", "ordering": "natural_code", "values_mode": "list_or_free", "applies_to": ["job", "position", "assignment"], "values_per_target": "many", "shares_total_100": true, "inherit": "down", "display_order": 60, "note": "One scheme per survey; a blended match uses several codes with shares adding to 100 and match quality exact, close, partial or blended"},
+  {"code": "PAY_EQUITY_CLASS", "name_en": "Pay equity job class", "name_fr": "Catégorie d'emplois (équité salariale)", "source": "tenant", "purpose": "pay_equity", "values_mode": "list", "applies_to": ["job", "position"], "values_per_target": "one", "inherit": "down", "display_order": 70},
+  {"code": "DEPT_CODE", "name_en": "Department code", "name_fr": "Code de service", "source": "tenant", "purpose": "department", "ordering": "natural_code", "values_mode": "list", "applies_to": ["org_unit", "position"], "values_per_target": "one", "inherit": "none", "display_order": 80, "note": "GL cost centres stay in finance.cost_distribution (docs/17 §8); this is the reporting code people know the department by"},
+  {"code": "POSITION_CONTROL", "name_en": "Position control number", "name_fr": "Numéro de contrôle du poste", "source": "tenant", "purpose": "identifier", "values_mode": "free", "code_pattern": "^[A-Z0-9-]{3,20}$", "code_case": "upper", "applies_to": ["position"], "values_per_target": "one", "uniqueness": "unique", "inherit": "none", "display_order": 90},
+  {"code": "BUDGET_LINE", "name_en": "Budget line", "name_fr": "Ligne budgétaire", "source": "tenant", "purpose": "cost", "values_mode": "free", "applies_to": ["position"], "values_per_target": "one", "uniqueness": "unique", "inherit": "none", "display_order": 100},
+  {"code": "LEGACY_ID", "name_en": "Legacy system ID", "name_fr": "Identifiant de l'ancien système", "source": "tenant", "purpose": "external_system", "values_mode": "free", "code_case": "upper", "applies_to": ["assignment"], "values_per_target": "one", "uniqueness": "unique", "inherit": "none", "display_order": 110, "note": "For IDs people look up. Integration keys between systems stay in core.external_ref"}
+ ],
+ "similarity_profiles": [
+  {"code": "default", "name_en": "Most similar positions", "name_fr": "Postes les plus semblables",
+   "weights": {"occupation": "0.45", "teer": "0.15", "requirements": "0.25", "internal": "0.15", "title": "0"},
+   "proximity": {"5": "1.00", "4": "0.75", "3": "0.55", "2": "0.40", "1": "0.15", "0": "0", "related": "0.60"},
+   "strength_weights": {"required": "1.0", "preferred": "0.5", "asset": "0.25"},
+   "internal_schemes": [{"scheme": "JOB_FAMILY", "kind": "equal", "weight": 1}, {"scheme": "GRADE", "kind": "rank", "weight": 1, "range": 10}],
+   "filters": {"only_available": true, "exclude_self": true}, "must_meet_required": false},
+  {"code": "redeployment", "name_en": "Redeployment and accommodation", "name_fr": "Réaffectation et mesures d'adaptation",
+   "weights": {"occupation": "0.35", "teer": "0.15", "requirements": "0.40", "internal": "0.10", "title": "0"},
+   "proximity": {"5": "1.00", "4": "0.75", "3": "0.55", "2": "0.40", "1": "0.15", "0": "0", "related": "0.60"},
+   "strength_weights": {"required": "1.0", "preferred": "0.5", "asset": "0.25"},
+   "internal_schemes": [{"scheme": "JOB_FAMILY", "kind": "equal", "weight": 1}, {"scheme": "GRADE", "kind": "rank", "weight": 1, "range": 10}],
+   "filters": {"only_available": true, "exclude_self": true}, "must_meet_required": true},
+  {"code": "succession", "name_en": "Succession and career paths", "name_fr": "Relève et cheminements de carrière",
+   "weights": {"occupation": "0.40", "teer": "0.10", "requirements": "0.35", "internal": "0.15", "title": "0"},
+   "proximity": {"5": "1.00", "4": "0.75", "3": "0.55", "2": "0.40", "1": "0.15", "0": "0", "related": "0.60"},
+   "strength_weights": {"required": "1.0", "preferred": "0.5", "asset": "0.25"},
+   "internal_schemes": [{"scheme": "JOB_FAMILY", "kind": "equal", "weight": 1}, {"scheme": "GRADE", "kind": "rank", "weight": 1, "range": 10}],
+   "filters": {"only_available": false, "exclude_self": true}, "must_meet_required": false},
+  {"code": "survey_benchmark", "name_en": "Benchmark jobs for pay", "name_fr": "Emplois repères pour la rémunération",
+   "weights": {"occupation": "0.50", "teer": "0.20", "requirements": "0.10", "internal": "0.20", "title": "0"},
+   "proximity": {"5": "1.00", "4": "0.75", "3": "0.55", "2": "0.40", "1": "0.15", "0": "0", "related": "0.60"},
+   "strength_weights": {"required": "1.0", "preferred": "0.5", "asset": "0.25"},
+   "internal_schemes": [{"scheme": "JOB_FAMILY", "kind": "equal", "weight": 1}, {"scheme": "GRADE", "kind": "rank", "weight": 1, "range": 10}],
+   "filters": {"only_available": false, "exclude_self": true}, "must_meet_required": false},
+  {"code": "duplicate_jobs", "name_en": "Possible duplicate jobs", "name_fr": "Emplois possiblement en double",
+   "weights": {"occupation": "0.40", "teer": "0.10", "requirements": "0.30", "internal": "0.10", "title": "0.10"},
+   "proximity": {"5": "1.00", "4": "0.75", "3": "0.55", "2": "0.40", "1": "0.15", "0": "0", "related": "0.60"},
+   "strength_weights": {"required": "1.0", "preferred": "0.5", "asset": "0.25"},
+   "internal_schemes": [{"scheme": "JOB_FAMILY", "kind": "equal", "weight": 1}, {"scheme": "GRADE", "kind": "rank", "weight": 1, "range": 10}],
+   "filters": {"only_available": false, "exclude_self": true}, "must_meet_required": false},
+  {"code": "title_search", "name_en": "Search by title", "name_fr": "Recherche par titre",
+   "weights": {"occupation": "0", "teer": "0", "requirements": "0", "internal": "0", "title": "1"},
+   "proximity": {"5": "1.00", "4": "0.75", "3": "0.55", "2": "0.40", "1": "0.15", "0": "0", "related": "0.60"},
+   "strength_weights": {"required": "1.0", "preferred": "0.5", "asset": "0.25"},
+   "internal_schemes": [{"scheme": "JOB_FAMILY", "kind": "equal", "weight": 1}, {"scheme": "GRADE", "kind": "rank", "weight": 1, "range": 10}],
+   "filters": {"only_available": false, "exclude_self": true}, "must_meet_required": false}
+ ],
+ "requirement_match_keys": {
+  "description": "match_key on core.work_requirement is '<kind>:<value>' from this vocabulary, so requirements on different jobs can be compared. Tenants may add values; never reuse a key with a different meaning.",
+  "education": ["none", "some_secondary", "secondary_school", "college_certificate", "college_diploma", "apprenticeship", "bachelor", "bachelor_social_work", "master", "doctorate", "professional_degree"],
+  "experience": ["<field>, for example social_services, payroll, supervision"],
+  "licence": ["driver", "driver_class_4", "<regulated trade or profession>"],
+  "registration": ["<regulatory body>, for example social_worker, early_childhood_educator, registered_nurse"],
+  "certification": ["<designation>, for example payroll, cphr, first_aid"],
+  "screening": ["criminal_record", "vulnerable_sector", "security_reliability", "secret"],
+  "language": ["en", "fr", "bilingual_b", "bilingual_c", "<language code>:<level>"],
+  "physical_demand": ["lift_23kg", "standing_long_periods", "<other>"]
+ }
+}

@@ -16,8 +16,8 @@ cd C:\Users\wael_\Documents\CanDoHR
 3. Start the site (only needed the first time, or after the code changes and packages are missing):
 
 ```powershell
-npm install
-npm run dev
+npx pnpm@9 install
+pnpm dev
 ```
 
 4. On this computer, open [http://localhost:3000](http://localhost:3000).
