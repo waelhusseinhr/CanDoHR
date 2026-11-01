@@ -29,6 +29,11 @@ POOLER_HOSTS = (
     "aws-1-us-east-1.pooler.supabase.com",
     "aws-0-us-east-1.pooler.supabase.com",
 )
+EXTRA_SECRETS: list[str] = []
+PASSWORD_MISMATCH = (
+    "The saved SUPABASE_DB_PASSWORD does not match the CanDo database password. "
+    "Update that GitHub Actions secret to the current database password."
+)
 
 
 def redact(text: str) -> str:
@@ -40,6 +45,10 @@ def redact(text: str) -> str:
         "SUPABASE_SERVICE_ROLE_KEY",
     ):
         secret = os.environ.get(name) or ""
+        if len(secret) >= 6:
+            out = out.replace(secret, "***")
+            out = out.replace(quote(secret, safe=""), "***")
+    for secret in EXTRA_SECRETS:
         if len(secret) >= 6:
             out = out.replace(secret, "***")
             out = out.replace(quote(secret, safe=""), "***")
@@ -114,7 +123,22 @@ def classify(stderr: str) -> str:
     return "other"
 
 
-def psql(host: str, user: str, sql: str) -> subprocess.CompletedProcess[str]:
+def password_variants() -> list[tuple[str, str]]:
+    raw = os.environ["SUPABASE_DB_PASSWORD"]
+    variants = [("saved", raw)]
+    trimmed = raw.strip()
+    if trimmed and trimmed != raw:
+        variants.append(("trimmed", trimmed))
+    one_line = "".join(trimmed.splitlines()) if trimmed else ""
+    if one_line and all(one_line != value for _label, value in variants):
+        variants.append(("single-line", one_line))
+    for _label, secret in variants:
+        if secret and secret not in EXTRA_SECRETS:
+            EXTRA_SECRETS.append(secret)
+    return variants
+
+
+def psql(host: str, user: str, sql: str, password: str) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env.update(
         {
@@ -122,7 +146,7 @@ def psql(host: str, user: str, sql: str) -> subprocess.CompletedProcess[str]:
             "PGPORT": "5432",
             "PGUSER": user,
             "PGDATABASE": DATABASE,
-            "PGPASSWORD": os.environ["SUPABASE_DB_PASSWORD"],
+            "PGPASSWORD": password,
             "PGSSLMODE": "require",
             "PGCONNECT_TIMEOUT": "20",
         }
@@ -135,10 +159,10 @@ def psql(host: str, user: str, sql: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def db_url(host: str, user: str) -> str:
-    password = quote(os.environ["SUPABASE_DB_PASSWORD"], safe="")
+def db_url(host: str, user: str, password: str) -> str:
+    encoded = quote(password, safe="")
     return f"postgresql://{quote(user, safe='')}:***placeholder***@{host}:5432/{DATABASE}?sslmode=require".replace(
-        "***placeholder***", password
+        "***placeholder***", encoded
     )
 
 
@@ -153,31 +177,34 @@ def candidates() -> list[tuple[str, str, str]]:
     return found
 
 
-def connect() -> tuple[str, str, str]:
+def connect() -> tuple[str, str, str, str]:
     last_kind = "network"
-    last_detail = ""
+    variants = password_variants()
     for kind, host, user in candidates():
-        say(f"trying {kind} host={host} user={user}")
-        probe = psql(host, user, "SELECT 1")
-        if probe.returncode == 0:
-            say(f"connected via {kind} host={host} user={user}")
-            return kind, host, user
-        last_kind = classify(probe.stderr + probe.stdout)
-        last_detail = redact(probe.stderr.strip() or probe.stdout.strip())
-        say(f"{kind} failed class={last_kind}")
-        if last_detail:
-            say(last_detail[:500])
-        if last_kind == "auth":
-            fail(
-                "The saved SUPABASE_DB_PASSWORD does not match the CanDo database password. "
-                "Update that GitHub Actions secret to the current database password."
-            )
+        for label, password in variants:
+            say(f"trying {kind} host={host} user={user} password={label}")
+            probe = psql(host, user, "SELECT 1", password)
+            if probe.returncode == 0:
+                say(f"connected via {kind} host={host} user={user} password={label}")
+                if label != "saved":
+                    say(
+                        "The secret matched only after removing a space or blank line around it. "
+                        "Replace SUPABASE_DB_PASSWORD with the password alone."
+                    )
+                return kind, host, user, password
+            last_kind = classify(probe.stderr + probe.stdout)
+            detail = redact(probe.stderr.strip() or probe.stdout.strip())
+            say(f"{kind} failed class={last_kind} password={label}")
+            if detail:
+                say(detail[:500])
+            if last_kind == "auth" and label == variants[-1][0]:
+                fail(PASSWORD_MISMATCH)
     fail(
         "GitHub Actions could not open a connection to the CanDo database "
         f"(last error class: {last_kind}). The password was not reported as wrong. "
         "Check that the Supabase database host accepts connections from GitHub."
     )
-    return "", "", ""
+    return "", "", "", ""
 
 
 def run_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -199,14 +226,14 @@ def push_command(url: str, yes: list[str], include_all: bool) -> list[str]:
     return command
 
 
-def push_migrations(host: str, user: str) -> None:
+def push_migrations(host: str, user: str, password: str) -> None:
     help_text = run_cli(["supabase", "db", "push", "--help"])
     global_help = run_cli(["supabase", "--help"])
     combined = (help_text.stdout or "") + (help_text.stderr or "") + (global_help.stdout or "")
     if "--db-url" not in combined:
         fail("This Supabase CLI does not offer db push --db-url, so the migrations were not applied.")
     yes = ["--yes"] if re.search(r"--yes\b", combined) else []
-    url = db_url(host, user)
+    url = db_url(host, user, password)
 
     def attempt(include_all: bool, dry_run: bool) -> subprocess.CompletedProcess[str]:
         command = push_command(url, yes, include_all)
@@ -228,10 +255,7 @@ def push_migrations(host: str, user: str) -> None:
     if dry.returncode != 0:
         kind = classify((dry.stderr or "") + (dry.stdout or ""))
         if kind == "auth":
-            fail(
-                "The saved SUPABASE_DB_PASSWORD does not match the CanDo database password. "
-                "Update that GitHub Actions secret to the current database password."
-            )
+            fail(PASSWORD_MISMATCH)
         fail("supabase db push --dry-run failed, so nothing was applied. See the redacted log above.")
 
     applied = attempt(include_all, False)
@@ -242,18 +266,16 @@ def push_migrations(host: str, user: str) -> None:
     if applied.returncode != 0:
         kind = classify((applied.stderr or "") + (applied.stdout or ""))
         if kind == "auth":
-            fail(
-                "The saved SUPABASE_DB_PASSWORD does not match the CanDo database password. "
-                "Update that GitHub Actions secret to the current database password."
-            )
+            fail(PASSWORD_MISMATCH)
         fail("supabase db push failed, so the CanDo database may be unchanged. See the redacted log above.")
 
 
-def report_schema(host: str, user: str) -> None:
+def report_schema(host: str, user: str, password: str) -> None:
     versions = psql(
         host,
         user,
         "SELECT version FROM supabase_migrations.schema_migrations ORDER BY version",
+        password,
     )
     if versions.returncode != 0:
         say("migration history query failed")
@@ -276,6 +298,7 @@ def report_schema(host: str, user: str) -> None:
         GROUP BY n.nspname
         ORDER BY n.nspname
         """,
+        password,
     )
     if schemas.returncode != 0:
         say("schema query failed")
@@ -317,12 +340,12 @@ def safe_cf_error(payload: dict) -> str:
     return f"code={code} message={message}"
 
 
-def origin_body(host: str, user: str) -> dict:
+def origin_body(host: str, user: str, password: str) -> dict:
     return {
         "scheme": "postgres",
         "database": DATABASE,
         "user": user,
-        "password": os.environ["SUPABASE_DB_PASSWORD"],
+        "password": password,
         "host": host,
         "port": 5432,
     }
@@ -344,7 +367,7 @@ def describe_config(item: dict) -> None:
     )
 
 
-def ensure_hyperdrive(host: str, user: str) -> None:
+def ensure_hyperdrive(host: str, user: str, password: str) -> None:
     if not os.environ.get("CLOUDFLARE_API_TOKEN"):
         say(
             "CLOUDFLARE_API_TOKEN is missing from this job, so Hyperdrive was not created. "
@@ -375,7 +398,7 @@ def ensure_hyperdrive(host: str, user: str) -> None:
             "/hyperdrive/configs",
             {
                 "name": HYPERDRIVE_NAME,
-                "origin": origin_body(host, user),
+                "origin": origin_body(host, user, password),
                 "caching": {"disabled": True},
             },
         )
@@ -393,7 +416,7 @@ def ensure_hyperdrive(host: str, user: str) -> None:
                         "/hyperdrive/configs",
                         {
                             "name": HYPERDRIVE_NAME,
-                            "origin": origin_body(pool_host, f"postgres.{PROJECT_REF}"),
+                            "origin": origin_body(pool_host, f"postgres.{PROJECT_REF}", password),
                             "caching": {"disabled": True},
                         },
                     )
@@ -428,7 +451,7 @@ def ensure_hyperdrive(host: str, user: str) -> None:
             f"/hyperdrive/configs/{match.get('id')}",
             {
                 "name": HYPERDRIVE_NAME,
-                "origin": origin_body(host, user),
+                "origin": origin_body(host, user, password),
                 "caching": {"disabled": True},
             },
         )
@@ -450,10 +473,10 @@ def main() -> None:
             "SUPABASE_DB_PASSWORD is missing from GitHub Actions secrets. "
             "Add it under Settings, Secrets and variables, Actions, for waelhusseinhr/CanDoHR."
         )
-    _kind, host, user = connect()
-    push_migrations(host, user)
-    report_schema(host, user)
-    ensure_hyperdrive(host, user)
+    _kind, host, user, password = connect()
+    push_migrations(host, user, password)
+    report_schema(host, user, password)
+    ensure_hyperdrive(host, user, password)
     say("DB_PASSWORD_SETUP=works")
 
 
