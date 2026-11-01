@@ -23,7 +23,7 @@ Spec mirror: `spec/dev-pack/` and `spec/claude/review/`.
 
 The tables are on the CanDo project. These items still do not use that database.
 
-- Hyperdrive is not created. `SUPABASE_DB_PASSWORD` works. `CLOUDFLARE_API_TOKEN` was refused (HTTP 403) when listing Hyperdrive connections, so the site config has no database binding. When Hyperdrive is created, query caching must be off.
+- Hyperdrive is not created. `SUPABASE_DB_PASSWORD` works. The latest try (GitHub Actions run 41346287117) was refused with HTTP 400, code 9106. The saved `CLOUDFLARE_API_TOKEN` is only 20 characters, so it is not a full Cloudflare API token. The site config has no database binding. When Hyperdrive is created, query caching must be off.
 - The hourly seal, the daily digest, and the event sender do not query Postgres yet. The tests use an in-memory store.
 - Email sign-in and the return addresses still have to be switched on in the Supabase dashboard. See `docs/SETUP.md`.
 - Core HR (people, jobs, positions, org units, agreements, and the hire flow) is tested in memory. The tables exist and are empty. The site shows sample people and positions.
