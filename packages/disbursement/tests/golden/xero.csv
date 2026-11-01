@@ -1,0 +1,3 @@
+JournalDate,AccountCode,Description,NetAmount,WorkPeriod,PostingPeriod,MappingVersion
+2027-03-25,6000,Payroll,700.00,FY2027-P12,FY2027-P12,MV-2027
+2027-04-01,6000,Payroll,700.00,FY2028-P01,FY2028-P01,MV-2027
