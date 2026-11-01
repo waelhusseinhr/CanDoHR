@@ -309,15 +309,20 @@ def report_schema(host: str, user: str, password: str) -> None:
             say(line.strip())
 
 
-def cf_api(method: str, path: str, body: dict | None = None) -> tuple[int, dict]:
-    token = os.environ.get("CLOUDFLARE_API_TOKEN") or ""
+def cloudflare_token() -> str:
+    # A pasted token often includes a line break. The token itself has no spaces.
+    return "".join((os.environ.get("CLOUDFLARE_API_TOKEN") or "").split())
+
+
+def cf_api(method: str, path: str, body: dict | None = None, timeout: int = 60) -> tuple[int, dict]:
+    token = cloudflare_token()
     url = f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}{path}"
     data = None if body is None else json.dumps(body).encode()
     req = urllib.request.Request(url, data=data, method=method)
     req.add_header("Authorization", f"Bearer {token}")
     req.add_header("Content-Type", "application/json")
     try:
-        with urllib.request.urlopen(req, timeout=60) as response:
+        with urllib.request.urlopen(req, timeout=timeout) as response:
             payload = json.loads(response.read().decode() or "{}")
             return response.status, payload
     except urllib.error.HTTPError as error:
@@ -366,20 +371,61 @@ def describe_config(item: dict) -> None:
     )
 
 
-def ensure_hyperdrive(host: str, user: str, password: str) -> None:
-    if not os.environ.get("CLOUDFLARE_API_TOKEN"):
+def hyperdrive_origins(password: str) -> list[tuple[str, str, str, str]]:
+    # Hyperdrive pools on its own, so the direct database host is the one to use.
+    # GitHub cannot open that IPv6 host; Cloudflare can. The session pooler is only a fallback.
+    return [
+        ("direct", DIRECT_HOST, "postgres", password),
+        ("session-pooler", "aws-0-us-east-1.pooler.supabase.com", f"postgres.{PROJECT_REF}", password),
+    ]
+
+
+def create_hyperdrive(label: str, host: str, user: str, password: str) -> tuple[int, dict]:
+    say(f"creating hyperdrive origin={label} host={host} user={user} database={DATABASE} port=5432")
+    return cf_api(
+        "POST",
+        "/hyperdrive/configs",
+        {
+            "name": HYPERDRIVE_NAME,
+            "origin": origin_body(host, user, password),
+            "caching": {"disabled": True},
+        },
+        timeout=120,
+    )
+
+
+def ensure_hyperdrive(password: str) -> None:
+    token = cloudflare_token()
+    if not token:
         say(
             "CLOUDFLARE_API_TOKEN is missing from this job, so Hyperdrive was not created. "
             "The database password itself worked."
         )
         say("HYPERDRIVE_RESULT=skipped")
         return
+    raw_token = os.environ.get("CLOUDFLARE_API_TOKEN") or ""
+    if raw_token != token:
+        say("CLOUDFLARE_API_TOKEN had spaces or line breaks; those were removed before the request")
+    say(f"CLOUDFLARE_API_TOKEN length={len(token)}")
     status, payload = cf_api("GET", "/hyperdrive/configs?per_page=100")
     if status >= 400 or not payload.get("success", False):
         say(f"HYPERDRIVE_RESULT=failed list_status={status} {safe_cf_error(payload)}")
+        say("Listing Hyperdrive failed. Trying to create the connection anyway.")
+        created: dict = {}
+        create_status = 0
+        for label, host, user, secret in hyperdrive_origins(password):
+            create_status, created = create_hyperdrive(label, host, user, secret)
+            if create_status < 400 and created.get("success", False):
+                result = created.get("result") if isinstance(created.get("result"), dict) else {}
+                describe_config(result)
+                say("HYPERDRIVE_RESULT=created")
+                say(f"HYPERDRIVE_ID={result.get('id')}")
+                return
+            say(f"HYPERDRIVE_RESULT=failed create_status={create_status} origin={label} {safe_cf_error(created)}")
         say(
-            "Migrations were applied. Hyperdrive was not created because the Cloudflare token "
-            "could not list Hyperdrive configs. Add Hyperdrive edit permission to CLOUDFLARE_API_TOKEN."
+            "Hyperdrive was not created. The Cloudflare token was refused (not the database password). "
+            "Save CLOUDFLARE_API_TOKEN again with no spaces or line breaks, for this same account, "
+            "with permission to edit Hyperdrive and to edit Workers."
         )
         return
     configs = payload.get("result") or []
@@ -392,23 +438,18 @@ def ensure_hyperdrive(host: str, user: str, password: str) -> None:
                 match = item
                 break
     if match is None:
-        create_status, created = cf_api(
-            "POST",
-            "/hyperdrive/configs",
-            {
-                "name": HYPERDRIVE_NAME,
-                "origin": origin_body(host, user, password),
-                "caching": {"disabled": True},
-            },
-        )
-        if create_status >= 400 or not created.get("success", False):
-            say(f"HYPERDRIVE_RESULT=failed create_status={create_status} {safe_cf_error(created)}")
-            say("Migrations were applied. Hyperdrive was not created. See the redacted API error above.")
-            return
-        result = created.get("result") if isinstance(created.get("result"), dict) else {}
-        describe_config(result)
-        say("HYPERDRIVE_RESULT=created")
-        say(f"HYPERDRIVE_ID={result.get('id')}")
+        created: dict = {}
+        create_status = 0
+        for label, host, user, secret in hyperdrive_origins(password):
+            create_status, created = create_hyperdrive(label, host, user, secret)
+            if create_status < 400 and created.get("success", False):
+                result = created.get("result") if isinstance(created.get("result"), dict) else {}
+                describe_config(result)
+                say("HYPERDRIVE_RESULT=created")
+                say(f"HYPERDRIVE_ID={result.get('id')}")
+                return
+            say(f"HYPERDRIVE_RESULT=failed create_status={create_status} origin={label} {safe_cf_error(created)}")
+        say("Migrations were applied. Hyperdrive was not created. See the redacted API error above.")
         return
     describe_config(match)
     caching = match.get("caching") if isinstance(match.get("caching"), dict) else {}
@@ -422,14 +463,16 @@ def ensure_hyperdrive(host: str, user: str, password: str) -> None:
         {"caching": {"disabled": True}},
     )
     if patch_status >= 400 or not patched.get("success", False):
+        _label, direct_host, direct_user, _secret = hyperdrive_origins(password)[0]
         patch_status, patched = cf_api(
             "PUT",
             f"/hyperdrive/configs/{match.get('id')}",
             {
                 "name": HYPERDRIVE_NAME,
-                "origin": origin_body(host, user, password),
+                "origin": origin_body(direct_host, direct_user, password),
                 "caching": {"disabled": True},
             },
+            timeout=120,
         )
     if patch_status >= 400 or not patched.get("success", False):
         say(f"HYPERDRIVE_RESULT=exists_caching_on patch_status={patch_status} {safe_cf_error(patched)}")
@@ -452,7 +495,7 @@ def main() -> None:
     _kind, host, user, password = connect()
     push_migrations(host, user, password)
     report_schema(host, user, password)
-    ensure_hyperdrive(host, user, password)
+    ensure_hyperdrive(password)
     say("DB_PASSWORD_SETUP=works")
 
 

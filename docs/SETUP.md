@@ -25,7 +25,7 @@ Values stay in GitHub. Settings, then Secrets and variables, then Actions. Do no
 
 | Name | What it is |
 | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Already used to publish the site. It cannot create Hyperdrive yet. In the Cloudflare token settings, add permission to edit Hyperdrive, then save the token again under this same name. |
+| `CLOUDFLARE_API_TOKEN` | Used to publish the site. Hyperdrive still refuses it. The saved value is only 20 characters, and a Cloudflare API token is longer, so replace this secret with the full token. It needs permission to edit Workers and to edit Hyperdrive. No spaces or line breaks. |
 | `SUPABASE_URL` | `https://lasowjpgxlxijpaeezxe.supabase.co` |
 | `SUPABASE_PUBLISHABLE_KEY` | The publishable (anon) key from Supabase, Project Settings, API. Safe for the browser. The tests do not need it; the site will. |
 | `SUPABASE_DB_PASSWORD` | The database password for the CanDo project. It is saved, and GitHub Actions used it to load the tables. |
@@ -37,7 +37,7 @@ R2 is turned on for the Cloudflare account. No bucket was created, and `cloudfla
 
 ## Database connection (Hyperdrive)
 
-Hyperdrive is the fast path from the site to Postgres. The database password works. Hyperdrive itself was not created. A later retry (GitHub Actions run 41338267837) still got HTTP 403, code 10000, when listing Hyperdrive connections. The Cloudflare token can publish the site, and it was refused when asked to list Hyperdrive connections (the error is an authentication refusal, not a wrong database password). After that token is allowed to edit Hyperdrive, the connection is created with query caching turned off. The site config does not attach a database until that connection exists. The identity app does not get a database connection.
+Hyperdrive is the fast path from the site to Postgres. The database password works. Hyperdrive itself was not created, so there is no Hyperdrive id. GitHub Actions run https://github.com/waelhusseinhr/CanDoHR/actions/runs/41346287117 reached the Hyperdrive API and was refused with HTTP 400, code 9106. The saved `CLOUDFLARE_API_TOKEN` is only 20 characters. A Cloudflare API token is longer, so that secret needs to be replaced with the full token for this account, with permission to edit Workers and to edit Hyperdrive, and with no spaces or line breaks. Query caching stays off when the connection is created. The site config does not attach a database until that connection exists. The identity app does not get a database connection.
 
 The tables were loaded through the session pooler `aws-0-us-east-1.pooler.supabase.com` (port 5432). The direct database host is IPv6 only, and GitHub cannot open it.
 
