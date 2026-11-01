@@ -31,8 +31,7 @@ POOLER_HOSTS = (
 )
 EXTRA_SECRETS: list[str] = []
 PASSWORD_MISMATCH = (
-    "The saved SUPABASE_DB_PASSWORD does not match the CanDo database password. "
-    "Update that GitHub Actions secret to the current database password."
+    "Reset SUPABASE_DB_PASSWORD again to the exact postgres password from the CanDo project's Database settings, with no extra spaces, and save it in GitHub Actions."
 )
 
 
@@ -167,14 +166,14 @@ def db_url(host: str, user: str, password: str) -> str:
 
 
 def candidates() -> list[tuple[str, str, str]]:
-    found: list[tuple[str, str, str]] = [("direct", DIRECT_HOST, "postgres")]
-    pool_user = f"postgres.{PROJECT_REF}"
-    for host in POOLER_HOSTS:
-        if resolves(host):
-            found.append(("pooler", host, pool_user))
-        else:
-            say(f"pooler host does not resolve: {host}")
-    return found
+    # The direct host is IPv6-only. GitHub runners cannot open it.
+    # Session mode on the shared pooler is the connection that reaches this project.
+    host = "aws-0-us-east-1.pooler.supabase.com"
+    user = f"postgres.{PROJECT_REF}"
+    if not resolves(host):
+        say(f"pooler host does not resolve: {host}")
+        return []
+    return [("session-pooler", host, user)]
 
 
 def connect() -> tuple[str, str, str, str]:
@@ -182,10 +181,10 @@ def connect() -> tuple[str, str, str, str]:
     variants = password_variants()
     for kind, host, user in candidates():
         for label, password in variants:
-            say(f"trying {kind} host={host} user={user} password={label}")
+            say(f"trying {kind} host={host} user={user} form={label}")
             probe = psql(host, user, "SELECT 1", password)
             if probe.returncode == 0:
-                say(f"connected via {kind} host={host} user={user} password={label}")
+                say(f"connected via {kind} host={host} user={user} form={label}")
                 if label != "saved":
                     say(
                         "The secret matched only after removing a space or blank line around it. "
@@ -194,7 +193,7 @@ def connect() -> tuple[str, str, str, str]:
                 return kind, host, user, password
             last_kind = classify(probe.stderr + probe.stdout)
             detail = redact(probe.stderr.strip() or probe.stdout.strip())
-            say(f"{kind} failed class={last_kind} password={label}")
+            say(f"{kind} failed class={last_kind} form={label}")
             if detail:
                 say(detail[:500])
             if last_kind == "auth" and label == variants[-1][0]:
@@ -404,29 +403,6 @@ def ensure_hyperdrive(host: str, user: str, password: str) -> None:
         )
         if create_status >= 400 or not created.get("success", False):
             say(f"HYPERDRIVE_RESULT=failed create_status={create_status} {safe_cf_error(created)}")
-            # Direct host can fail from Cloudflare when the project is IPv6-only.
-            # Session pooler is the fallback, still with query caching off.
-            if host == DIRECT_HOST:
-                for pool_host in POOLER_HOSTS:
-                    if not resolves(pool_host):
-                        continue
-                    say(f"retrying Hyperdrive via pooler host={pool_host}")
-                    retry_status, retried = cf_api(
-                        "POST",
-                        "/hyperdrive/configs",
-                        {
-                            "name": HYPERDRIVE_NAME,
-                            "origin": origin_body(pool_host, f"postgres.{PROJECT_REF}", password),
-                            "caching": {"disabled": True},
-                        },
-                    )
-                    if retry_status < 400 and retried.get("success", False):
-                        result = retried.get("result") if isinstance(retried.get("result"), dict) else {}
-                        describe_config(result)
-                        say("HYPERDRIVE_RESULT=created")
-                        say(f"HYPERDRIVE_ID={result.get('id')}")
-                        return
-                    say(f"pooler create failed status={retry_status} {safe_cf_error(retried)}")
             say("Migrations were applied. Hyperdrive was not created. See the redacted API error above.")
             return
         result = created.get("result") if isinstance(created.get("result"), dict) else {}
