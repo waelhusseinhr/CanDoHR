@@ -1,0 +1,89 @@
+# Deploys the public site (the vinext app at the repo root) to candohr.ca.
+# Runs on a push to the site branch, and only after the CI workflow for that
+# same commit has succeeded. Uses the GitHub Actions secret CLOUDFLARE_API_TOKEN.
+# The account id is the one already in cloudflare.config.ts.
+
+name: Deploy site
+
+on:
+  push:
+    branches:
+      - cursor/step-0-repository-4cf6
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: deploy-candohr-ca
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CF_SEND_TELEMETRY: "false"
+      CLOUDFLARE_ACCOUNT_ID: cd54a788a204d1515eb3b3224cd9594a
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Wait until CI succeeds for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, subprocess, time, sys
+          repo = os.environ["GITHUB_REPOSITORY"]
+          sha = os.environ["GITHUB_SHA"]
+          deadline = time.time() + 25 * 60
+          while time.time() < deadline:
+              raw = subprocess.check_output(
+                  ["gh", "run", "list", "--repo", repo, "--commit", sha, "--workflow", "ci.yml",
+                   "--json", "databaseId,status,conclusion,event,url"],
+                  text=True,
+              )
+              runs = json.loads(raw)
+              pending = [r for r in runs if r["status"] != "completed"]
+              success = [r for r in runs if r["conclusion"] == "success"]
+              if success and not pending:
+                  print(f"CI succeeded: {success[0]['url']}")
+                  sys.exit(0)
+              if runs and not pending and not success:
+                  print("CI finished without success. Not deploying.")
+                  for run in runs:
+                      print(f"{run['conclusion']} {run['url']}")
+                  sys.exit(1)
+              print("Waiting for CI...")
+              time.sleep(20)
+          print("Timed out waiting for CI.")
+          sys.exit(1)
+          PY
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy the site to Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "CLOUDFLARE_API_TOKEN is not available to this job."
+            exit 1
+          fi
+          pnpm run deploy
