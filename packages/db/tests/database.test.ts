@@ -138,12 +138,22 @@ async function ensureStep2(db: Kysely<Database>): Promise<void> {
     select exists (select 1 from pg_roles where rolname = 'step2_app') as role_exists
   `.execute(db);
   if (!existing.rows[0]?.role_exists) {
-    await sql`create role step2_app login password 'step2-app-local' nosuperuser nobypassrls`.execute(db);
+    // Defaults are NOSUPERUSER and NOBYPASSRLS. A non-superuser cannot change those attributes later.
+    await sql`create role step2_app login password 'step2-app-local'`.execute(db);
   }
-  await sql`alter role step2_app nosuperuser nobypassrls`.execute(db);
-  await sql`grant step2_app to current_user`.execute(db);
-  await sql`create schema if not exists extensions`.execute(db);
-  await sql`create extension if not exists btree_gist with schema extensions`.execute(db);
+  const member = await sql<{ is_member: boolean }>`
+    select pg_has_role(current_user, 'step2_app', 'member') as is_member
+  `.execute(db);
+  if (!member.rows[0]?.is_member) {
+    await sql`grant step2_app to current_user`.execute(db);
+  }
+  const gist = await sql<{ ext_exists: boolean }>`
+    select exists (select 1 from pg_extension where extname = 'btree_gist') as ext_exists
+  `.execute(db);
+  if (!gist.rows[0]?.ext_exists) {
+    await sql`create schema if not exists extensions`.execute(db);
+    await sql`create extension btree_gist with schema extensions`.execute(db);
+  }
   await db.transaction().execute(async (trx) => {
     await sql`set local search_path to step2, public, extensions`.execute(trx);
     await sql`drop schema if exists step2 cascade`.execute(trx);

@@ -81,6 +81,31 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The tenant test switches to step2_app with SET ROLE. postgres on the local
+      # Supabase database is not a superuser, so it must be a member of that role.
+      # Creating the role is retried as supabase_admin when postgres is not allowed to.
+      - name: Let the tenant test use its own role
+        run: |
+          set -euo pipefail
+          DB_URL="$(supabase status -o json | python3 -c "import json,sys; print(json.load(sys.stdin)['DB_URL'])")"
+          admin_url="$(python3 - "$DB_URL" <<'PY'
+          import sys
+          from urllib.parse import urlsplit, urlunsplit
+          parts = urlsplit(sys.argv[1])
+          netloc = f"supabase_admin:postgres@{parts.hostname}:{parts.port}"
+          print(urlunsplit((parts.scheme, netloc, parts.path, "", "")))
+          PY
+          )"
+          run_sql() {
+            if ! psql "$DB_URL" -v ON_ERROR_STOP=1 -c "$1"; then
+              psql "$admin_url" -v ON_ERROR_STOP=1 -c "$1"
+            fi
+          }
+          if ! psql "$DB_URL" -tAc "select 1 from pg_roles where rolname = 'step2_app'" | grep -q 1; then
+            run_sql "CREATE ROLE step2_app LOGIN PASSWORD 'step2-app-local'"
+          fi
+          run_sql "GRANT step2_app TO postgres"
+
       - name: Test shared foundations and tenant transactions
         run: |
           set -euo pipefail
