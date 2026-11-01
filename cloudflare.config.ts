@@ -16,6 +16,8 @@ export default defineConfig({
     env: {
       ASSETS: bindings.assets(),
       IMAGES: bindings.images(),
+      // Hyperdrive config "candohr". Query caching is disabled on that config.
+      HYPERDRIVE: bindings.hyperdrive({ id: "78a5fcc7d00d4dc3ae0562d8a2f1e3ff" }),
     },
   }),
 });
