@@ -1,0 +1,1818 @@
+{
+ "description": "Cases for reference/market_pricing_reference.py and its TypeScript port (docs/19). Survey figures are fictional; public wage rows are illustrative, not Job Bank data.",
+ "cases": [
+  {
+   "id": "AGE-001",
+   "kind": "ageing",
+   "title": "Simple ageing over 9 whole months at 3%",
+   "input": {
+    "amount": "52000",
+    "from": "2025-04-01",
+    "to": "2026-01-01",
+    "annualRate": "0.03",
+    "method": "simple"
+   },
+   "expected": {
+    "months": "9.00",
+    "factor": "1.022500",
+    "aged": "53170.00"
+   }
+  },
+  {
+   "id": "AGE-002",
+   "kind": "ageing",
+   "title": "Compound ageing over 21 months at 3.5%",
+   "input": {
+    "amount": "61500",
+    "from": "2024-04-01",
+    "to": "2026-01-01",
+    "annualRate": "0.035",
+    "method": "compound"
+   },
+   "expected": {
+    "months": "21.00",
+    "factor": "1.062052",
+    "aged": "65316.17"
+   }
+  },
+  {
+   "id": "AGE-003",
+   "kind": "ageing",
+   "title": "Part month: 14 extra days count as 14/30 of a month",
+   "input": {
+    "amount": "50000",
+    "from": "2025-04-01",
+    "to": "2026-01-15",
+    "annualRate": "0.03",
+    "method": "simple"
+   },
+   "expected": {
+    "months": "9.47",
+    "factor": "1.023675",
+    "aged": "51183.75"
+   }
+  },
+  {
+   "id": "AGE-004",
+   "kind": "ageing",
+   "title": "Common date before the effective date ages backwards",
+   "input": {
+    "amount": "50000",
+    "from": "2026-04-01",
+    "to": "2026-01-01",
+    "annualRate": "0.03",
+    "method": "simple"
+   },
+   "expected": {
+    "months": "-3.00",
+    "factor": "0.992500",
+    "aged": "49625.00"
+   }
+  },
+  {
+   "id": "PRICE-001",
+   "kind": "price",
+   "title": "Survey (70%) and public wages (30%), aged to a common date; P25 and P75 come from the survey only",
+   "input": {
+    "asOf": "2026-01-01",
+    "editions": {
+     "SVY-A-2025": {
+      "effectiveDate": "2025-04-01",
+      "rows": [
+       {
+        "job_code": "SA-101",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 9,
+        "n_incumbents": 31,
+        "mean": 52400,
+        "p10": 45000,
+        "p25": 48500,
+        "p50": 52000,
+        "p75": 56000,
+        "p90": 60500
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 6,
+        "n_incumbents": 14,
+        "mean": 51100,
+        "p10": null,
+        "p25": 47900,
+        "p50": 50600,
+        "p75": 54800,
+        "p90": null
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 22,
+        "n_incumbents": 88,
+        "mean": 51300,
+        "p10": 44200,
+        "p25": 47600,
+        "p50": 50800,
+        "p75": 55100,
+        "p90": 59900
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 3,
+        "n_incumbents": 5,
+        "mean": null,
+        "p10": null,
+        "p25": null,
+        "p50": null,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 15,
+        "n_incumbents": 37,
+        "mean": 62300,
+        "p10": 53000,
+        "p25": 57400,
+        "p50": 61500,
+        "p75": 66800,
+        "p90": 72100
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 4,
+        "mean": 64000,
+        "p10": null,
+        "p25": null,
+        "p50": 63500,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 6,
+        "mean": 63800,
+        "p10": null,
+        "p25": null,
+        "p50": 63000,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-202",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 18,
+        "n_incumbents": 40,
+        "mean": 71200,
+        "p10": 59000,
+        "p25": 64100,
+        "p50": 70000,
+        "p75": 76500,
+        "p90": 84000
+       }
+      ]
+     },
+     "PUBLIC-2025": {
+      "effectiveDate": "2024-01-01",
+      "rows": [
+       {
+        "noc": "42201",
+        "geo": "59",
+        "basis": "hourly",
+        "low": "20.00",
+        "median": "27.50",
+        "high": "38.00"
+       },
+       {
+        "noc": "42201",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "19.00",
+        "median": "26.00",
+        "high": "36.06"
+       },
+       {
+        "noc": "13102",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "21.00",
+        "median": "30.00",
+        "high": "41.00"
+       }
+      ],
+      "statisticColumns": {
+       "p10": "low",
+       "p50": "median",
+       "p90": "high"
+      }
+     }
+    },
+    "definition": {
+     "statistic": "p50",
+     "statistics": [
+      "p25",
+      "p50",
+      "p75"
+     ],
+     "adjustPct": 0,
+     "ageing": {
+      "method": "simple",
+      "annualRate": "0.03"
+     },
+     "minimum": {
+      "nOrgs": 4
+     },
+     "minSources": 1,
+     "sources": [
+      {
+       "code": "SVY-A-2025",
+       "kind": "survey",
+       "weighting": "organization",
+       "element": "base_salary",
+       "cutChain": [
+        "R1",
+        "ALL"
+       ],
+       "weight": 70
+      },
+      {
+       "code": "PUBLIC-2025",
+       "kind": "public_wage",
+       "geoChain": [
+        "5920",
+        "59",
+        "CA"
+       ],
+       "hoursBasis": "1950",
+       "weight": 30
+      }
+     ]
+    },
+    "job": {
+     "jobId": "JOB-YOUTH-OUTREACH",
+     "noc": "42201",
+     "matches": {
+      "SVY-A-2025": [
+       {
+        "code": "SA-101",
+        "share": 100
+       }
+      ]
+     }
+    }
+   },
+   "expected": {
+    "status": "priced",
+    "market": {
+     "p25": "49591.25",
+     "p50": "54271.75",
+     "p75": "57260.00"
+    },
+    "target": "54271.75",
+    "lineage": [
+     {
+      "source": "SVY-A-2025",
+      "used": true,
+      "cut": "R1",
+      "agedTarget": "53170.00",
+      "effectiveWeightPct": "70.00"
+     },
+     {
+      "source": "PUBLIC-2025",
+      "used": true,
+      "geo": "59",
+      "agedTarget": "56842.50",
+      "effectiveWeightPct": "30.00"
+     }
+    ]
+   }
+  },
+  {
+   "id": "PRICE-002",
+   "kind": "price",
+   "title": "Blended match 60/40; the preferred cut is masked for one job, so both use the next cut",
+   "input": {
+    "asOf": "2026-01-01",
+    "editions": {
+     "SVY-A-2025": {
+      "effectiveDate": "2025-04-01",
+      "rows": [
+       {
+        "job_code": "SA-101",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 9,
+        "n_incumbents": 31,
+        "mean": 52400,
+        "p10": 45000,
+        "p25": 48500,
+        "p50": 52000,
+        "p75": 56000,
+        "p90": 60500
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 6,
+        "n_incumbents": 14,
+        "mean": 51100,
+        "p10": null,
+        "p25": 47900,
+        "p50": 50600,
+        "p75": 54800,
+        "p90": null
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 22,
+        "n_incumbents": 88,
+        "mean": 51300,
+        "p10": 44200,
+        "p25": 47600,
+        "p50": 50800,
+        "p75": 55100,
+        "p90": 59900
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 3,
+        "n_incumbents": 5,
+        "mean": null,
+        "p10": null,
+        "p25": null,
+        "p50": null,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 15,
+        "n_incumbents": 37,
+        "mean": 62300,
+        "p10": 53000,
+        "p25": 57400,
+        "p50": 61500,
+        "p75": 66800,
+        "p90": 72100
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 4,
+        "mean": 64000,
+        "p10": null,
+        "p25": null,
+        "p50": 63500,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 6,
+        "mean": 63800,
+        "p10": null,
+        "p25": null,
+        "p50": 63000,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-202",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 18,
+        "n_incumbents": 40,
+        "mean": 71200,
+        "p10": 59000,
+        "p25": 64100,
+        "p50": 70000,
+        "p75": 76500,
+        "p90": 84000
+       }
+      ]
+     },
+     "PUBLIC-2025": {
+      "effectiveDate": "2024-01-01",
+      "rows": [
+       {
+        "noc": "42201",
+        "geo": "59",
+        "basis": "hourly",
+        "low": "20.00",
+        "median": "27.50",
+        "high": "38.00"
+       },
+       {
+        "noc": "42201",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "19.00",
+        "median": "26.00",
+        "high": "36.06"
+       },
+       {
+        "noc": "13102",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "21.00",
+        "median": "30.00",
+        "high": "41.00"
+       }
+      ],
+      "statisticColumns": {
+       "p10": "low",
+       "p50": "median",
+       "p90": "high"
+      }
+     }
+    },
+    "definition": {
+     "statistic": "p50",
+     "statistics": [
+      "p25",
+      "p50",
+      "p75"
+     ],
+     "adjustPct": 0,
+     "ageing": {
+      "method": "compound",
+      "annualRate": "0.03"
+     },
+     "minimum": {
+      "nOrgs": 4
+     },
+     "minSources": 1,
+     "sources": [
+      {
+       "code": "SVY-A-2025",
+       "kind": "survey",
+       "weighting": "organization",
+       "element": "base_salary",
+       "cutChain": [
+        "F2",
+        "ALL"
+       ],
+       "weight": 100
+      }
+     ]
+    },
+    "job": {
+     "jobId": "JOB-PROGRAM-COORD",
+     "matches": {
+      "SVY-A-2025": [
+       {
+        "code": "SA-101",
+        "share": 60
+       },
+       {
+        "code": "SA-102",
+        "share": 40
+       }
+      ]
+     }
+    }
+   },
+   "expected": {
+    "status": "priced",
+    "market": {
+     "p25": "52674.91",
+     "p50": "56314.71",
+     "p75": "61120.07"
+    },
+    "target": "56314.71",
+    "lineage": [
+     {
+      "source": "SVY-A-2025",
+      "used": true,
+      "cut": "ALL",
+      "agedTarget": "56314.71",
+      "effectiveWeightPct": "100.00"
+     }
+    ]
+   }
+  },
+  {
+   "id": "PRICE-003",
+   "kind": "price",
+   "title": "Survey below the tenant's minimum of 5 organizations in every cut; weight moves to public wages",
+   "input": {
+    "asOf": "2026-01-01",
+    "editions": {
+     "SVY-A-2025": {
+      "effectiveDate": "2025-04-01",
+      "rows": [
+       {
+        "job_code": "SA-101",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 9,
+        "n_incumbents": 31,
+        "mean": 52400,
+        "p10": 45000,
+        "p25": 48500,
+        "p50": 52000,
+        "p75": 56000,
+        "p90": 60500
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 6,
+        "n_incumbents": 14,
+        "mean": 51100,
+        "p10": null,
+        "p25": 47900,
+        "p50": 50600,
+        "p75": 54800,
+        "p90": null
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 22,
+        "n_incumbents": 88,
+        "mean": 51300,
+        "p10": 44200,
+        "p25": 47600,
+        "p50": 50800,
+        "p75": 55100,
+        "p90": 59900
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 3,
+        "n_incumbents": 5,
+        "mean": null,
+        "p10": null,
+        "p25": null,
+        "p50": null,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 15,
+        "n_incumbents": 37,
+        "mean": 62300,
+        "p10": 53000,
+        "p25": 57400,
+        "p50": 61500,
+        "p75": 66800,
+        "p90": 72100
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 4,
+        "mean": 64000,
+        "p10": null,
+        "p25": null,
+        "p50": 63500,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 6,
+        "mean": 63800,
+        "p10": null,
+        "p25": null,
+        "p50": 63000,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-202",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 18,
+        "n_incumbents": 40,
+        "mean": 71200,
+        "p10": 59000,
+        "p25": 64100,
+        "p50": 70000,
+        "p75": 76500,
+        "p90": 84000
+       }
+      ]
+     },
+     "PUBLIC-2025": {
+      "effectiveDate": "2024-01-01",
+      "rows": [
+       {
+        "noc": "42201",
+        "geo": "59",
+        "basis": "hourly",
+        "low": "20.00",
+        "median": "27.50",
+        "high": "38.00"
+       },
+       {
+        "noc": "42201",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "19.00",
+        "median": "26.00",
+        "high": "36.06"
+       },
+       {
+        "noc": "13102",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "21.00",
+        "median": "30.00",
+        "high": "41.00"
+       }
+      ],
+      "statisticColumns": {
+       "p10": "low",
+       "p50": "median",
+       "p90": "high"
+      }
+     }
+    },
+    "definition": {
+     "statistic": "p50",
+     "statistics": [
+      "p25",
+      "p50",
+      "p75"
+     ],
+     "adjustPct": 0,
+     "ageing": {
+      "method": "simple",
+      "annualRate": "0.03"
+     },
+     "minimum": {
+      "nOrgs": 5
+     },
+     "minSources": 1,
+     "sources": [
+      {
+       "code": "SVY-A-2025",
+       "kind": "survey",
+       "weighting": "organization",
+       "element": "base_salary",
+       "cutChain": [
+        "R1",
+        "ALL"
+       ],
+       "weight": 70
+      },
+      {
+       "code": "PUBLIC-2025",
+       "kind": "public_wage",
+       "geoChain": [
+        "5920",
+        "59",
+        "CA"
+       ],
+       "hoursBasis": "1950",
+       "weight": 30
+      }
+     ]
+    },
+    "job": {
+     "jobId": "JOB-PAYROLL-COORD",
+     "noc": "13102",
+     "matches": {
+      "SVY-A-2025": [
+       {
+        "code": "SA-201",
+        "share": 100
+       }
+      ]
+     }
+    }
+   },
+   "expected": {
+    "status": "priced",
+    "market": {
+     "p25": null,
+     "p50": "62010.00",
+     "p75": null
+    },
+    "target": "62010.00",
+    "lineage": [
+     {
+      "source": "SVY-A-2025",
+      "used": false,
+      "reason": "NO_USABLE_CUT"
+     },
+     {
+      "source": "PUBLIC-2025",
+      "used": true,
+      "geo": "CA",
+      "agedTarget": "62010.00",
+      "effectiveWeightPct": "100.00"
+     }
+    ]
+   }
+  },
+  {
+   "id": "PRICE-004",
+   "kind": "price",
+   "title": "No match and no NOC code: insufficient data, nothing invented",
+   "input": {
+    "asOf": "2026-01-01",
+    "editions": {
+     "SVY-A-2025": {
+      "effectiveDate": "2025-04-01",
+      "rows": [
+       {
+        "job_code": "SA-101",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 9,
+        "n_incumbents": 31,
+        "mean": 52400,
+        "p10": 45000,
+        "p25": 48500,
+        "p50": 52000,
+        "p75": 56000,
+        "p90": 60500
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 6,
+        "n_incumbents": 14,
+        "mean": 51100,
+        "p10": null,
+        "p25": 47900,
+        "p50": 50600,
+        "p75": 54800,
+        "p90": null
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 22,
+        "n_incumbents": 88,
+        "mean": 51300,
+        "p10": 44200,
+        "p25": 47600,
+        "p50": 50800,
+        "p75": 55100,
+        "p90": 59900
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 3,
+        "n_incumbents": 5,
+        "mean": null,
+        "p10": null,
+        "p25": null,
+        "p50": null,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 15,
+        "n_incumbents": 37,
+        "mean": 62300,
+        "p10": 53000,
+        "p25": 57400,
+        "p50": 61500,
+        "p75": 66800,
+        "p90": 72100
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 4,
+        "mean": 64000,
+        "p10": null,
+        "p25": null,
+        "p50": 63500,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 6,
+        "mean": 63800,
+        "p10": null,
+        "p25": null,
+        "p50": 63000,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-202",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 18,
+        "n_incumbents": 40,
+        "mean": 71200,
+        "p10": 59000,
+        "p25": 64100,
+        "p50": 70000,
+        "p75": 76500,
+        "p90": 84000
+       }
+      ]
+     },
+     "PUBLIC-2025": {
+      "effectiveDate": "2024-01-01",
+      "rows": [
+       {
+        "noc": "42201",
+        "geo": "59",
+        "basis": "hourly",
+        "low": "20.00",
+        "median": "27.50",
+        "high": "38.00"
+       },
+       {
+        "noc": "42201",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "19.00",
+        "median": "26.00",
+        "high": "36.06"
+       },
+       {
+        "noc": "13102",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "21.00",
+        "median": "30.00",
+        "high": "41.00"
+       }
+      ],
+      "statisticColumns": {
+       "p10": "low",
+       "p50": "median",
+       "p90": "high"
+      }
+     }
+    },
+    "definition": {
+     "statistic": "p50",
+     "statistics": [
+      "p25",
+      "p50",
+      "p75"
+     ],
+     "adjustPct": 0,
+     "ageing": {
+      "method": "simple",
+      "annualRate": "0.03"
+     },
+     "minimum": {
+      "nOrgs": 4
+     },
+     "minSources": 1,
+     "sources": [
+      {
+       "code": "SVY-A-2025",
+       "kind": "survey",
+       "weighting": "organization",
+       "element": "base_salary",
+       "cutChain": [
+        "R1",
+        "ALL"
+       ],
+       "weight": 70
+      },
+      {
+       "code": "PUBLIC-2025",
+       "kind": "public_wage",
+       "geoChain": [
+        "5920",
+        "59",
+        "CA"
+       ],
+       "hoursBasis": "1950",
+       "weight": 30
+      }
+     ]
+    },
+    "job": {
+     "jobId": "JOB-NEW",
+     "matches": {}
+    }
+   },
+   "expected": {
+    "status": "insufficient_data",
+    "lineage": [
+     {
+      "source": "SVY-A-2025",
+      "used": false,
+      "reason": "NOT_MATCHED"
+     },
+     {
+      "source": "PUBLIC-2025",
+      "used": false,
+      "reason": "NO_NOC_CODE"
+     }
+    ]
+   }
+  },
+  {
+   "id": "PRICE-005",
+   "kind": "price",
+   "title": "Lead the market by 5% with a -4% geographic differential, no ageing needed",
+   "input": {
+    "asOf": "2025-04-01",
+    "editions": {
+     "SVY-A-2025": {
+      "effectiveDate": "2025-04-01",
+      "rows": [
+       {
+        "job_code": "SA-101",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 9,
+        "n_incumbents": 31,
+        "mean": 52400,
+        "p10": 45000,
+        "p25": 48500,
+        "p50": 52000,
+        "p75": 56000,
+        "p90": 60500
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 6,
+        "n_incumbents": 14,
+        "mean": 51100,
+        "p10": null,
+        "p25": 47900,
+        "p50": 50600,
+        "p75": 54800,
+        "p90": null
+       },
+       {
+        "job_code": "SA-101",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 22,
+        "n_incumbents": 88,
+        "mean": 51300,
+        "p10": 44200,
+        "p25": 47600,
+        "p50": 50800,
+        "p75": 55100,
+        "p90": 59900
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "F2",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 3,
+        "n_incumbents": 5,
+        "mean": null,
+        "p10": null,
+        "p25": null,
+        "p50": null,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-102",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 15,
+        "n_incumbents": 37,
+        "mean": 62300,
+        "p10": 53000,
+        "p25": 57400,
+        "p50": 61500,
+        "p75": 66800,
+        "p90": 72100
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "R1",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 4,
+        "mean": 64000,
+        "p10": null,
+        "p25": null,
+        "p50": 63500,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-201",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 4,
+        "n_incumbents": 6,
+        "mean": 63800,
+        "p10": null,
+        "p25": null,
+        "p50": 63000,
+        "p75": null,
+        "p90": null
+       },
+       {
+        "job_code": "SA-202",
+        "cut": "ALL",
+        "weighting": "organization",
+        "element": "base_salary",
+        "n_orgs": 18,
+        "n_incumbents": 40,
+        "mean": 71200,
+        "p10": 59000,
+        "p25": 64100,
+        "p50": 70000,
+        "p75": 76500,
+        "p90": 84000
+       }
+      ]
+     },
+     "PUBLIC-2025": {
+      "effectiveDate": "2024-01-01",
+      "rows": [
+       {
+        "noc": "42201",
+        "geo": "59",
+        "basis": "hourly",
+        "low": "20.00",
+        "median": "27.50",
+        "high": "38.00"
+       },
+       {
+        "noc": "42201",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "19.00",
+        "median": "26.00",
+        "high": "36.06"
+       },
+       {
+        "noc": "13102",
+        "geo": "CA",
+        "basis": "hourly",
+        "low": "21.00",
+        "median": "30.00",
+        "high": "41.00"
+       }
+      ],
+      "statisticColumns": {
+       "p10": "low",
+       "p50": "median",
+       "p90": "high"
+      }
+     }
+    },
+    "definition": {
+     "statistic": "p50",
+     "statistics": [
+      "p25",
+      "p50",
+      "p75"
+     ],
+     "adjustPct": 5,
+     "ageing": {
+      "method": "simple",
+      "annualRate": "0.03"
+     },
+     "minimum": {
+      "nOrgs": 4
+     },
+     "minSources": 1,
+     "sources": [
+      {
+       "code": "SVY-A-2025",
+       "kind": "survey",
+       "weighting": "organization",
+       "element": "base_salary",
+       "cutChain": [
+        "ALL"
+       ],
+       "weight": 100,
+       "geoDifferentialPct": -4
+      }
+     ]
+    },
+    "job": {
+     "jobId": "JOB-ACCOUNTANT",
+     "matches": {
+      "SVY-A-2025": [
+       {
+        "code": "SA-202",
+        "share": 100
+       }
+      ]
+     }
+    }
+   },
+   "expected": {
+    "status": "priced",
+    "market": {
+     "p25": "61536.00",
+     "p50": "67200.00",
+     "p75": "73440.00"
+    },
+    "target": "70560.00",
+    "lineage": [
+     {
+      "source": "SVY-A-2025",
+      "used": true,
+      "cut": "ALL",
+      "agedTarget": "67200.00",
+      "effectiveWeightPct": "100.00"
+     }
+    ]
+   }
+  },
+  {
+   "id": "LINE-001",
+   "kind": "market_line",
+   "title": "Market line over eight benchmark jobs, one outlier flagged",
+   "input": {
+    "points": [
+     300,
+     380,
+     460,
+     540,
+     620,
+     700,
+     780,
+     860
+    ],
+    "values": [
+     "42000",
+     "47500",
+     "55000",
+     "62000",
+     "72000",
+     "84000",
+     "99000",
+     "152000"
+    ],
+    "outlierPct": "0.15"
+   },
+   "expected": {
+    "a": "9.9486059631",
+    "b": "0.0020975312",
+    "r2": "0.9545",
+    "progressionPer100Points": "23.34",
+    "residuals": [
+     {
+      "points": 300,
+      "value": "42000",
+      "predicted": "39256.23",
+      "residualPct": "7.0",
+      "outlier": false
+     },
+     {
+      "points": 380,
+      "value": "47500",
+      "predicted": "46428.46",
+      "residualPct": "2.3",
+      "outlier": false
+     },
+     {
+      "points": 460,
+      "value": "55000",
+      "predicted": "54911.07",
+      "residualPct": "0.2",
+      "outlier": false
+     },
+     {
+      "points": 540,
+      "value": "62000",
+      "predicted": "64943.49",
+      "residualPct": "-4.5",
+      "outlier": false
+     },
+     {
+      "points": 620,
+      "value": "72000",
+      "predicted": "76808.86",
+      "residualPct": "-6.3",
+      "outlier": false
+     },
+     {
+      "points": 700,
+      "value": "84000",
+      "predicted": "90842.07",
+      "residualPct": "-7.5",
+      "outlier": false
+     },
+     {
+      "points": 780,
+      "value": "99000",
+      "predicted": "107439.19",
+      "residualPct": "-7.9",
+      "outlier": false
+     },
+     {
+      "points": 860,
+      "value": "152000",
+      "predicted": "127068.65",
+      "residualPct": "19.6",
+      "outlier": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "ANN-001",
+   "kind": "annualize",
+   "title": "Hourly rate to annual with the edition's hours basis",
+   "input": {
+    "hourly": "27.50",
+    "hours": "1950"
+   },
+   "expected": {
+    "annual": "53625.00"
+   }
+  },
+  {
+   "id": "PAY-001",
+   "kind": "pay_metrics",
+   "title": "Compa-ratio, penetration, quartile, market ratio and cost to minimum (part-time prorated)",
+   "input": {
+    "range": {
+     "minimum": "52000",
+     "midpoint": "61000",
+     "maximum": "70000"
+    },
+    "marketRate": "60000",
+    "people": [
+     {
+      "id": "E1",
+      "rate": "50000",
+      "fte": "1"
+     },
+     {
+      "id": "E2",
+      "rate": "55000",
+      "fte": "0.8"
+     },
+     {
+      "id": "E3",
+      "rate": "61000",
+      "fte": "1"
+     },
+     {
+      "id": "E4",
+      "rate": "72500",
+      "fte": "1"
+     },
+     {
+      "id": "E5",
+      "rate": "51000",
+      "fte": "0.5"
+     }
+    ]
+   },
+   "expected": {
+    "people": [
+     {
+      "id": "E1",
+      "compaRatio": "0.820",
+      "penetration": "-0.111",
+      "quartile": "below_minimum",
+      "marketRatio": "0.833"
+     },
+     {
+      "id": "E2",
+      "compaRatio": "0.902",
+      "penetration": "0.167",
+      "quartile": "Q1",
+      "marketRatio": "0.917"
+     },
+     {
+      "id": "E3",
+      "compaRatio": "1.000",
+      "penetration": "0.500",
+      "quartile": "Q3",
+      "marketRatio": "1.017"
+     },
+     {
+      "id": "E4",
+      "compaRatio": "1.189",
+      "penetration": "1.139",
+      "quartile": "above_maximum",
+      "marketRatio": "1.208"
+     },
+     {
+      "id": "E5",
+      "compaRatio": "0.836",
+      "penetration": "-0.056",
+      "quartile": "below_minimum",
+      "marketRatio": "0.850"
+     }
+    ],
+    "costToMinimum": "2500.00"
+   }
+  },
+  {
+   "id": "JE-001",
+   "kind": "job_evaluation",
+   "title": "Youth outreach worker: 560 points, grade G06, ratings inside the evidence-based suggestions",
+   "input": {
+    "ratings": {
+     "K1": 5,
+     "K2": 2,
+     "K3": 3,
+     "E1": 3,
+     "E2": 2,
+     "E3": 4,
+     "R1": 3,
+     "R2": 2,
+     "R3": 4,
+     "R4": 2,
+     "W1": 3,
+     "W2": 3
+    },
+    "evidence": {
+     "teer": 2,
+     "careerLevel": "P2",
+     "competencyTargets": {
+      "VAL": 3,
+      "CLI": 3,
+      "COM": 3,
+      "ADA": 3,
+      "RES": 3,
+      "CCR": 3,
+      "NAV": 3,
+      "SPC": 3,
+      "DIG": 2
+     }
+    }
+   },
+   "expected": {
+    "points": 560,
+    "grade": "G06",
+    "byFactor": {
+     "K1": 125,
+     "K2": 40,
+     "K3": 60,
+     "E1": 45,
+     "E2": 10,
+     "E3": 40,
+     "R1": 60,
+     "R2": 40,
+     "R3": 56,
+     "R4": 24,
+     "W1": 30,
+     "W2": 30
+    },
+    "suggestions": {
+     "K1": [
+      4,
+      5
+     ],
+     "K2": [
+      2,
+      4
+     ],
+     "K3": [
+      2,
+      4
+     ],
+     "E1": [
+      2,
+      4
+     ],
+     "R1": [
+      3,
+      4
+     ],
+     "R2": [
+      1,
+      2
+     ],
+     "R3": [
+      2,
+      4
+     ],
+     "R4": [
+      2,
+      4
+     ]
+    }
+   }
+  },
+  {
+   "id": "JE-002",
+   "kind": "job_evaluation",
+   "title": "Payroll coordinator: 427 points, grade G04",
+   "input": {
+    "ratings": {
+     "K1": 4,
+     "K2": 3,
+     "K3": 2,
+     "E1": 3,
+     "E2": 2,
+     "E3": 1,
+     "R1": 3,
+     "R2": 1,
+     "R3": 1,
+     "R4": 4,
+     "W1": 1,
+     "W2": 1
+    }
+   },
+   "expected": {
+    "points": 427,
+    "grade": "G04",
+    "byFactor": {
+     "K1": 100,
+     "K2": 60,
+     "K3": 40,
+     "E1": 45,
+     "E2": 10,
+     "E3": 10,
+     "R1": 60,
+     "R2": 20,
+     "R3": 14,
+     "R4": 48,
+     "W1": 10,
+     "W2": 10
+    }
+   }
+  },
+  {
+   "id": "JE-003",
+   "kind": "job_evaluation",
+   "title": "An evaluation missing a factor cannot be scored",
+   "input": {
+    "ratings": {
+     "K1": 4,
+     "K2": 3,
+     "K3": 2,
+     "E1": 3,
+     "E2": 2,
+     "E3": 1,
+     "R1": 3,
+     "R2": 1,
+     "R3": 1,
+     "R4": 4,
+     "W1": 1
+    }
+   },
+   "expected": {
+    "error": "EVALUATION_INCOMPLETE"
+   }
+  },
+  {
+   "id": "PRAC-001",
+   "kind": "practice",
+   "title": "Practice comparisons in each direction",
+   "input": {
+    "comparisons": [
+     {
+      "practice": "LIF_BASIC_MULT",
+      "own": 2,
+      "market": {
+       "p50": 2,
+       "prevalence_pct": 97
+      }
+     },
+     {
+      "practice": "STD_WAIT_DAYS",
+      "own": 3,
+      "market": {
+       "p50": 7,
+       "prevalence_pct": 64
+      }
+     },
+     {
+      "practice": "HLT_PARAMED_MAX",
+      "own": 500,
+      "market": {
+       "p50": 510,
+       "prevalence_pct": 95
+      }
+     },
+     {
+      "practice": "ACC_HSA",
+      "own": 300,
+      "market": {
+       "p50": 500,
+       "prevalence_pct": 58
+      }
+     },
+     {
+      "practice": "WEL_EAP",
+      "own": true,
+      "market": {
+       "prevalence_pct": 92
+      }
+     },
+     {
+      "practice": "TOF_SABBATICAL",
+      "own": true,
+      "market": {
+       "prevalence_pct": 20
+      }
+     },
+     {
+      "practice": "HLT_DRUG_CARD",
+      "own": false,
+      "market": {
+       "prevalence_pct": 85
+      }
+     },
+     {
+      "practice": "ALW_PARKING",
+      "own": "subsidized",
+      "market": {
+       "mode": "none",
+       "prevalence_pct": 100
+      }
+     },
+     {
+      "practice": "PAY_INCREASE_BUDGET",
+      "own": 3,
+      "market": {
+       "p50": 3.5,
+       "prevalence_pct": 100
+      }
+     }
+    ]
+   },
+   "expected": {
+    "results": {
+     "LIF_BASIC_MULT": "at_market",
+     "STD_WAIT_DAYS": "richer",
+     "HLT_PARAMED_MAX": "at_market",
+     "ACC_HSA": "leaner",
+     "WEL_EAP": "at_market",
+     "TOF_SABBATICAL": "richer",
+     "HLT_DRUG_CARD": "leaner",
+     "ALW_PARKING": "richer",
+     "PAY_INCREASE_BUDGET": "not_compared"
+    }
+   }
+  },
+  {
+   "id": "STRUCT-001",
+   "kind": "structure",
+   "title": "Ten grades from the LINE-001 market line: midpoints, ranges, progression and overlap",
+   "input": {
+    "line": {
+     "a": "9.9486059631",
+     "b": "0.0020975312"
+    },
+    "bands": [
+     {
+      "grade": "G01",
+      "min": 180,
+      "max": 249
+     },
+     {
+      "grade": "G02",
+      "min": 250,
+      "max": 319
+     },
+     {
+      "grade": "G03",
+      "min": 320,
+      "max": 389
+     },
+     {
+      "grade": "G04",
+      "min": 390,
+      "max": 459
+     },
+     {
+      "grade": "G05",
+      "min": 460,
+      "max": 529
+     },
+     {
+      "grade": "G06",
+      "min": 530,
+      "max": 609
+     },
+     {
+      "grade": "G07",
+      "min": 610,
+      "max": 689
+     },
+     {
+      "grade": "G08",
+      "min": 690,
+      "max": 779
+     },
+     {
+      "grade": "G09",
+      "min": 780,
+      "max": 879
+     },
+     {
+      "grade": "G10",
+      "min": 880,
+      "max": 1000
+     }
+    ],
+    "spreads": {
+     "G01": 30,
+     "G02": 30,
+     "G03": 30,
+     "G04": 40,
+     "G05": 40,
+     "G06": 40,
+     "G07": 50,
+     "G08": 50,
+     "G09": 60,
+     "G10": 60
+    },
+    "rounding": 100
+   },
+   "expected": {
+    "grades": [
+     {
+      "grade": "G01",
+      "pointsMid": "214.5",
+      "minimum": "28500",
+      "midpoint": "32800",
+      "maximum": "37100",
+      "spreadPct": "30",
+      "progressionPct": null
+     },
+     {
+      "grade": "G02",
+      "pointsMid": "284.5",
+      "minimum": "33000",
+      "midpoint": "38000",
+      "maximum": "43000",
+      "spreadPct": "30",
+      "progressionPct": "15.9",
+      "overlapWithLowerPct": "41.0"
+     },
+     {
+      "grade": "G03",
+      "pointsMid": "354.5",
+      "minimum": "38300",
+      "midpoint": "44000",
+      "maximum": "49700",
+      "spreadPct": "30",
+      "progressionPct": "15.8",
+      "overlapWithLowerPct": "41.2"
+     },
+     {
+      "grade": "G04",
+      "pointsMid": "424.5",
+      "minimum": "42500",
+      "midpoint": "51000",
+      "maximum": "59500",
+      "spreadPct": "40",
+      "progressionPct": "15.9",
+      "overlapWithLowerPct": "42.4"
+     },
+     {
+      "grade": "G05",
+      "pointsMid": "494.5",
+      "minimum": "49200",
+      "midpoint": "59000",
+      "maximum": "68800",
+      "spreadPct": "40",
+      "progressionPct": "15.7",
+      "overlapWithLowerPct": "52.6"
+     },
+     {
+      "grade": "G06",
+      "pointsMid": "569.5",
+      "minimum": "57600",
+      "midpoint": "69100",
+      "maximum": "80600",
+      "spreadPct": "40",
+      "progressionPct": "17.1",
+      "overlapWithLowerPct": "48.7"
+     },
+     {
+      "grade": "G07",
+      "pointsMid": "649.5",
+      "minimum": "65400",
+      "midpoint": "81700",
+      "maximum": "98000",
+      "spreadPct": "50",
+      "progressionPct": "18.2",
+      "overlapWithLowerPct": "46.6"
+     },
+     {
+      "grade": "G08",
+      "pointsMid": "734.5",
+      "minimum": "78200",
+      "midpoint": "97700",
+      "maximum": "117200",
+      "spreadPct": "50",
+      "progressionPct": "19.6",
+      "overlapWithLowerPct": "50.8"
+     },
+     {
+      "grade": "G09",
+      "pointsMid": "829.5",
+      "minimum": "91700",
+      "midpoint": "119200",
+      "maximum": "146700",
+      "spreadPct": "60",
+      "progressionPct": "22.0",
+      "overlapWithLowerPct": "46.4"
+     },
+     {
+      "grade": "G10",
+      "pointsMid": "940",
+      "minimum": "115600",
+      "midpoint": "150300",
+      "maximum": "185000",
+      "spreadPct": "60",
+      "progressionPct": "26.1",
+      "overlapWithLowerPct": "44.8"
+     }
+    ]
+   }
+  }
+ ]
+}

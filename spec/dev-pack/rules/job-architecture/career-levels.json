@@ -1,0 +1,737 @@
+{
+ "description": "CanDo default job architecture: career tracks and levels, with starter job families. Loaded as the CAREER_LEVEL and JOB_FAMILY tenant code schemes (docs/18 §3) when a tenant switches them on; every value can be renamed, removed or added to. Defaults for competency targets, TEER and job evaluation points are proposals used for suggestions and consistency warnings, never for blocking (docs/19 §3).",
+ "version": "2026.10",
+ "status": "proposed",
+ "scale_reference": "Competency levels refer to the five-level scale of rules/competencies/unified-competency-model.json (1 Foundational … 5 Strategic). Points refer to rules/job-evaluation/sample-point-factor-plan.json (180 to 1000).",
+ "competency_groups": {
+  "CORE": [
+   "VAL",
+   "CLI",
+   "COM",
+   "ADA",
+   "RES"
+  ],
+  "LEAD": [
+   "TLD",
+   "STR",
+   "CHG"
+  ],
+  "FUNC": [
+   "CCR",
+   "NAV",
+   "SPC",
+   "DIG"
+  ]
+ },
+ "tracks": [
+  {
+   "code": "S",
+   "name_en": "Support and operations",
+   "name_fr": "Soutien et opérations",
+   "summary_en": "Work that follows established procedures, from routine tasks to skilled and lead-hand work: administration, client service, facilities, trades and operations.",
+   "summary_fr": "Travail qui suit des procédures établies, des tâches courantes au travail spécialisé et de chef d’équipe : administration, service à la clientèle, installations, métiers et opérations."
+  },
+  {
+   "code": "P",
+   "name_en": "Professional and technical",
+   "name_fr": "Professionnel et technique",
+   "summary_en": "Individual contributors who apply a body of professional or technical knowledge, from new graduates to recognized experts. No people management, though senior levels may direct others' work.",
+   "summary_fr": "Contributeurs individuels qui appliquent un ensemble de connaissances professionnelles ou techniques, du nouveau diplômé à l’expert reconnu. Aucune gestion de personnel, même si les niveaux supérieurs peuvent orienter le travail des autres."
+  },
+  {
+   "code": "M",
+   "name_en": "Management",
+   "name_fr": "Gestion",
+   "summary_en": "Leaders accountable for other people's work: hiring, direction, performance and pay recommendations, from first-line supervisors to directors.",
+   "summary_fr": "Leaders responsables du travail d’autres personnes : embauche, direction, rendement et recommandations salariales, du superviseur de premier niveau au directeur."
+  },
+  {
+   "code": "E",
+   "name_en": "Executive",
+   "name_fr": "Direction",
+   "summary_en": "The executive team: heads of major functions and the chief executive, accountable for strategy and results of the whole organization.",
+   "summary_fr": "L’équipe de direction : responsables des grandes fonctions et premier dirigeant, responsables de la stratégie et des résultats de l’ensemble de l’organisation."
+  }
+ ],
+ "levels": [
+  {
+   "code": "S1",
+   "track": "S",
+   "rank": 1,
+   "name_en": "Entry support",
+   "name_fr": "Soutien – débutant",
+   "summary_en": "Performs routine, well-defined tasks after a short orientation, with work checked often.",
+   "summary_fr": "Effectue des tâches courantes et bien définies après une brève initiation; le travail est vérifié souvent.",
+   "dimensions": {
+    "scope": "Own tasks, set by others",
+    "autonomy": "Close guidance; clear instructions for each task",
+    "problem_solving": "Recognizes when something is not routine and refers it",
+    "influence": "Own work; courteous contact with clients and colleagues",
+    "people": "none"
+   },
+   "typical_experience_years": [
+    0,
+    1
+   ],
+   "typical_teer": [
+    4,
+    5
+   ],
+   "typical_points": [
+    180,
+    300
+   ],
+   "competency_defaults": {
+    "CORE": 1,
+    "FUNC": 1,
+    "LEAD": null
+   }
+  },
+  {
+   "code": "S2",
+   "track": "S",
+   "rank": 2,
+   "name_en": "Support",
+   "name_fr": "Soutien",
+   "summary_en": "Carries out a range of standard tasks independently once trained, choosing among set procedures.",
+   "summary_fr": "Exécute de façon autonome, après formation, un éventail de tâches standard en choisissant parmi des procédures établies.",
+   "dimensions": {
+    "scope": "A defined set of duties",
+    "autonomy": "Works from procedures; checks in on exceptions",
+    "problem_solving": "Solves routine problems using established methods",
+    "influence": "Own work and the clients served",
+    "people": "none"
+   },
+   "typical_experience_years": [
+    1,
+    3
+   ],
+   "typical_teer": [
+    3,
+    4
+   ],
+   "typical_points": [
+    240,
+    380
+   ],
+   "competency_defaults": {
+    "CORE": 2,
+    "FUNC": 2,
+    "LEAD": null
+   }
+  },
+  {
+   "code": "S3",
+   "track": "S",
+   "rank": 3,
+   "name_en": "Senior support or skilled",
+   "name_fr": "Soutien principal ou spécialisé",
+   "summary_en": "Handles varied and sometimes complex work that needs specialized training or a trade, and helps train others.",
+   "summary_fr": "Traite un travail varié et parfois complexe qui exige une formation spécialisée ou un métier, et aide à former les autres.",
+   "dimensions": {
+    "scope": "A full process or service area",
+    "autonomy": "General direction; plans own work",
+    "problem_solving": "Adapts procedures to unusual cases",
+    "influence": "Peers and clients; trains new staff",
+    "people": "work_direction"
+   },
+   "typical_experience_years": [
+    3,
+    6
+   ],
+   "typical_teer": [
+    2,
+    3
+   ],
+   "typical_points": [
+    320,
+    460
+   ],
+   "competency_defaults": {
+    "CORE": 2,
+    "FUNC": 3,
+    "LEAD": null
+   }
+  },
+  {
+   "code": "S4",
+   "track": "S",
+   "rank": 4,
+   "name_en": "Lead hand or specialist",
+   "name_fr": "Chef d’équipe ou spécialiste",
+   "summary_en": "The most experienced support or skilled work: leads a crew or shift, or is the go-to specialist for a process, without formal people management.",
+   "summary_fr": "Le travail de soutien ou spécialisé le plus expérimenté : dirige une équipe ou un quart, ou est le spécialiste de référence d’un processus, sans gestion formelle du personnel.",
+   "dimensions": {
+    "scope": "A crew, shift or process",
+    "autonomy": "Broad direction; sets daily priorities",
+    "problem_solving": "Resolves non-standard problems and improves procedures",
+    "influence": "The team's daily work and quality",
+    "people": "work_direction"
+   },
+   "typical_experience_years": [
+    5,
+    10
+   ],
+   "typical_teer": [
+    2,
+    3
+   ],
+   "typical_points": [
+    380,
+    520
+   ],
+   "competency_defaults": {
+    "CORE": 3,
+    "FUNC": 3,
+    "LEAD": null,
+    "byCompetency": {
+     "TLD": 2
+    }
+   }
+  },
+  {
+   "code": "P1",
+   "track": "P",
+   "rank": 3,
+   "name_en": "Developing professional",
+   "name_fr": "Professionnel en développement",
+   "summary_en": "Applies professional or technical knowledge, usually from a degree or diploma, to defined assignments while building experience.",
+   "summary_fr": "Applique des connaissances professionnelles ou techniques, généralement acquises par un diplôme, à des mandats définis tout en acquérant de l’expérience.",
+   "dimensions": {
+    "scope": "Defined assignments or a small caseload",
+    "autonomy": "Regular guidance and review",
+    "problem_solving": "Solves problems with known methods; asks on new ones",
+    "influence": "Own work and clients",
+    "people": "none"
+   },
+   "typical_experience_years": [
+    0,
+    2
+   ],
+   "typical_teer": [
+    1,
+    2
+   ],
+   "typical_points": [
+    340,
+    480
+   ],
+   "competency_defaults": {
+    "CORE": 2,
+    "FUNC": 2,
+    "LEAD": null
+   }
+  },
+  {
+   "code": "P2",
+   "track": "P",
+   "rank": 4,
+   "name_en": "Professional",
+   "name_fr": "Professionnel",
+   "summary_en": "Fully competent in the discipline; handles the normal range of work independently and judges when to escalate.",
+   "summary_fr": "Pleinement compétent dans sa discipline; traite de façon autonome l’éventail normal du travail et juge quand faire appel à d’autres.",
+   "dimensions": {
+    "scope": "A full caseload, program component or professional area",
+    "autonomy": "General direction; results reviewed",
+    "problem_solving": "Analyses moderately complex problems and chooses among approaches",
+    "influence": "Clients, peers and partners on own files",
+    "people": "none"
+   },
+   "typical_experience_years": [
+    2,
+    6
+   ],
+   "typical_teer": [
+    1,
+    2
+   ],
+   "typical_points": [
+    420,
+    580
+   ],
+   "competency_defaults": {
+    "CORE": 3,
+    "FUNC": 3,
+    "LEAD": null
+   }
+  },
+  {
+   "code": "P3",
+   "track": "P",
+   "rank": 5,
+   "name_en": "Senior professional",
+   "name_fr": "Professionnel principal",
+   "summary_en": "Handles the most complex work in the discipline, advises others and leads projects; may guide junior staff.",
+   "summary_fr": "Traite le travail le plus complexe de la discipline, conseille les autres et dirige des projets; peut guider le personnel moins expérimenté.",
+   "dimensions": {
+    "scope": "Complex files, projects or a professional program area",
+    "autonomy": "Broad objectives; little review",
+    "problem_solving": "Develops new approaches where precedents are limited",
+    "influence": "The team and partner organizations",
+    "people": "work_direction"
+   },
+   "typical_experience_years": [
+    5,
+    10
+   ],
+   "typical_teer": [
+    1
+   ],
+   "typical_points": [
+    500,
+    660
+   ],
+   "competency_defaults": {
+    "CORE": 3,
+    "FUNC": 4,
+    "LEAD": null,
+    "byCompetency": {
+     "STR": 2,
+     "CHG": 2
+    }
+   }
+  },
+  {
+   "code": "P4",
+   "track": "P",
+   "rank": 6,
+   "name_en": "Expert",
+   "name_fr": "Expert",
+   "summary_en": "Recognized authority in a field inside the organization; sets methods and standards and advises leaders.",
+   "summary_fr": "Autorité reconnue dans un domaine au sein de l’organisation; établit les méthodes et les normes et conseille les dirigeants.",
+   "dimensions": {
+    "scope": "A field of practice across the organization",
+    "autonomy": "Sets own agenda within strategy",
+    "problem_solving": "Resolves the hardest problems in the field; anticipates new ones",
+    "influence": "Leaders, funders and external bodies on the field",
+    "people": "work_direction"
+   },
+   "typical_experience_years": [
+    8,
+    15
+   ],
+   "typical_teer": [
+    1
+   ],
+   "typical_points": [
+    580,
+    740
+   ],
+   "competency_defaults": {
+    "CORE": 4,
+    "FUNC": 4,
+    "LEAD": null,
+    "byCompetency": {
+     "TLD": 2,
+     "STR": 3,
+     "CHG": 3
+    }
+   }
+  },
+  {
+   "code": "P5",
+   "track": "P",
+   "rank": 7,
+   "name_en": "Principal expert",
+   "name_fr": "Expert principal",
+   "summary_en": "Rare level for an expert whose work shapes the organization's direction or its sector; usually only in large organizations.",
+   "summary_fr": "Niveau rare pour un expert dont le travail oriente l’organisation ou son secteur; généralement seulement dans les grandes organisations.",
+   "dimensions": {
+    "scope": "The organization and its sector",
+    "autonomy": "Defines problems as well as solutions",
+    "problem_solving": "Original work with long-term effect",
+    "influence": "Executives, governments and the sector",
+    "people": "work_direction"
+   },
+   "typical_experience_years": [
+    12,
+    null
+   ],
+   "typical_teer": [
+    1
+   ],
+   "typical_points": [
+    660,
+    820
+   ],
+   "competency_defaults": {
+    "CORE": 4,
+    "FUNC": 5,
+    "LEAD": null,
+    "byCompetency": {
+     "TLD": 3,
+     "STR": 4,
+     "CHG": 4
+    }
+   }
+  },
+  {
+   "code": "M1",
+   "track": "M",
+   "rank": 5,
+   "name_en": "Supervisor or team lead",
+   "name_fr": "Superviseur ou chef d’équipe",
+   "summary_en": "First-line leader of a team or shift: assigns and checks work, coaches, and takes part in hiring and performance decisions.",
+   "summary_fr": "Leader de premier niveau d’une équipe ou d’un quart : attribue et vérifie le travail, encadre et participe aux décisions d’embauche et de rendement.",
+   "dimensions": {
+    "scope": "One team, shift or site",
+    "autonomy": "Operates within a manager's plan and budget",
+    "problem_solving": "Solves operational problems; escalates policy issues",
+    "influence": "The team's results and climate",
+    "people": "supervises"
+   },
+   "typical_experience_years": [
+    3,
+    8
+   ],
+   "typical_teer": [
+    0,
+    1,
+    2
+   ],
+   "typical_points": [
+    440,
+    600
+   ],
+   "competency_defaults": {
+    "CORE": 3,
+    "FUNC": 3,
+    "LEAD": 2,
+    "byCompetency": {
+     "TLD": 3
+    }
+   }
+  },
+  {
+   "code": "M2",
+   "track": "M",
+   "rank": 6,
+   "name_en": "Manager",
+   "name_fr": "Gestionnaire",
+   "summary_en": "Manages a program, service or function through staff and supervisors: plans, budgets, hires and is accountable for results.",
+   "summary_fr": "Gère un programme, un service ou une fonction par l’entremise de son personnel et de superviseurs : planifie, budgète, embauche et répond des résultats.",
+   "dimensions": {
+    "scope": "A program, service or function",
+    "autonomy": "Sets plans within the department's direction",
+    "problem_solving": "Balances competing priorities and resources",
+    "influence": "The unit, partners and funders",
+    "people": "supervises"
+   },
+   "typical_experience_years": [
+    5,
+    12
+   ],
+   "typical_teer": [
+    0
+   ],
+   "typical_points": [
+    520,
+    700
+   ],
+   "competency_defaults": {
+    "CORE": 3,
+    "FUNC": 3,
+    "LEAD": 3,
+    "byCompetency": {
+     "TLD": 4
+    }
+   }
+  },
+  {
+   "code": "M3",
+   "track": "M",
+   "rank": 7,
+   "name_en": "Senior manager",
+   "name_fr": "Gestionnaire principal",
+   "summary_en": "Leads several programs or a large function through managers; shapes plans and policies for the area.",
+   "summary_fr": "Dirige plusieurs programmes ou une grande fonction par l’entremise de gestionnaires; façonne les plans et les politiques du secteur.",
+   "dimensions": {
+    "scope": "Several programs or a large function",
+    "autonomy": "Direction from an executive; wide discretion",
+    "problem_solving": "Resolves issues that cross programs and functions",
+    "influence": "The department and external partners",
+    "people": "manages_managers"
+   },
+   "typical_experience_years": [
+    8,
+    15
+   ],
+   "typical_teer": [
+    0
+   ],
+   "typical_points": [
+    620,
+    800
+   ],
+   "competency_defaults": {
+    "CORE": 4,
+    "FUNC": 4,
+    "LEAD": 4,
+    "byCompetency": {
+     "STR": 3
+    }
+   }
+  },
+  {
+   "code": "M4",
+   "track": "M",
+   "rank": 8,
+   "name_en": "Director",
+   "name_fr": "Directeur",
+   "summary_en": "Heads a department or major function below the executive team; sets its strategy, structure and budget.",
+   "summary_fr": "Dirige un service ou une grande fonction sous l’équipe de direction; en établit la stratégie, la structure et le budget.",
+   "dimensions": {
+    "scope": "A department or major function",
+    "autonomy": "Accountable to an executive for the department's results",
+    "problem_solving": "Sets direction where goals conflict",
+    "influence": "The organization, funders and the community",
+    "people": "manages_managers"
+   },
+   "typical_experience_years": [
+    10,
+    null
+   ],
+   "typical_teer": [
+    0
+   ],
+   "typical_points": [
+    700,
+    880
+   ],
+   "competency_defaults": {
+    "CORE": 4,
+    "FUNC": 4,
+    "LEAD": 4
+   }
+  },
+  {
+   "code": "E1",
+   "track": "E",
+   "rank": 9,
+   "name_en": "Executive",
+   "name_fr": "Cadre de direction",
+   "summary_en": "Member of the executive team heading a major part of the organization, with directors or managers reporting in.",
+   "summary_fr": "Membre de l’équipe de direction à la tête d’une grande partie de l’organisation, avec des directeurs ou des gestionnaires sous sa responsabilité.",
+   "dimensions": {
+    "scope": "A major part of the organization",
+    "autonomy": "Accountable to the chief executive; shapes organization strategy",
+    "problem_solving": "Strategic choices with long-term effect",
+    "influence": "The board, governments, funders and the sector",
+    "people": "leads_function"
+   },
+   "typical_experience_years": [
+    12,
+    null
+   ],
+   "typical_teer": [
+    0
+   ],
+   "typical_points": [
+    800,
+    960
+   ],
+   "competency_defaults": {
+    "CORE": 5,
+    "FUNC": 4,
+    "LEAD": 5
+   }
+  },
+  {
+   "code": "E2",
+   "track": "E",
+   "rank": 10,
+   "name_en": "Chief executive",
+   "name_fr": "Premier dirigeant",
+   "summary_en": "The top position, reporting to the board; accountable for the mission, strategy and all operations.",
+   "summary_fr": "Le poste le plus élevé, relevant du conseil d’administration; responsable de la mission, de la stratégie et de toutes les opérations.",
+   "dimensions": {
+    "scope": "The whole organization",
+    "autonomy": "Accountable to the board",
+    "problem_solving": "Sets the organization's direction",
+    "influence": "Board, members, governments and the public",
+    "people": "leads_organization"
+   },
+   "typical_experience_years": [
+    15,
+    null
+   ],
+   "typical_teer": [
+    0
+   ],
+   "typical_points": [
+    880,
+    1000
+   ],
+   "competency_defaults": {
+    "CORE": 5,
+    "FUNC": 4,
+    "LEAD": 5
+   }
+  }
+ ],
+ "people_values": {
+  "none": "No direction of others",
+  "work_direction": "Assigns or checks others' work without formal people management",
+  "supervises": "Formal people management of individual contributors",
+  "manages_managers": "People management of supervisors or managers",
+  "leads_function": "Leads a major function through managers",
+  "leads_organization": "Leads the organization"
+ },
+ "job_code_pattern": {
+  "description": "Recommended, not required: family + sub-family + level, for example CSV-YTH-P2 for a youth program professional. The pattern keeps survey matching simple because a job family and level can map to a survey's family and level in one step (docs/19 §6.3).",
+  "pattern": "^[A-Z]{3}(-[A-Z0-9]{2,4})?-(S[1-4]|P[1-5]|M[1-4]|E[12])$"
+ },
+ "starter_job_families": [
+  {
+   "code": "EXE",
+   "name_en": "Executive leadership",
+   "name_fr": "Direction générale"
+  },
+  {
+   "code": "CSV",
+   "name_en": "Client and community services",
+   "name_fr": "Services à la clientèle et à la communauté",
+   "sub_families": [
+    {
+     "code": "YTH",
+     "name_en": "Youth",
+     "name_fr": "Jeunesse"
+    },
+    {
+     "code": "HSG",
+     "name_en": "Housing",
+     "name_fr": "Logement"
+    },
+    {
+     "code": "SET",
+     "name_en": "Settlement and newcomer services",
+     "name_fr": "Établissement et services aux nouveaux arrivants"
+    },
+    {
+     "code": "CNS",
+     "name_en": "Counselling",
+     "name_fr": "Counselling"
+    },
+    {
+     "code": "GEN",
+     "name_en": "General",
+     "name_fr": "Général"
+    }
+   ]
+  },
+  {
+   "code": "HLT",
+   "name_en": "Health and care",
+   "name_fr": "Santé et soins"
+  },
+  {
+   "code": "EDU",
+   "name_en": "Education and training",
+   "name_fr": "Éducation et formation"
+  },
+  {
+   "code": "FIN",
+   "name_en": "Finance and accounting",
+   "name_fr": "Finances et comptabilité",
+   "sub_families": [
+    {
+     "code": "ACC",
+     "name_en": "Accounting",
+     "name_fr": "Comptabilité"
+    },
+    {
+     "code": "PAY",
+     "name_en": "Payroll",
+     "name_fr": "Paie"
+    },
+    {
+     "code": "GEN",
+     "name_en": "General",
+     "name_fr": "Général"
+    }
+   ]
+  },
+  {
+   "code": "PPL",
+   "name_en": "People and culture",
+   "name_fr": "Personnes et culture",
+   "sub_families": [
+    {
+     "code": "TAQ",
+     "name_en": "Talent acquisition",
+     "name_fr": "Acquisition de talents"
+    },
+    {
+     "code": "REW",
+     "name_en": "Total rewards",
+     "name_fr": "Rémunération globale"
+    },
+    {
+     "code": "GEN",
+     "name_en": "General",
+     "name_fr": "Général"
+    }
+   ]
+  },
+  {
+   "code": "TEC",
+   "name_en": "Technology and data",
+   "name_fr": "Technologie et données"
+  },
+  {
+   "code": "CMK",
+   "name_en": "Communications and marketing",
+   "name_fr": "Communications et marketing"
+  },
+  {
+   "code": "FDV",
+   "name_en": "Fund development",
+   "name_fr": "Développement philanthropique"
+  },
+  {
+   "code": "POL",
+   "name_en": "Policy, research and evaluation",
+   "name_fr": "Politiques, recherche et évaluation"
+  },
+  {
+   "code": "ADM",
+   "name_en": "Administration",
+   "name_fr": "Administration"
+  },
+  {
+   "code": "FAC",
+   "name_en": "Facilities and operations",
+   "name_fr": "Installations et opérations"
+  },
+  {
+   "code": "LEG",
+   "name_en": "Legal, risk and governance",
+   "name_fr": "Affaires juridiques, risques et gouvernance"
+  },
+  {
+   "code": "REG",
+   "name_en": "Regulation and standards",
+   "name_fr": "Réglementation et normes"
+  }
+ ],
+ "consistency_rules": [
+  {
+   "code": "LEVEL_TEER",
+   "severity": "warning",
+   "text_en": "The job's NOC TEER is outside the level's typical TEER range. Check the level or the NOC code.",
+   "text_fr": "La catégorie FER (TEER) de la CNP de l’emploi est hors de la plage habituelle du niveau. Vérifiez le niveau ou le code CNP."
+  },
+  {
+   "code": "LEVEL_POINTS",
+   "severity": "warning",
+   "text_en": "The job's evaluated points are outside the level's typical range. Check the evaluation or the level.",
+   "text_fr": "Les points d’évaluation de l’emploi sont hors de la plage habituelle du niveau. Vérifiez l’évaluation ou le niveau."
+  },
+  {
+   "code": "LEVEL_PEOPLE",
+   "severity": "warning",
+   "text_en": "A management-track level is set but the position has no reports, or an individual-contributor level is set on a position with reports.",
+   "text_fr": "Un niveau du volet gestion est attribué, mais le poste n’a aucun subordonné, ou un niveau de contributeur individuel est attribué à un poste qui a des subordonnés."
+  }
+ ]
+}

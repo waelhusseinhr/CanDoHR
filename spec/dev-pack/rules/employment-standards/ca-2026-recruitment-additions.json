@@ -1,0 +1,84 @@
+{
+  "$comment": "Recruitment and onboarding values from the law, for docs/23 and migration 0009. Merge every key and structured field into the employment standards edition in Step 7, before it is tested (AGENTS, How to work). An entry marked verify_at_load blocks activation (RULE_NOT_VERIFIED); a jurisdiction an organization uses with no entry stops with JURISDICTION_RULE_MISSING. CanDo never uses a smaller number than the one here; an organization may choose a stricter one.",
+  "version": "2026-10-25",
+  "source_decisions": "claude/review/02-recruitment-onboarding-decisions.md; docs/23",
+  "keys": {
+    "candidate_records_retention": "Shortest time candidate records (postings, applications, interview notes and scores) must be kept. months: the minimum; from: 'decision' (the hiring decision that affected the candidate) or 'posting_closed' (the day the posting was taken down). A value of 0 months means the law sets no fixed minimum; the organization's own setting then decides (docs/23 §4.4).",
+    "sin_due": "When the employee must give the SIN, counted from the first day of work. CanDo warns HR before the date passes; an organization's due date may be earlier, never later (docs/23 §6.2).",
+    "pay_transparency": "Additions to the edition's pay_transparency entries."
+  },
+  "nationwide": {
+    "$comment": "Rules that apply to every employer in Canada, whatever the province or federal regulation.",
+    "sin_due": {
+      "days_after_start": 3,
+      "employer_reports_missing_sin_to_service_canada_within_days": 6,
+      "cite": "CRA, Get the social insurance number from the individual (canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/set-up-new-employee/social-insurance-number.html); Employment Insurance Regulations",
+      "checked_on": "2026-10-25",
+      "status": "secondary"
+    }
+  },
+  "jurisdictions": {
+    "BC": {
+      "candidate_records_retention": {
+        "months": 12,
+        "from": "decision",
+        "cite": "Personal Information Protection Act (BC), s. 35(1): personal information used to make a decision that directly affects the individual is kept at least one year after it is used",
+        "status": "secondary"
+      }
+    },
+    "ON": {
+      "candidate_records_retention": {
+        "months": 36,
+        "from": "posting_closed",
+        "cite": "Employment Standards Act, 2000 (Ontario), record-keeping for publicly advertised job postings and application forms, in force 2026-01-01 (same rule as pay_transparency.posting_records_years)",
+        "status": "secondary"
+      }
+    },
+    "QC": {
+      "candidate_records_retention": {
+        "months": 12,
+        "from": "decision",
+        "cite": "Act respecting the protection of personal information in the private sector (Quebec): information used to make a decision about a person is kept at least one year after the decision",
+        "status": "verify_at_load"
+      }
+    },
+    "AB": {
+      "candidate_records_retention": {
+        "months": 0,
+        "from": "decision",
+        "cite": "Personal Information Protection Act (Alberta) s. 35: kept only as long as reasonably required for legal or business purposes; no fixed minimum found",
+        "status": "verify_at_load"
+      }
+    },
+    "NL": {
+      "pay_transparency": {
+        "salary_range_in_postings": false,
+        "pay_history_questions_banned": true,
+        "cite": "Pay Transparency Act (NL), 2022: the pay history ban is in force; the posting range requirement is not yet in force",
+        "status": "secondary"
+      },
+      "candidate_records_retention": {
+        "months": 0, "from": "decision",
+        "cite": "PIPEDA applies to private employers' candidate data only in part; no fixed minimum found",
+        "status": "verify_at_load"
+      }
+    },
+    "NS": {
+      "pay_transparency": {
+        "salary_range_in_postings": false,
+        "pay_history_questions_banned": true,
+        "cite": "Secondary sources describe a ban on pay history questions in interviews; not confirmed",
+        "status": "verify_at_load"
+      },
+      "candidate_records_retention": { "months": 0, "from": "decision", "cite": "No fixed minimum found", "status": "verify_at_load" }
+    },
+    "PE": { "candidate_records_retention": { "months": 0, "from": "decision", "cite": "No fixed minimum found", "status": "verify_at_load" } },
+    "NB": { "candidate_records_retention": { "months": 0, "from": "decision", "cite": "No fixed minimum found", "status": "verify_at_load" } },
+    "MB": { "candidate_records_retention": { "months": 0, "from": "decision", "cite": "No fixed minimum found", "status": "verify_at_load" } },
+    "SK": { "candidate_records_retention": { "months": 0, "from": "decision", "cite": "No fixed minimum found", "status": "verify_at_load" } },
+    "YT": { "candidate_records_retention": { "months": 0, "from": "decision", "cite": "No fixed minimum found", "status": "verify_at_load" } },
+    "NT": { "candidate_records_retention": { "months": 0, "from": "decision", "cite": "No fixed minimum found", "status": "verify_at_load" } },
+    "NU": { "candidate_records_retention": { "months": 0, "from": "decision", "cite": "No fixed minimum found", "status": "verify_at_load" } },
+    "FED": { "candidate_records_retention": { "months": 0, "from": "decision", "cite": "PIPEDA principle 4.5: keep information used to make a decision long enough for the person to have access; no fixed number", "status": "verify_at_load" } }
+  }
+}

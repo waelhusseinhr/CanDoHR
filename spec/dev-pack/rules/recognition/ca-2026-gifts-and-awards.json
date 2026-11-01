@@ -1,0 +1,59 @@
+{
+ "$comment": "CRA's administrative policy on gifts, awards and long-service awards to employees, by tax year (docs/31 §6.1). The Step 17 loader copies each verified year into ref.gift_award_rule; talent.reward computes each reward's bucket and taxable amount from it, and payroll confirms the taxable part. Values include taxes. Arm's-length employees only; anything else goes to payroll for review.",
+ "version": "2026-10-30",
+ "source_decisions": "claude/review/10-engagement-recognition-decisions.md; docs/31",
+ "years": [
+  {
+   "tax_year": 2026,
+   "non_cash_annual_limit": 500,
+   "long_service_limit": 500,
+   "long_service_min_years": 5,
+   "long_service_interval_years": 5,
+   "excess_is_taxable": true,
+   "values_include_taxes": true,
+   "status": "official",
+   "cite": "Canada Revenue Agency, Gifts, awards, and long-service awards (page modified 2026-07-27)",
+   "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/benefits-allowances/gifts-awards-social-events/gifts-awards-long-service-awards.html"
+  }
+ ],
+ "gift_card_non_cash_conditions": [
+  "Preloaded, and usable only at a single retailer or a group of retailers named on the card",
+  "Its terms say the loaded amount cannot be converted into cash",
+  "The employer logs the employee's name, the date, the reason, the card type, the amount and the retailers"
+ ],
+ "always_taxable": [
+  "Cash, including cheques",
+  "Near-cash: securities, precious metals or jewels, gift cards that fail the conditions, prepaid network cards, digital currency",
+  "Rewards tied to job performance (meeting targets, finishing a project); the $500 limit does not apply"
+ ],
+ "long_service_rules": [
+  "Non-cash, including qualifying gift cards",
+  "Recognizes 5 or more years of service with the employer",
+  "At least 5 years since the employer's last long-service award",
+  "A separate $500; its unused part cannot be used for other gifts and awards"
+ ],
+ "withholding": {
+  "cash": {
+   "income_tax": true,
+   "cpp": true,
+   "ei": true,
+   "t4": [
+    "14",
+    "24",
+    "26"
+   ],
+   "pay_code": "AWARD-CASH"
+  },
+  "near_cash_and_non_cash": {
+   "income_tax": true,
+   "cpp": true,
+   "ei": false,
+   "t4": [
+    "14",
+    "26",
+    "code 40"
+   ],
+   "pay_code": "AWARD-BENEFIT"
+  }
+ }
+}

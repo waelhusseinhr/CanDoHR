@@ -1,0 +1,14 @@
+# Protected paths (docs/15-build-plan.md). @waelhusseinhr approves spec changes.
+/rules/ @waelhusseinhr
+/tests/ @waelhusseinhr
+/reference/ @waelhusseinhr
+/schema/ @waelhusseinhr
+/api/ @waelhusseinhr
+/supabase/migrations/ @waelhusseinhr
+/docs/ @waelhusseinhr
+/requirements/ @waelhusseinhr
+/AGENTS.md @waelhusseinhr
+/CLAUDE.md @waelhusseinhr
+/.cursor/rules/ @waelhusseinhr
+/.github/ @waelhusseinhr
+/infra/ @waelhusseinhr

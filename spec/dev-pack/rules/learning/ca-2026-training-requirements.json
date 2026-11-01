@@ -1,0 +1,257 @@
+{
+ "$comment": "Training the law requires, by jurisdiction and sector, for docs/29 and migration 0015. The loader writes each entry into ref.training_requirement in Step 17. An organization's rule that carries one out can be stricter, never looser (TRAINING_RULE_LOOSER_THAN_LAW); an entry still marked verify_at_load cannot be applied (RULE_NOT_VERIFIED). Every entry is checked against the statute before it is used for a customer; secondary means taken from a reliable secondary summary, official from the government's own text.",
+ "version": "2026-10-28",
+ "source_decisions": "claude/review/08-learning-development-decisions.md; docs/29",
+ "fields": {
+  "audience": "Who must take it: roles (worker, supervisor, employee, designated_recipient, new_worker, young_worker, employer_representative), hazards, sectors. The organization's training rule turns this into its own scope (jobs, positions, locations, supervisors).",
+  "before_work": "The training must be done before the person starts the work it covers; a rule that carries it out blocks scheduling for that work.",
+  "due_days": "Days from the event (hire, new role) by which it must be done; null where the law gives no number (see due_note).",
+  "frequency_months": "How often it must be repeated; null where the law sets no refresher."
+ },
+ "requirements": [
+  {
+   "requirement_code": "FED-HV-EMPLOYEE",
+   "jurisdiction": "FED",
+   "topic": "harassment_violence",
+   "name_en": "Harassment and violence prevention training (employees)",
+   "name_fr": "Formation sur la prévention du harcèlement et de la violence (employés)",
+   "audience": {
+    "roles": [
+     "employee"
+    ]
+   },
+   "before_work": false,
+   "due_days": 90,
+   "due_note": "Within three months after the day employment begins; again after the training is updated, or when assigned an activity or role with increased or specific risk",
+   "frequency_months": 36,
+   "cite": "Work Place Harassment and Violence Prevention Regulations, SOR/2020-130, s. 12(4)",
+   "source_url": "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2020-130/section-12.html",
+   "status": "official",
+   "effective_from": "2021-01-01"
+  },
+  {
+   "requirement_code": "FED-HV-DESIGNATED-RECIPIENT",
+   "jurisdiction": "FED",
+   "topic": "harassment_violence",
+   "name_en": "Harassment and violence prevention training (designated recipient)",
+   "name_fr": "Formation sur la prévention du harcèlement et de la violence (destinataire désigné)",
+   "audience": {
+    "roles": [
+     "designated_recipient"
+    ]
+   },
+   "before_work": true,
+   "due_days": null,
+   "due_note": "Before assuming their duties under the Regulations",
+   "frequency_months": 36,
+   "cite": "SOR/2020-130, s. 12(5)",
+   "source_url": "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2020-130/section-12.html",
+   "status": "official",
+   "effective_from": "2021-01-01"
+  },
+  {
+   "requirement_code": "FED-HV-EMPLOYER",
+   "jurisdiction": "FED",
+   "topic": "harassment_violence",
+   "name_en": "Harassment and violence prevention training (employer)",
+   "name_fr": "Formation sur la prévention du harcèlement et de la violence (employeur)",
+   "audience": {
+    "roles": [
+     "employer_representative"
+    ]
+   },
+   "before_work": false,
+   "due_days": null,
+   "due_note": "Within one year after the Regulations came into force, then at least every three years",
+   "frequency_months": 36,
+   "cite": "SOR/2020-130, s. 12(6)",
+   "source_url": "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2020-130/section-12.html",
+   "status": "official",
+   "effective_from": "2021-01-01"
+  },
+  {
+   "requirement_code": "BC-OHS-NEW-YOUNG-WORKER-ORIENTATION",
+   "jurisdiction": "BC",
+   "topic": "orientation",
+   "name_en": "Young or new worker health and safety orientation and training",
+   "name_fr": "Orientation et formation en santé et sécurité des jeunes et nouveaux travailleurs",
+   "audience": {
+    "roles": [
+     "new_worker",
+     "young_worker"
+    ]
+   },
+   "before_work": true,
+   "due_days": null,
+   "due_note": "Before a young or new worker begins work in a workplace; a new worker includes one returning after hazards changed or relocated to a workplace with different hazards; a young worker is under 25",
+   "frequency_months": null,
+   "cite": "BC Occupational Health and Safety Regulation, ss. 3.22, 3.23 (records: s. 3.25)",
+   "source_url": "https://www.worksafebc.com/en/law-policy/occupational-health-safety/searchable-ohs-regulation/ohs-regulation/part-03-rights-and-responsibilities",
+   "status": "official",
+   "effective_from": "2007-01-01"
+  },
+  {
+   "requirement_code": "ON-OHS-WORKER-AWARENESS",
+   "jurisdiction": "ON",
+   "topic": "health_safety",
+   "name_en": "Worker health and safety awareness training",
+   "name_fr": "Formation de sensibilisation à la santé et à la sécurité (travailleurs)",
+   "audience": {
+    "roles": [
+     "worker"
+    ]
+   },
+   "before_work": false,
+   "due_days": null,
+   "due_note": "As soon as practicable; prior training with written proof may count",
+   "frequency_months": null,
+   "cite": "O. Reg. 297/13 (Occupational Health and Safety Awareness and Training)",
+   "source_url": "https://www.siskinds.com/new-ohsa-regulations-coming-into-force-on-july/",
+   "status": "secondary",
+   "effective_from": "2014-07-01"
+  },
+  {
+   "requirement_code": "ON-OHS-SUPERVISOR-AWARENESS",
+   "jurisdiction": "ON",
+   "topic": "health_safety",
+   "name_en": "Supervisor health and safety awareness training",
+   "name_fr": "Formation de sensibilisation à la santé et à la sécurité (superviseurs)",
+   "audience": {
+    "roles": [
+     "supervisor"
+    ]
+   },
+   "before_work": false,
+   "due_days": 7,
+   "due_note": "Within one week of performing work as a supervisor",
+   "frequency_months": null,
+   "cite": "O. Reg. 297/13",
+   "source_url": "https://www.siskinds.com/new-ohsa-regulations-coming-into-force-on-july/",
+   "status": "secondary",
+   "effective_from": "2014-07-01"
+  },
+  {
+   "requirement_code": "ON-WHMIS",
+   "jurisdiction": "ON",
+   "topic": "hazardous_products",
+   "name_en": "WHMIS training for workers who work with or near hazardous products",
+   "name_fr": "Formation SIMDUT pour les travailleurs exposés à des produits dangereux",
+   "audience": {
+    "hazards": [
+     "hazardous_products"
+    ]
+   },
+   "before_work": true,
+   "due_days": null,
+   "due_note": "Before working with or near hazardous products; the employer reviews the training program at least once a year (whether that means retraining is to verify)",
+   "frequency_months": null,
+   "cite": "R.R.O. 1990, Reg. 860 (WHMIS) under the Occupational Health and Safety Act",
+   "status": "verify_at_load",
+   "effective_from": "2015-02-11"
+  },
+  {
+   "requirement_code": "BC-WHMIS",
+   "jurisdiction": "BC",
+   "topic": "hazardous_products",
+   "name_en": "WHMIS education and training",
+   "name_fr": "Formation SIMDUT",
+   "audience": {
+    "hazards": [
+     "hazardous_products"
+    ]
+   },
+   "before_work": true,
+   "due_days": null,
+   "due_note": "Before working with or near hazardous products; the employer reviews the training program at least once a year (whether that means retraining is to verify)",
+   "frequency_months": null,
+   "cite": "BC Occupational Health and Safety Regulation, Part 5 (WHMIS)",
+   "status": "verify_at_load",
+   "effective_from": "2015-02-11"
+  },
+  {
+   "requirement_code": "FED-WHMIS",
+   "jurisdiction": "FED",
+   "topic": "hazardous_products",
+   "name_en": "WHMIS training (federally regulated workplaces)",
+   "name_fr": "Formation SIMDUT (lieux de travail sous réglementation fédérale)",
+   "audience": {
+    "hazards": [
+     "hazardous_products"
+    ]
+   },
+   "before_work": true,
+   "due_days": null,
+   "due_note": "Before handling or being exposed to hazardous products",
+   "frequency_months": null,
+   "cite": "Canada Occupational Health and Safety Regulations, Part X",
+   "status": "verify_at_load",
+   "effective_from": "2015-02-11"
+  },
+  {
+   "requirement_code": "ON-AODA-CUSTOMER-SERVICE",
+   "jurisdiction": "ON",
+   "topic": "accessibility",
+   "name_en": "Accessible customer service and Human Rights Code training",
+   "name_fr": "Formation sur le service à la clientèle accessible et le Code des droits de la personne",
+   "audience": {
+    "roles": [
+     "employee",
+     "volunteer"
+    ]
+   },
+   "before_work": false,
+   "due_days": null,
+   "due_note": "As soon as practicable; again when policies change",
+   "frequency_months": null,
+   "cite": "O. Reg. 191/11 (Integrated Accessibility Standards), ss. 7 and 80.49",
+   "status": "verify_at_load",
+   "effective_from": "2016-07-01"
+  },
+  {
+   "requirement_code": "ON-OHS-HARASSMENT-PROGRAM",
+   "jurisdiction": "ON",
+   "topic": "harassment_violence",
+   "name_en": "Information and instruction on the workplace harassment and violence programs",
+   "name_fr": "Information et directives sur les programmes contre le harcèlement et la violence au travail",
+   "audience": {
+    "roles": [
+     "worker"
+    ]
+   },
+   "before_work": false,
+   "due_days": null,
+   "due_note": "Appropriate information and instruction on the contents of the policy and program; the program is reviewed at least once a year (whether that means retraining is to verify)",
+   "frequency_months": null,
+   "cite": "Occupational Health and Safety Act, ss. 32.0.2, 32.0.7",
+   "status": "verify_at_load",
+   "effective_from": "2016-09-08"
+  }
+ ],
+ "training_records_retention": {
+  "BC": {
+   "rule": "Records of all orientation and training under ss. 3.23 and 3.24 must be kept; no period stated in the section",
+   "cite": "BC OHS Regulation s. 3.25",
+   "status": "verify_at_load"
+  },
+  "ON": {
+   "rule": "Proof of completed awareness training is given to a worker or supervisor who asks within six months of ceasing to work for the employer",
+   "cite": "O. Reg. 297/13",
+   "status": "secondary"
+  }
+ },
+ "quebec_workforce_skills": {
+  "payroll_threshold": 2000000,
+  "minimum_percent": 1,
+  "shortfall": "Pay the difference between 1% of payroll and eligible training expenses to the Fonds de développement et de reconnaissance des compétences de la main-d'œuvre, on the RL-1 summary (RLZ-1.S), by the last day of February of the following year",
+  "cite": "Act to promote workforce skills development and recognition; Revenu Québec",
+  "source_url": "https://www.revenuquebec.ca/fr/entreprises/retenues-et-cotisations/calculer-les-retenues-a-la-source-et-vos-cotisations-demployeur/fonds-de-developpement-et-de-reconnaissance-des-competences-de-la-main-doeuvre/",
+  "status": "official",
+  "report": "Phase 2, with Quebec payroll (docs/29 §9.3)"
+ },
+ "training_taxable_benefit": {
+  "rule": "Training mainly for the employer's benefit is not taxable: specific employment-related training to maintain or upgrade job skills, and general business-related courses such as stress management, employment equity, first aid and language courses. Training mainly for the employee's benefit (personal interest, or technical skills unrelated to the employer's business) is a taxable benefit. HR marks each request (docs/29 §8.2).",
+  "cite": "Canada Revenue Agency, Educational assistance (employer-paid training)",
+  "source_url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/benefits-allowances/subsidized-school-services.html",
+  "status": "official"
+ }
+}

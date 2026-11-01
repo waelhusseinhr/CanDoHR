@@ -1,0 +1,5238 @@
+{
+ "$comment": "Register of every fixed value, default and fallback in CanDo (AGENTS rules 43 and 44, docs/22). tests/hardcoding/check_values.py fails when the code or the database holds one that is not here, or when this file names one that no longer exists. Change a list, a default or a fallback only in the same pull request as the code, with its class and source.",
+ "version": "2026-10-30",
+ "classes": {
+  "system_status": "A state CanDo's own workflow moves a record through. Code depends on every value; screens show each organization's wording through translations, never new values.",
+  "engine_method": "A way CanDo calculates, routes, matches or stores an entry. Each value has code behind it; the organization chooses among them (through a setting, a list category or the record itself) and a new value needs new code.",
+  "published_vocabulary": "Values defined by law, a government body or a published standard (CRA, Service Canada, Statistics Canada, Payments Canada, the statute). They change only when the publication changes.",
+  "taxonomy": "Fixed categories that CanDo's logic, reports or the law read. Organizations keep their own names and values in their own records (or in core.list_value) and map them to these categories.",
+  "technical": "Internal shape: what a row points to, where it came from, how it is stored or shown. No business meaning.",
+  "initial_state": "The first state of a workflow record (draft, pending, active). The workflow moves it on.",
+  "counter": "A count or running total that starts at zero.",
+  "display_order": "Where an item sorts on screen until the organization reorders it.",
+  "law_until_exemption": "The law applies until an exemption or a claim is recorded: tax, CPP, EI and overtime apply; TD1 amounts are nothing claimed. It errs on the side of compliance and the employee.",
+  "safety": "The most protective value for security or privacy (MFA on, restricted cases, the assistant off until approved). It can be loosened only where a setting allows.",
+  "neutral_choice": "The neutral value of an option with no legal or pay effect (a display flag, a feature not switched on, no adjustment). The organization sets it on the record.",
+  "decided": "Chosen by the product owner in a module review (cited)."
+ },
+ "fallbacks": [
+  {
+   "id": "FB-001",
+   "when": "An organization has not set a setting",
+   "then": "CanDo's registered default for that setting (platform.setting_definition.default_value), shown on the setup screen as the default",
+   "status": "decided",
+   "source": "Principle, 25 Oct 2026 (claude/review/01); docs/22 §2",
+   "where": "platform.setting()"
+  },
+  {
+   "id": "FB-002",
+   "when": "A legal entity has no value of its own for a setting that can be set per employer",
+   "then": "The organization's value, then FB-001",
+   "status": "decided",
+   "source": "docs/21 §1",
+   "where": "platform.setting()"
+  },
+  {
+   "id": "FB-003",
+   "when": "A setting has no CanDo default (decision_status pending) and the organization has not chosen",
+   "then": "No fallback: SETTING_NOT_SET; setup cannot finish until the organization chooses",
+   "status": "decided",
+   "source": "AGENTS rule 44",
+   "where": "platform.setting()"
+  },
+  {
+   "id": "FB-004",
+   "when": "An insert leaves empty a column whose default is registered in platform.column_default",
+   "then": "The organization's setting for it (or its main language or locale); any other empty value fails its constraint",
+   "status": "decided",
+   "source": "docs/22 §3",
+   "where": "platform.fill_from_settings()"
+  },
+  {
+   "id": "FB-005",
+   "when": "A manager position is vacant and has no acting manager",
+   "then": "Approvals go to the next filled position up the line, and HR is alerted to name an acting manager",
+   "status": "decided",
+   "source": "R2.1, docs/21 §4.1",
+   "where": "schema 0007 §7"
+  },
+  {
+   "id": "FB-006",
+   "when": "Time in a request falls in minutes no manager's approval coverage includes",
+   "then": "The line manager, or HR, as the policy's 'uncovered' says (setting approvals.uncovered_time)",
+   "status": "spec",
+   "source": "docs/20 §2",
+   "where": "reference/several_positions_reference.py split_request"
+  },
+  {
+   "id": "FB-007",
+   "when": "An approver would approve their own request",
+   "then": "The part goes to the approver's own approver; never self-approved (locked setting approvals.no_self_approval)",
+   "status": "decided",
+   "source": "docs/21 §7.4",
+   "where": "schema 0007 §10"
+  },
+  {
+   "id": "FB-008",
+   "when": "A rule value is marked verify_at_load, or is null (not yet researched)",
+   "then": "No value is assumed: in production the rule set cannot be activated, and a calculation that needs it stops or warns with RULE_NOT_VERIFIED for HR",
+   "status": "decided",
+   "source": "rules/employment-standards activation_rule; AGENTS rule 44",
+   "where": "rules engine"
+  },
+  {
+   "id": "FB-009",
+   "when": "No rule edition covers the date",
+   "then": "Stop: no calculation without a loaded edition",
+   "status": "decided",
+   "source": "AGENTS rule 15",
+   "where": "reference/payroll_reference.py load_rules"
+  },
+  {
+   "id": "FB-010",
+   "when": "Two pay sources or premiums meet and the agreement says nothing about how they combine",
+   "then": "Stop with UNRESOLVED_INTERACTION; labour relations completes the agreement version (first_in_order also needs the agreement's evaluation_order)",
+   "status": "decided",
+   "source": "docs/17 §11; Owner, 27 Oct 2026 (Module 03 review, R7.1)",
+   "where": "reference/premium_stacking_reference.py"
+  },
+  {
+   "id": "FB-011",
+   "when": "A cost has no explicit distribution",
+   "then": "The assignment's, then the position's, then the org unit's distribution, then the suspense account with a task for finance",
+   "status": "decided",
+   "source": "docs/17 §8.2; Owner, 27 Oct 2026 (Module 03 review, R6.1)",
+   "where": "payroll.pay_result_line_distribution.source_rule"
+  },
+  {
+   "id": "FB-012",
+   "when": "A cost is over a funding source's cap or not eligible for it",
+   "then": "As the funding source's cap_behaviour says; new sources start from funding.default_cap_behaviour: move the excess to the fallback fund, with alerts at 90, 60 and 30 days",
+   "status": "decided",
+   "source": "docs/17 §8.3; Owner, 27 Oct 2026 (Module 03 review, R6.2; closes Q12)",
+   "where": "finance.funding_source.cap_behaviour"
+  },
+  {
+   "id": "FB-013",
+   "when": "Retro or a correction reaches a funding source that has closed",
+   "then": "The successor source, the fallback source or suspense, as the source's post_close_policy says",
+   "status": "decided",
+   "source": "docs/17 §8.7; Owner, 27 Oct 2026 (Module 03 review, R6.3)",
+   "where": "finance.funding_source.post_close_policy"
+  },
+  {
+   "id": "FB-014",
+   "when": "Migration 0008 meets relationship types created before it",
+   "then": "They keep the purpose 0007 gave them (mentor: none; hrbp: hr_services; any other: supervision) until the organization reviews them at setup",
+   "status": "proposed",
+   "source": "schema 0008 §8.3",
+   "where": "schema 0008 §8.3"
+  },
+  {
+   "id": "FB-015",
+   "when": "A competency gap is worked out for a position",
+   "then": "The latest assessment from the same position, else the latest from any position, from the sources in competencies.gap_sources; self-assessments are shown and never counted",
+   "status": "spec",
+   "source": "docs/20 §5.4",
+   "where": "talent.competency_gap()"
+  },
+  {
+   "id": "FB-016",
+   "when": "A text has no version in the user's screen language",
+   "then": "The text as the organization typed it (its main language), with a small tag showing its language (EN or FR). A language the organization keeps as required with no text is a data error (TRANSLATION_MISSING). Other versions come only from the organization or from CanDo's paid translation service",
+   "status": "decided",
+   "source": "Owner, 25 Oct 2026 (docs/16 Q44)",
+   "where": "platform.text_for()"
+  },
+  {
+   "id": "FB-017",
+   "when": "Migration 0008 meets an organization that had French switched on but has texts without French",
+   "then": "French is kept as an optional language; a French-screen user sees the English text marked EN until French texts are added",
+   "status": "proposed",
+   "source": "schema 0008 §9; docs/16 Q44",
+   "where": "schema 0008 §9"
+  },
+  {
+   "id": "FB-018",
+   "when": "A published code (NOC) has no title in the language asked",
+   "then": "The published language's title, marked with its language (for example EN), until the French NOC is loaded",
+   "status": "spec",
+   "source": "docs/18 C1; docs/16 Q22",
+   "where": "ref.search_code_titles() callers"
+  },
+  {
+   "id": "FB-019",
+   "when": "A title is needed for a purpose (posting, funder) that the position has no title for",
+   "then": "The working title, then the job's title; the result says which one it is (origin)",
+   "status": "decided",
+   "source": "R4.4, docs/21 §6.4",
+   "where": "core.position_title_for()"
+  },
+  {
+   "id": "FB-020",
+   "when": "A person in several positions is covered by two plans of one kind",
+   "then": "HR decides which plan pays first for that person and records why; CanDo shows any order a plan contract sets (for example a union trust plan's) beside the decision, and never orders the plans itself",
+   "status": "decided",
+   "source": "docs/20 §6.1; docs/16 Q37; Owner, 28 Oct 2026 (Module 05 review, R3.2; closes Q37)",
+   "where": "benefits.enrolment.cob_rank with cob_decided_by and cob_reason; benefits.cob_decisions_needed()"
+  },
+  {
+   "id": "FB-021",
+   "when": "A position ends and no benefit-change rule matches the enrolment",
+   "then": "HR decides (hr_decides), with the statutory floor shown",
+   "status": "decided",
+   "source": "docs/20 §6; Owner, 28 Oct 2026 (Module 05 review, R3.4)",
+   "where": "reference/several_positions_reference.py benefit_outcome"
+  },
+  {
+   "id": "FB-022",
+   "when": "An employer ends a position with notice owed and the jurisdiction's benefits-during-notice rule is not loaded",
+   "then": "Stop with JURISDICTION_RULE_MISSING; a rule marked verify_at_load gives RULE_NOT_VERIFIED to HR",
+   "status": "decided",
+   "source": "AGENTS rule 44; docs/16 Q36",
+   "where": "reference/several_positions_reference.py benefit_outcome"
+  },
+  {
+   "id": "FB-023",
+   "when": "A person is covered by two agreements and a benefit-class or person-level rule must pick one",
+   "then": "HR chooses the governing agreement for that person and records why; CanDo makes no automatic choice (GOVERNING_AGREEMENT_NOT_SET until HR decides)",
+   "status": "decided",
+   "source": "docs/17 §7.7; docs/16 Q13; Owner, 28 Oct 2026 (Module 05 review, R3.1; closes Q13)",
+   "where": "benefits.governing_agreement; benefits.governing_agreement_for()"
+  },
+  {
+   "id": "FB-024",
+   "when": "A payroll profile has no Indian Act s. 87 exemption recorded",
+   "then": "Tax, CPP and EI apply (s87_status not_applicable) until HR records the exemption with its basis. Pre-boarding asks every new hire whether they claim it; a yes gives HR a task due before the first pay",
+   "status": "decided",
+   "source": "Indian Act s. 87; requirements/03; Owner, 25 Oct 2026 (Module 02 review, F2)",
+   "where": "payroll.payroll_profile_version.s87_status"
+  },
+  {
+   "id": "FB-025",
+   "when": "A leave or time request names no positions",
+   "then": "It covers every position the person holds that is active in the period",
+   "status": "spec",
+   "source": "docs/20 §3",
+   "where": "reference/several_positions_reference.py split_request"
+  },
+  {
+   "id": "FB-026",
+   "when": "A one-time payment names no position",
+   "then": "Refused until it names a position (payroll.one_time_allocation = assignment); an organization can choose to share unnamed payments by earnings instead",
+   "status": "decided",
+   "source": "docs/20 §4.3; Owner, 27 Oct 2026 (Module 03 review, R7.2)",
+   "where": "payroll.one_time_item.allocation"
+  },
+  {
+   "id": "FB-027",
+   "when": "An employment's status is worked out on a date",
+   "then": "The first category in employment.status_precedence held by a position that has not ended; no position on the date gives no status; a category missing from the precedence stops with EMPLOYMENT_STATUS_UNRESOLVED",
+   "status": "decided",
+   "source": "R1.1, docs/21 §3.1",
+   "where": "core.employment_status_type()"
+  },
+  {
+   "id": "FB-028",
+   "when": "An employee has no federal or provincial TD1 on file",
+   "then": "Claim code 1: the basic personal amount, as CRA requires; HR is reminded to collect the form",
+   "status": "decided",
+   "source": "CRA TD1 instructions; T4127; Owner, 25 Oct 2026 (Module 02 review, F1)",
+   "where": "reference/payroll_reference.py annual_tax"
+  },
+  {
+   "id": "FB-029",
+   "when": "An approval part stays undecided",
+   "then": "After approvals.escalate_after_working_days working days it also goes to the approver's own manager",
+   "status": "decided",
+   "source": "Q34, docs/21 §7.5",
+   "where": "schema 0007 §10"
+  },
+  {
+   "id": "FB-030",
+   "when": "An agreement gives less than the law on a standard the law does not let it replace",
+   "then": "CanDo pays the law's minimum whatever is approved",
+   "status": "decided",
+   "source": "R6.1, docs/21 §8.1",
+   "where": "schema 0007 §12"
+  },
+  {
+   "id": "FB-031",
+   "when": "A user's language has no screens yet",
+   "then": "No substitution: the user is given a locale whose language has screens (INTERFACE_LANGUAGE_NOT_AVAILABLE otherwise); data, documents and notices follow the organization's data languages (FB-016)",
+   "status": "decided",
+   "source": "docs/22 §4",
+   "where": "platform.check_interface_locale()"
+  },
+  {
+   "id": "FB-032",
+   "when": "A new organization is created",
+   "then": "It starts with the starter lists (ref.list_starter) and English as the language it types its words in, unless it chooses French at setup (languages.starter); an organization with a Quebec work location keeps its words in French",
+   "status": "decided",
+   "source": "Owner, 25 Oct 2026 (docs/16 Q44); docs/22 §3-4",
+   "where": "core.seed_tenant()"
+  },
+  {
+   "id": "FB-033",
+   "when": "A letter, email or document template has no version in the language the employee picked",
+   "then": "It is sent in the language the template exists in; for an employee working in Quebec the French version must exist (FRENCH_REQUIRED_FOR_QUEBEC)",
+   "status": "decided",
+   "source": "Owner, 25 Oct 2026 (docs/16 Q44)",
+   "where": "documents and notifications (Steps 4 and 12)"
+  },
+  {
+   "id": "FB-034",
+   "when": "A probation counted on the calendar reaches its end date and no one has recorded a decision",
+   "then": "The probation is passed on its end date and HR is told; the reminders before the end (probation.end_reminders_days) are there so this rarely happens",
+   "status": "decided",
+   "source": "Owner, 25 Oct 2026 (Module 02 review, R7.2)",
+   "where": "core.close_lapsed_probations() (schema 0009 §10)"
+  },
+  {
+   "id": "FB-035",
+   "when": "Migration 0009 meets an organization that keeps a language other than those of the starter texts as required for its data",
+   "then": "Its starter routes, onboarding plans, posting channels and case kinds are not copied, and the migration says so; HR adds them with their texts or copies them once the texts can be completed",
+   "status": "proposed",
+   "source": "docs/23 §10",
+   "where": "schema 0009 §14"
+  },
+  {
+   "id": "FB-036",
+   "when": "A pay statement or tax slip is issued and the person has made no delivery choice",
+   "then": "A current employee gets it in CanDo self-service (no consent needed under CRA's rule); a former employee, or one on leave or laid off, gets it on paper unless they consented to electronic delivery; it is never emailed without email consent. A paper request always wins. Choices are per kind of document and can be withdrawn",
+   "status": "decided",
+   "source": "Owner, 27 Oct 2026 (Module 03 review, R5.1, corrected the same day to follow CRA's rule)",
+   "where": "payroll.delivery_method() (schema 0010 §7)"
+  },
+  {
+   "id": "FB-037",
+   "when": "A timesheet's facts match none of the organization's timesheet routes",
+   "then": "Only its manager's approval is needed (no second approval); second approvals exist only where the organization adds a route",
+   "status": "decided",
+   "source": "Owner, 28 Oct 2026 (Module 06 review, R4.1)",
+   "where": "timeleave.timesheet_route()"
+  },
+  {
+   "id": "FB-038",
+   "when": "Migration 0014 meets reviews written before it",
+   "then": "They are marked rated and keep their ratings and overall method; the 90-day rule and the reasons apply when a rating is next changed",
+   "status": "decided",
+   "source": "Owner, 28 Oct 2026 (Module 07 review, confirmed after the write-up)",
+   "where": "schema 0014 §4"
+  },
+  {
+   "id": "FB-039",
+   "when": "Migration 0016 meets plans made before it",
+   "then": "They are marked org_chart plans, the only feature that made plans before 0016; position plans and workforce plans start with 0016",
+   "status": "decided",
+   "source": "Owner, 29 Oct 2026 (Module 09 review, confirmed after the write-up)",
+   "where": "schema 0016 §8"
+  }
+ ],
+ "fixed_lists": {
+  "benefits.carrier_invoice.status": {
+   "values": [
+    "approved",
+    "draft",
+    "reconciled",
+    "rejected",
+    "sent_to_payables"
+   ],
+   "class": "system_status"
+  },
+  "benefits.change_decision.outcome": {
+   "values": [
+    "continue_until",
+    "end_on_date",
+    "hr_decides",
+    "no_change"
+   ],
+   "class": "system_status"
+  },
+  "benefits.change_decision.proposed_outcome": {
+   "values": [
+    "continue_until",
+    "end_on_date",
+    "hr_decides",
+    "no_change"
+   ],
+   "class": "system_status"
+  },
+  "benefits.change_decision.status": {
+   "values": [
+    "applied",
+    "cancelled",
+    "decided",
+    "hr_review",
+    "proposed"
+   ],
+   "class": "system_status"
+  },
+  "benefits.change_rule.action": {
+   "values": [
+    "continue_until",
+    "end_on_date",
+    "hr_decides"
+   ],
+   "class": "engine_method"
+  },
+  "benefits.dependent.relationship": {
+   "values": [
+    "child",
+    "other",
+    "spouse"
+   ],
+   "class": "taxonomy",
+   "note": "Spouse includes common-law partners as the province defines them; the plan contract decides who is covered (docs/26 §4.5)."
+  },
+  "benefits.enrolment.source": {
+   "values": [
+    "automatic",
+    "employee",
+    "hr",
+    "life_event",
+    "migration",
+    "open_enrolment",
+    "rollover"
+   ],
+   "class": "technical",
+   "note": "Where an enrolment came from; automatic for mandatory pension plans (docs/26 §9.2)."
+  },
+  "benefits.leave_contribution_choice.method": {
+   "values": [
+    "arrears_on_return",
+    "employer_pays",
+    "payroll",
+    "prepay"
+   ],
+   "class": "engine_method",
+   "note": "R4.1: offered as benefits.statutory_leave_contributions allows (docs/26 §6.1)."
+  },
+  "benefits.leave_rule.action": {
+   "values": [
+    "continue_employee_cost",
+    "continue_employer_paid",
+    "suspend"
+   ],
+   "class": "engine_method",
+   "note": "R4.2 (docs/26 §6.2)."
+  },
+  "benefits.leave_rule.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "benefits.leave_rule.then_action": {
+   "values": [
+    "continue_employee_cost",
+    "suspend"
+   ],
+   "class": "engine_method",
+   "note": "After the employer-paid months (docs/26 §6.2)."
+  },
+  "benefits.opt_out.plan_kind": {
+   "values": [
+    "dental",
+    "health"
+   ],
+   "class": "taxonomy",
+   "note": "R5.4: opting out is for health and dental only (docs/26 §4.6)."
+  },
+  "benefits.plan.eligibility_scope": {
+   "values": [
+    "agreement",
+    "assignment",
+    "employer"
+   ],
+   "class": "engine_method"
+  },
+  "benefits.plan.kind": {
+   "values": [
+    "add",
+    "dental",
+    "eap",
+    "group_rrsp",
+    "health",
+    "hsa",
+    "life",
+    "ltd",
+    "other",
+    "pension_db",
+    "pension_dc",
+    "std",
+    "tfsa"
+   ],
+   "class": "taxonomy"
+  },
+  "benefits.plan.late_enrolment": {
+   "values": [
+    "eoi",
+    "hr_decides",
+    "limited_coverage",
+    "next_open_enrolment"
+   ],
+   "class": "engine_method",
+   "note": "R2.3: each plan states it; new plans start from benefits.late_enrolment_starter (docs/26 §4.3)."
+  },
+  "benefits.practice.richer_when": {
+   "values": [
+    "higher",
+    "lower",
+    "none",
+    "yes"
+   ],
+   "class": "engine_method"
+  },
+  "benefits.practice.source": {
+   "values": [
+    "catalogue",
+    "tenant"
+   ],
+   "class": "technical"
+  },
+  "benefits.practice.value_type": {
+   "values": [
+    "boolean",
+    "count",
+    "days",
+    "enum",
+    "money",
+    "months",
+    "multiple_of_salary",
+    "percent",
+    "text",
+    "weeks"
+   ],
+   "class": "technical"
+  },
+  "benefits.practice_own_value.source": {
+   "values": [
+    "derived",
+    "manual"
+   ],
+   "class": "technical"
+  },
+  "comp.bargaining_scenario.status": {
+   "values": [
+    "draft",
+    "ratified",
+    "shared",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "comp.cycle.guideline_method": {
+   "values": [
+    "across_the_board",
+    "discretion",
+    "matrix",
+    "range_position"
+   ],
+   "class": "engine_method",
+   "note": "Filled from cycles.guideline_method (docs/25 §6.2)."
+  },
+  "comp.cycle.letter_release": {
+   "values": [
+    "automatic",
+    "hr_review",
+    "manager_delivers"
+   ],
+   "class": "engine_method",
+   "note": "Filled from cycles.letter_release (docs/25 §6.4)."
+  },
+  "comp.cycle.merit_rating_source": {
+   "values": [
+    "overall",
+    "section"
+   ],
+   "class": "engine_method"
+  },
+  "comp.cycle.status": {
+   "values": [
+    "approved",
+    "in_review",
+    "loaded",
+    "open",
+    "planning"
+   ],
+   "class": "system_status"
+  },
+  "comp.decision.status": {
+   "values": [
+    "approved",
+    "loaded",
+    "proposed",
+    "rejected"
+   ],
+   "class": "system_status"
+  },
+  "comp.incentive_award.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "paid",
+    "proposed",
+    "rejected"
+   ],
+   "class": "system_status"
+  },
+  "comp.incentive_plan.kind": {
+   "values": [
+    "annual_bonus",
+    "commission",
+    "long_term",
+    "profit_sharing",
+    "retention",
+    "signing",
+    "spot"
+   ],
+   "class": "taxonomy",
+   "note": "The organization names its plans; the kind decides which rules apply (clawbacks, long-term grants) (docs/25 §7)."
+  },
+  "comp.incentive_plan.proration": {
+   "values": [
+    "eligible_days",
+    "employed_on_payout",
+    "plan_decides"
+   ],
+   "class": "engine_method",
+   "note": "Filled from incentives.proration (docs/25 §7.2)."
+  },
+  "comp.incentive_plan.status": {
+   "values": [
+    "active",
+    "draft",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "comp.je_evidence_link.combine": {
+   "values": [
+    "max",
+    "min"
+   ],
+   "class": "engine_method"
+  },
+  "comp.je_evidence_link.source": {
+   "values": [
+    "career_level",
+    "competency_targets",
+    "noc_teer",
+    "position_tree",
+    "work_requirements"
+   ],
+   "class": "technical"
+  },
+  "comp.je_factor.factor_group": {
+   "values": [
+    "effort",
+    "responsibility",
+    "skill",
+    "working_conditions"
+   ],
+   "class": "taxonomy"
+  },
+  "comp.je_plan.method": {
+   "values": [
+    "classification",
+    "market_slotting",
+    "point_factor",
+    "ranking"
+   ],
+   "class": "engine_method"
+  },
+  "comp.je_plan.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "comp.je_plan_version.source": {
+   "values": [
+    "cando_sample",
+    "tenant"
+   ],
+   "class": "technical"
+  },
+  "comp.je_plan_version.status": {
+   "values": [
+    "draft",
+    "published",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "comp.job_evaluation.status": {
+   "values": [
+    "approved",
+    "draft",
+    "in_review",
+    "superseded",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "comp.lti_grant.instrument": {
+   "values": [
+    "other",
+    "phantom_unit",
+    "psu",
+    "rsu",
+    "stock_option"
+   ],
+   "class": "published_vocabulary",
+   "note": "Instruments named as in CRA's guidance on employee stock options and the plan documents (docs/25 §7.4)."
+  },
+  "comp.lti_grant.status": {
+   "values": [
+    "exercised",
+    "expired",
+    "forfeited",
+    "granted",
+    "vested",
+    "vesting"
+   ],
+   "class": "system_status"
+  },
+  "comp.market_composite.status": {
+   "values": [
+    "insufficient_data",
+    "priced"
+   ],
+   "class": "system_status"
+  },
+  "comp.market_data.element": {
+   "values": [
+    "allowances",
+    "base_salary",
+    "hourly_rate",
+    "range_max",
+    "range_mid",
+    "range_min",
+    "sti_actual",
+    "sti_actual_pct",
+    "sti_eligible",
+    "sti_target_pct",
+    "total_cash",
+    "total_direct"
+   ],
+   "class": "taxonomy"
+  },
+  "comp.market_data.weighting": {
+   "values": [
+    "incumbent",
+    "organization",
+    "single"
+   ],
+   "class": "engine_method"
+  },
+  "comp.market_definition.statistic": {
+   "values": [
+    "mean",
+    "p10",
+    "p25",
+    "p50",
+    "p75",
+    "p90"
+   ],
+   "class": "engine_method"
+  },
+  "comp.market_definition.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "comp.market_definition_source.kind": {
+   "values": [
+    "public_wage",
+    "survey"
+   ],
+   "class": "engine_method"
+  },
+  "comp.market_definition_source.weighting": {
+   "values": [
+    "incumbent",
+    "organization",
+    "single"
+   ],
+   "class": "engine_method"
+  },
+  "comp.market_pricing_run.status": {
+   "values": [
+    "approved",
+    "draft",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "comp.pay_structure.basis": {
+   "values": [
+    "annual",
+    "hourly"
+   ],
+   "class": "engine_method"
+  },
+  "comp.pay_structure.kind": {
+   "values": [
+    "broadband",
+    "graded",
+    "hourly_table",
+    "market_job",
+    "step_grid"
+   ],
+   "class": "taxonomy"
+  },
+  "comp.pay_structure.location_method": {
+   "values": [
+    "location_premium",
+    "location_ranges",
+    "none"
+   ],
+   "class": "engine_method",
+   "note": "R2.4: each structure says how location pay works (docs/25 §4.4)."
+  },
+  "comp.pay_structure.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "comp.pay_structure_version.status": {
+   "values": [
+    "approved",
+    "draft",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "comp.philosophy.status": {
+   "values": [
+    "approved",
+    "draft",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "comp.range_catch_up.status": {
+   "values": [
+    "cancelled",
+    "met",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "comp.salary_range.basis": {
+   "values": [
+    "annual",
+    "hourly"
+   ],
+   "class": "engine_method"
+  },
+  "comp.survey.status": {
+   "values": [
+    "active",
+    "expired",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "comp.survey_cut.dimension": {
+   "values": [
+    "all",
+    "complexity",
+    "focus",
+    "industry",
+    "other",
+    "ownership",
+    "region",
+    "sector",
+    "size_budget",
+    "size_fte",
+    "size_revenue"
+   ],
+   "class": "taxonomy"
+  },
+  "comp.survey_edition.status": {
+   "values": [
+    "loading",
+    "published",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "comp.survey_submission.status": {
+   "values": [
+    "approved",
+    "draft",
+    "exported",
+    "in_review",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "comp.survey_submission_row.match_quality": {
+   "values": [
+    "close",
+    "exact",
+    "partial"
+   ],
+   "class": "engine_method"
+  },
+  "comp.total_rewards_component.category": {
+   "values": [
+    "base",
+    "benefits",
+    "learning",
+    "other",
+    "perk",
+    "recognition",
+    "retirement",
+    "statutory",
+    "time_off",
+    "variable"
+   ],
+   "class": "taxonomy"
+  },
+  "comp.total_rewards_component.valuation": {
+   "values": [
+    "db_current_service",
+    "employer_contributions",
+    "employer_premiums",
+    "entitlement_days_x_daily_rate",
+    "fixed_amount",
+    "learning_spend",
+    "manual",
+    "paid_last_12_months",
+    "rate_components"
+   ],
+   "class": "engine_method"
+  },
+  "compliance.case_party.role": {
+   "values": [
+    "complainant",
+    "representative",
+    "respondent",
+    "subject",
+    "witness"
+   ],
+   "class": "taxonomy",
+   "note": "R7.4: a respondent sees only that HR must review."
+  },
+  "compliance.salary_disclosure.status": {
+   "values": [
+    "approved",
+    "draft",
+    "published",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "core.agreement.status": {
+   "values": [
+    "expired_bridging",
+    "in_bargaining",
+    "in_force",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "core.agreement_standards_finding.comparison": {
+   "values": [
+    "per_hour",
+    "whole_standard"
+   ],
+   "class": "engine_method"
+  },
+  "core.agreement_standards_finding.finding": {
+   "values": [
+    "below_law_not_replaceable",
+    "below_law_replaceable",
+    "meets_or_exceeds",
+    "not_verified"
+   ],
+   "class": "system_status"
+  },
+  "core.agreement_version.prepared_by": {
+   "values": [
+    "cando",
+    "customer",
+    "partner"
+   ],
+   "class": "technical"
+  },
+  "core.agreement_version.status": {
+   "values": [
+    "active",
+    "draft",
+    "in_verification",
+    "superseded",
+    "verified"
+   ],
+   "class": "system_status"
+  },
+  "core.approval_coverage.approver": {
+   "values": [
+    "line",
+    "relationship"
+   ],
+   "class": "technical"
+  },
+  "core.approval_coverage.target_type": {
+   "values": [
+    "assignment",
+    "position"
+   ],
+   "class": "technical"
+  },
+  "core.approval_part.routed_by": {
+   "values": [
+    "all",
+    "any",
+    "coverage",
+    "escalated",
+    "uncovered_hr",
+    "uncovered_line"
+   ],
+   "class": "technical"
+  },
+  "core.approval_part.rule": {
+   "values": [
+    "all",
+    "any"
+   ],
+   "class": "engine_method"
+  },
+  "core.approval_part.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "declined",
+    "pending"
+   ],
+   "class": "system_status"
+  },
+  "core.approval_part.subject_type": {
+   "values": [
+    "availability_change",
+    "leave_request",
+    "overtime_preauth",
+    "timesheet"
+   ],
+   "class": "technical"
+  },
+  "core.approval_policy.capability": {
+   "values": [
+    "availability",
+    "expense",
+    "leave",
+    "overtime",
+    "time"
+   ],
+   "class": "taxonomy"
+  },
+  "core.approval_policy.mode": {
+   "values": [
+    "all",
+    "any",
+    "by_coverage"
+   ],
+   "class": "engine_method"
+  },
+  "core.approval_policy.overlap": {
+   "values": [
+    "all",
+    "any"
+   ],
+   "class": "engine_method"
+  },
+  "core.approval_policy.target_type": {
+   "values": [
+    "assignment",
+    "position"
+   ],
+   "class": "technical"
+  },
+  "core.approval_policy.uncovered": {
+   "values": [
+    "hr",
+    "line"
+   ],
+   "class": "engine_method"
+  },
+  "core.assignment_pay_item.basis": {
+   "values": [
+    "per_day_worked",
+    "per_duty_hour",
+    "per_hour_worked",
+    "per_month",
+    "per_pay_period",
+    "per_shift",
+    "per_year",
+    "percent_of_base",
+    "rate_for_duty_hours"
+   ],
+   "class": "engine_method"
+  },
+  "core.assignment_pay_item.cost_target": {
+   "values": [
+    "assignment",
+    "explicit"
+   ],
+   "class": "engine_method"
+  },
+  "core.assignment_pay_item.kind": {
+   "values": [
+    "duty_premium",
+    "duty_rate"
+   ],
+   "class": "taxonomy"
+  },
+  "core.assignment_pay_item.kind#assignment_pay_item_kind_check": {
+   "values": [
+    "allowance",
+    "duty_premium",
+    "duty_rate",
+    "on_call",
+    "other",
+    "stipend"
+   ],
+   "class": "taxonomy"
+  },
+  "core.assignment_pay_item.source": {
+   "values": [
+    "agreement",
+    "compensation_decision",
+    "manual",
+    "offer",
+    "policy"
+   ],
+   "class": "technical"
+  },
+  "core.assignment_version.assignment_type": {
+   "values": [
+    "acting",
+    "casual_pool",
+    "job_share",
+    "overlap",
+    "regular",
+    "relief_pool",
+    "secondment_in",
+    "secondment_out",
+    "term"
+   ],
+   "class": "engine_method"
+  },
+  "core.assignment_version.status": {
+   "values": [
+    "active",
+    "ended",
+    "laid_off",
+    "on_leave",
+    "suspended_for_acting"
+   ],
+   "class": "system_status"
+  },
+  "core.change_reason.category": {
+   "values": [
+    "acting",
+    "assignment_end",
+    "correction",
+    "data_update",
+    "demotion",
+    "hire",
+    "hours_change",
+    "lateral_transfer",
+    "leave",
+    "other",
+    "pay_change",
+    "probation",
+    "promotion",
+    "reclassification",
+    "rehire",
+    "reorganization",
+    "status_conversion",
+    "termination"
+   ],
+   "class": "taxonomy"
+  },
+  "core.change_reason.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "core.code_assignment.match_quality": {
+   "values": [
+    "blended",
+    "close",
+    "exact",
+    "partial"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_assignment.source": {
+   "values": [
+    "concordance",
+    "derived",
+    "import",
+    "manual",
+    "override",
+    "suggestion_accepted"
+   ],
+   "class": "technical"
+  },
+  "core.code_assignment.target_type": {
+   "values": [
+    "assignment",
+    "job",
+    "location",
+    "org_unit",
+    "person",
+    "position",
+    "requisition"
+   ],
+   "class": "technical"
+  },
+  "core.code_mapping.relation": {
+   "values": [
+    "benchmark",
+    "merge",
+    "one_to_one",
+    "partial",
+    "split"
+   ],
+   "class": "published_vocabulary"
+  },
+  "core.code_scheme.code_case": {
+   "values": [
+    "as_entered",
+    "upper"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_scheme.inherit": {
+   "values": [
+    "down",
+    "none"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_scheme.ordering": {
+   "values": [
+    "alpha_code",
+    "alpha_title",
+    "custom_rank",
+    "hierarchy",
+    "natural_code"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_scheme.purpose": {
+   "values": [
+    "cost",
+    "department",
+    "employment_equity",
+    "external_system",
+    "identifier",
+    "job_family",
+    "job_level",
+    "occupation",
+    "other",
+    "pay_equity",
+    "pay_grade",
+    "salary_survey"
+   ],
+   "class": "taxonomy"
+  },
+  "core.code_scheme.source": {
+   "values": [
+    "derived",
+    "published",
+    "tenant"
+   ],
+   "class": "technical"
+  },
+  "core.code_scheme.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "core.code_scheme.structure": {
+   "values": [
+    "flat",
+    "hierarchical"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_scheme.uniqueness": {
+   "values": [
+    "none",
+    "unique"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_scheme.values_mode": {
+   "values": [
+    "free",
+    "list",
+    "list_or_free"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_scheme.values_per_target": {
+   "values": [
+    "many",
+    "one"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_scheme_rule.kind": {
+   "values": [
+    "derive",
+    "must_map",
+    "requires",
+    "same_branch"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_scheme_rule.severity": {
+   "values": [
+    "block",
+    "warning"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_scheme_rule.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "core.code_suggestion.method": {
+   "values": [
+    "assistant",
+    "concordance",
+    "duties_text",
+    "structure_walk",
+    "tenant_mapping",
+    "title_index"
+   ],
+   "class": "engine_method"
+  },
+  "core.code_suggestion.purpose": {
+   "values": [
+    "coding",
+    "recoding",
+    "requirements"
+   ],
+   "class": "taxonomy"
+  },
+  "core.code_suggestion.status": {
+   "values": [
+    "accepted",
+    "expired",
+    "open",
+    "rejected",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "core.counter_ledger.kind": {
+   "values": [
+    "accrual",
+    "adjustment",
+    "cap",
+    "loss",
+    "opening",
+    "reset",
+    "transfer_in",
+    "transfer_out"
+   ],
+   "class": "engine_method"
+  },
+  "core.domain_governance.rule": {
+   "values": [
+    "combined_same_agreement",
+    "combined_same_employer",
+    "governing_agreement",
+    "highest_fte",
+    "per_assignment",
+    "person",
+    "primary_assignment"
+   ],
+   "class": "engine_method"
+  },
+  "core.employment_version.status": {
+   "values": [
+    "active",
+    "on_leave",
+    "suspended",
+    "terminated"
+   ],
+   "class": "system_status"
+  },
+  "core.end_reason.applies_to": {
+   "values": [
+    "assignment",
+    "both",
+    "employment"
+   ],
+   "class": "engine_method"
+  },
+  "core.end_reason.category": {
+   "values": [
+    "death",
+    "end_of_term",
+    "layoff",
+    "other",
+    "position_eliminated",
+    "reduction_by_employer",
+    "resignation",
+    "retirement",
+    "termination_with_cause",
+    "termination_without_cause",
+    "transfer"
+   ],
+   "class": "taxonomy"
+  },
+  "core.end_reason.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "core.hierarchy.kind": {
+   "values": [
+    "custom",
+    "financial",
+    "funding",
+    "geographic",
+    "governance",
+    "management"
+   ],
+   "class": "taxonomy"
+  },
+  "core.legal_entity_version.regulatory_jurisdiction": {
+   "values": [
+    "federal",
+    "provincial"
+   ],
+   "class": "published_vocabulary"
+  },
+  "core.list_value.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "core.location_version.northern_zone": {
+   "values": [
+    "intermediate",
+    "none",
+    "prescribed"
+   ],
+   "class": "published_vocabulary"
+  },
+  "core.org_unit_version.status": {
+   "values": [
+    "active",
+    "closed"
+   ],
+   "class": "system_status"
+  },
+  "core.pay_rate.component": {
+   "values": [
+    "base",
+    "market_supplement",
+    "out_of_schedule",
+    "red_circle"
+   ],
+   "class": "engine_method"
+  },
+  "core.pay_rate_version.basis": {
+   "values": [
+    "annual_salary",
+    "daily",
+    "hourly",
+    "period_salary"
+   ],
+   "class": "engine_method"
+  },
+  "core.pay_rate_version.protection_rule": {
+   "values": [
+    "freeze_until_range_catches_up",
+    "general_increases_for_months",
+    "lump_sum_increases"
+   ],
+   "class": "engine_method"
+  },
+  "core.pay_rate_version.source": {
+   "values": [
+    "agreement_grid",
+    "compensation_decision",
+    "manual",
+    "offer",
+    "progression_job",
+    "retro_settlement"
+   ],
+   "class": "technical"
+  },
+  "core.payroll_account.remitter_type": {
+   "values": [
+    "accelerated_1",
+    "accelerated_2",
+    "quarterly",
+    "regular"
+   ],
+   "class": "published_vocabulary"
+  },
+  "core.position.origin": {
+   "values": [
+    "auto_at_hire",
+    "data_migration",
+    "import",
+    "planned",
+    "status_conversion"
+   ],
+   "class": "technical"
+  },
+  "core.position_control_override.check_kind": {
+   "values": [
+    "budget",
+    "complement",
+    "fte",
+    "funding"
+   ],
+   "class": "engine_method"
+  },
+  "core.position_control_override.status": {
+   "values": [
+    "approved",
+    "pending",
+    "rejected"
+   ],
+   "class": "system_status"
+  },
+  "core.position_title.purpose": {
+   "values": [
+    "funder",
+    "legacy",
+    "other",
+    "posting",
+    "working"
+   ],
+   "class": "taxonomy"
+  },
+  "core.position_version.status": {
+   "values": [
+    "active",
+    "eliminated",
+    "frozen"
+   ],
+   "class": "system_status"
+  },
+  "core.probation.kind": {
+   "values": [
+    "agreement",
+    "employer",
+    "trial"
+   ],
+   "class": "engine_method"
+  },
+  "core.probation.measure": {
+   "values": [
+    "calendar_days",
+    "calendar_months",
+    "days_worked",
+    "hours_paid",
+    "hours_worked",
+    "shifts_worked"
+   ],
+   "class": "engine_method"
+  },
+  "core.probation.measure#probation_counted_measure": {
+   "values": [
+    "calendar_days",
+    "calendar_months"
+   ],
+   "class": "engine_method"
+  },
+  "core.probation.status": {
+   "values": [
+    "ended",
+    "extended",
+    "failed",
+    "in_progress",
+    "passed",
+    "returned",
+    "waived"
+   ],
+   "class": "system_status"
+  },
+  "core.probation.status#probation_outcome_dated": {
+   "values": [
+    "extended",
+    "in_progress"
+   ],
+   "class": "system_status"
+  },
+  "core.probation_check_in.status": {
+   "values": [
+    "cancelled",
+    "done",
+    "missed",
+    "scheduled"
+   ],
+   "class": "system_status"
+  },
+  "core.probation_extension.employee_notice_method": {
+   "values": [
+    "email",
+    "in_person",
+    "letter",
+    "other",
+    "phone",
+    "video"
+   ],
+   "class": "engine_method",
+   "note": "Same list as platform.change_set.communication_method."
+  },
+  "core.probation_extension.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "in_effect",
+    "proposed"
+   ],
+   "class": "system_status"
+  },
+  "core.recoding_campaign.status": {
+   "values": [
+    "cancelled",
+    "committed",
+    "draft",
+    "in_review",
+    "proposals_ready"
+   ],
+   "class": "system_status"
+  },
+  "core.rehire_eligibility.status": {
+   "values": [
+    "check_with_hr",
+    "eligible",
+    "not_eligible"
+   ],
+   "class": "system_status"
+  },
+  "core.rehire_reason.category": {
+   "values": [
+    "conduct",
+    "contract_terms",
+    "job_abandonment",
+    "misrepresentation",
+    "other",
+    "performance",
+    "policy_breach",
+    "safety"
+   ],
+   "class": "taxonomy"
+  },
+  "core.rehire_reason.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "core.relationship_type.cross_employer_purpose": {
+   "values": [
+    "hr_services",
+    "none",
+    "payroll_services",
+    "supervision"
+   ],
+   "class": "taxonomy"
+  },
+  "core.self_id_category.official_group": {
+   "values": [
+    "ee_disability",
+    "ee_indigenous",
+    "ee_visible_minority",
+    "ee_women"
+   ],
+   "class": "published_vocabulary"
+  },
+  "core.self_id_category.origin": {
+   "values": [
+    "cando_standard",
+    "tenant"
+   ],
+   "class": "technical"
+  },
+  "core.self_id_category.status": {
+   "values": [
+    "active",
+    "draft",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "core.status_conversion_request.started_by": {
+   "values": [
+    "agreement",
+    "manager_request",
+    "threshold"
+   ],
+   "class": "engine_method",
+   "note": "R7.5."
+  },
+  "core.status_conversion_request.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "completed",
+    "declined",
+    "flagged",
+    "requested"
+   ],
+   "class": "system_status"
+  },
+  "core.work_authorization.kind": {
+   "values": [
+    "citizen",
+    "other",
+    "permanent_resident",
+    "study_permit",
+    "work_permit"
+   ],
+   "class": "published_vocabulary",
+   "note": "Canadian work authorization categories (IRCC); HR records, never shown beyond HR."
+  },
+  "core.work_requirement.kind": {
+   "values": [
+    "certification",
+    "competency",
+    "driver_licence",
+    "education",
+    "experience",
+    "language",
+    "licence",
+    "other",
+    "physical_demand",
+    "registration",
+    "security_screening",
+    "skill",
+    "training",
+    "working_condition"
+   ],
+   "class": "taxonomy"
+  },
+  "core.work_requirement.source": {
+   "values": [
+    "agreement",
+    "job",
+    "legislation",
+    "manual",
+    "noc",
+    "position"
+   ],
+   "class": "technical"
+  },
+  "core.work_requirement.status": {
+   "values": [
+    "active",
+    "proposed"
+   ],
+   "class": "system_status"
+  },
+  "core.work_requirement.strength": {
+   "values": [
+    "asset",
+    "preferred",
+    "required"
+   ],
+   "class": "engine_method"
+  },
+  "core.work_requirement.target_type": {
+   "values": [
+    "job",
+    "position"
+   ],
+   "class": "technical"
+  },
+  "core.work_requirement.verification": {
+   "values": [
+    "assessment",
+    "background_check",
+    "credential_record",
+    "document",
+    "none",
+    "self_declared"
+   ],
+   "class": "engine_method"
+  },
+  "finance.calendar.kind": {
+   "values": [
+    "agreement_year",
+    "benefit_plan_year",
+    "custom",
+    "fiscal",
+    "funder",
+    "leave_year",
+    "pension_year"
+   ],
+   "class": "taxonomy"
+  },
+  "finance.calendar.owner_type": {
+   "values": [
+    "agreement",
+    "benefit_plan",
+    "funding_source",
+    "leave_plan",
+    "legal_entity",
+    "pension_plan",
+    "tenant"
+   ],
+   "class": "technical"
+  },
+  "finance.calendar_period.status": {
+   "values": [
+    "closed",
+    "future",
+    "locked",
+    "open",
+    "soft_closed"
+   ],
+   "class": "system_status"
+  },
+  "finance.cost_distribution.target_type": {
+   "values": [
+    "assignment",
+    "org_unit",
+    "position"
+   ],
+   "class": "technical"
+  },
+  "finance.funding_source.accounting_basis": {
+   "values": [
+    "accrual",
+    "cash"
+   ],
+   "class": "engine_method"
+  },
+  "finance.funding_source.cap_behaviour": {
+   "values": [
+    "hard_stop",
+    "spill_fallback",
+    "spill_next_line",
+    "warn_only"
+   ],
+   "class": "engine_method"
+  },
+  "finance.funding_source.post_close_policy": {
+   "values": [
+    "fallback",
+    "successor",
+    "suspense"
+   ],
+   "class": "engine_method"
+  },
+  "finance.funding_source.status": {
+   "values": [
+    "active",
+    "closed",
+    "closing",
+    "draft"
+   ],
+   "class": "system_status"
+  },
+  "finance.gl_mapping_version.apply_by": {
+   "values": [
+    "posting_date",
+    "work_date"
+   ],
+   "class": "engine_method"
+  },
+  "finance.intercompany_arrangement.recovery_basis": {
+   "values": [
+    "cost",
+    "cost_plus",
+    "fixed"
+   ],
+   "class": "engine_method"
+  },
+  "offboard.separation.status": {
+   "values": [
+    "approved",
+    "complete",
+    "draft",
+    "in_progress"
+   ],
+   "class": "system_status"
+  },
+  "payroll.bank_account.split_type": {
+   "values": [
+    "amount",
+    "percent",
+    "remainder"
+   ],
+   "class": "engine_method"
+  },
+  "payroll.bank_change_request.channel": {
+   "values": [
+    "hr_on_behalf",
+    "import",
+    "self_service"
+   ],
+   "class": "technical"
+  },
+  "payroll.bank_change_request.id_type_seen": {
+   "values": [
+    "drivers_licence",
+    "other_government_photo_id",
+    "passport",
+    "provincial_photo_id",
+    "status_card"
+   ],
+   "class": "published_vocabulary"
+  },
+  "payroll.bank_change_request.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "in_effect",
+    "pending_verification",
+    "rejected"
+   ],
+   "class": "system_status"
+  },
+  "payroll.bank_change_request.verification_method": {
+   "values": [
+    "phone",
+    "video"
+   ],
+   "class": "engine_method"
+  },
+  "payroll.deduction_arrears.status": {
+   "values": [
+    "open",
+    "recovered",
+    "recovering",
+    "written_off"
+   ],
+   "class": "system_status"
+  },
+  "payroll.delivery_choice.choice": {
+   "values": [
+    "electronic_consent",
+    "email_consent",
+    "paper_request"
+   ],
+   "class": "taxonomy",
+   "note": "R5.1 (corrected): consent matters for former staff, staff on leave or laid off, and email; anyone may ask for paper."
+  },
+  "payroll.delivery_choice.document_kind": {
+   "values": [
+    "pay_statement",
+    "tax_slip"
+   ],
+   "class": "taxonomy",
+   "note": "R5.1: choices are made per kind of document."
+  },
+  "payroll.delivery_choice.method": {
+   "values": [
+    "paper_form",
+    "self_service"
+   ],
+   "class": "technical"
+  },
+  "payroll.duty.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "payroll.garnishment_order.kind": {
+   "values": [
+    "cra_requirement_to_pay",
+    "family_support",
+    "federal_garnishment",
+    "other",
+    "provincial_garnishment"
+   ],
+   "class": "published_vocabulary",
+   "note": "Kinds of orders under federal and provincial law (R4.1)."
+  },
+  "payroll.garnishment_order.status": {
+   "values": [
+    "active",
+    "received",
+    "satisfied",
+    "suspended",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "payroll.gl_journal.kind": {
+   "values": [
+    "accrual",
+    "accrual_reversal",
+    "cash",
+    "intercompany_recovery",
+    "liability_adjustment",
+    "opening_balance",
+    "prior_year_adjustment",
+    "retro"
+   ],
+   "class": "engine_method"
+  },
+  "payroll.gl_journal.source": {
+   "values": [
+    "accrual_run",
+    "go_live",
+    "intercompany",
+    "liability_valuation",
+    "manual",
+    "pay_run"
+   ],
+   "class": "technical"
+  },
+  "payroll.one_time_item.allocation": {
+   "values": [
+    "assignment",
+    "earnings_share"
+   ],
+   "class": "engine_method"
+  },
+  "payroll.one_time_item.status": {
+   "values": [
+    "cancelled",
+    "included",
+    "paid",
+    "pending"
+   ],
+   "class": "system_status"
+  },
+  "payroll.opening_balance.kind": {
+   "values": [
+    "banked_time_liability",
+    "funding_spent_to_date",
+    "legacy_accrual",
+    "payroll_clearing",
+    "retro_reserve",
+    "sick_payout_liability",
+    "vacation_liability"
+   ],
+   "class": "taxonomy"
+  },
+  "payroll.overpayment.recovery_basis": {
+   "values": [
+    "agreement_rule",
+    "court_order",
+    "employee_authorization",
+    "jurisdiction_rule"
+   ],
+   "class": "engine_method"
+  },
+  "payroll.overpayment.recovery_basis#recovery_needs_basis": {
+   "values": [
+    "agreement_rule",
+    "court_order",
+    "jurisdiction_rule"
+   ],
+   "class": "engine_method"
+  },
+  "payroll.overpayment.source": {
+   "values": [
+    "correction",
+    "manual",
+    "other",
+    "retro"
+   ],
+   "class": "technical"
+  },
+  "payroll.overpayment.status": {
+   "values": [
+    "authorization_requested",
+    "authorized",
+    "cancelled",
+    "disputed",
+    "held",
+    "recovered",
+    "recovering",
+    "waived"
+   ],
+   "class": "system_status"
+  },
+  "payroll.parallel_run.status": {
+   "values": [
+    "accepted",
+    "explained",
+    "in_progress"
+   ],
+   "class": "system_status"
+  },
+  "payroll.pay_code.arrears_recovery": {
+   "values": [
+    "hr_decides",
+    "next_pay",
+    "not_recovered",
+    "spread"
+   ],
+   "class": "engine_method",
+   "note": "R4.3: each deduction states what happens to a shortfall."
+  },
+  "payroll.pay_code.kind": {
+   "values": [
+    "benefit",
+    "deduction",
+    "earning",
+    "employer_cost",
+    "memo"
+   ],
+   "class": "taxonomy"
+  },
+  "payroll.pay_code.reduces_taxable": {
+   "values": [
+    "F",
+    "F2",
+    "U1",
+    "none"
+   ],
+   "class": "published_vocabulary"
+  },
+  "payroll.pay_group.frequency": {
+   "values": [
+    "annual",
+    "biweekly",
+    "daily",
+    "monthly",
+    "other",
+    "quarterly",
+    "semimonthly",
+    "weekly"
+   ],
+   "class": "published_vocabulary"
+  },
+  "payroll.pay_group.proration_method": {
+   "values": [
+    "calendar_days",
+    "scheduled_hours",
+    "working_days"
+   ],
+   "class": "engine_method"
+  },
+  "payroll.pay_period.status": {
+   "values": [
+    "closed",
+    "future",
+    "open",
+    "processing"
+   ],
+   "class": "system_status"
+  },
+  "payroll.pay_result.status": {
+   "values": [
+    "calculated",
+    "finalized",
+    "reversed"
+   ],
+   "class": "system_status"
+  },
+  "payroll.pay_result_line_distribution.source_rule": {
+   "values": [
+    "assignment",
+    "fallback",
+    "one_time",
+    "org_unit",
+    "position",
+    "spill",
+    "suspense",
+    "time_line"
+   ],
+   "class": "technical"
+  },
+  "payroll.pay_run.run_type": {
+   "values": [
+    "adjustment",
+    "bonus",
+    "final",
+    "manual_payment_record",
+    "off_cycle",
+    "regular",
+    "retro",
+    "reversal",
+    "simulation"
+   ],
+   "class": "engine_method"
+  },
+  "payroll.pay_run.status": {
+   "values": [
+    "approved",
+    "calculated",
+    "calculating",
+    "cancelled",
+    "draft",
+    "finalized",
+    "inputs_locked",
+    "paid",
+    "reviewed"
+   ],
+   "class": "system_status"
+  },
+  "payroll.pay_run.tax_method": {
+   "values": [
+    "auto",
+    "non_periodic",
+    "periodic"
+   ],
+   "class": "engine_method"
+  },
+  "payroll.pay_run_partition.status": {
+   "values": [
+    "calculated",
+    "calculating",
+    "failed",
+    "finalized",
+    "pending"
+   ],
+   "class": "system_status"
+  },
+  "payroll.pay_run_rule_pin.family": {
+   "values": [
+    "agreement",
+    "employer_taxes",
+    "employment_standards",
+    "engine",
+    "policy",
+    "quebec_tax",
+    "statutory"
+   ],
+   "class": "taxonomy"
+  },
+  "payroll.payment_file.format": {
+   "values": [
+    "cpa005",
+    "iso20022_pain001",
+    "positive_pay"
+   ],
+   "class": "published_vocabulary"
+  },
+  "payroll.payroll_profile_version.s87_status": {
+   "values": [
+    "exempt_full",
+    "exempt_partial",
+    "not_applicable",
+    "under_review"
+   ],
+   "class": "published_vocabulary"
+  },
+  "payroll.recovery_authorization.kind": {
+   "values": [
+    "advance",
+    "bonus_clawback",
+    "equipment",
+    "loan",
+    "other",
+    "training"
+   ],
+   "class": "taxonomy",
+   "note": "R4.4: money owed recovered only with written authorization. bonus_clawback: a signed signing or retention bonus agreement (docs/25 §7.3)."
+  },
+  "payroll.remittance.status": {
+   "values": [
+    "calculated",
+    "late",
+    "paid",
+    "scheduled"
+   ],
+   "class": "system_status"
+  },
+  "payroll.retro_request.status": {
+   "values": [
+    "approved",
+    "calculated",
+    "cancelled",
+    "no_difference",
+    "overpayment_held",
+    "paid",
+    "queued"
+   ],
+   "class": "system_status"
+  },
+  "payroll.roe.status": {
+   "values": [
+    "accepted",
+    "draft",
+    "rejected",
+    "submitted",
+    "validated"
+   ],
+   "class": "system_status"
+  },
+  "payroll.slip.report_type": {
+   "values": [
+    "amended",
+    "cancelled",
+    "original"
+   ],
+   "class": "published_vocabulary"
+  },
+  "payroll.slip.slip_type": {
+   "values": [
+    "NR4",
+    "RL1",
+    "T4",
+    "T4A"
+   ],
+   "class": "published_vocabulary"
+  },
+  "payroll.slip.status": {
+   "values": [
+    "accepted",
+    "draft",
+    "filed",
+    "rejected",
+    "validated"
+   ],
+   "class": "system_status"
+  },
+  "payroll.vacation_pay_rule.method": {
+   "values": [
+    "accrue_pay_when_taken",
+    "pay_each_cheque"
+   ],
+   "class": "engine_method",
+   "note": "R3.1: the employer chooses per group of employees."
+  },
+  "payroll.vacation_pay_rule.rate_source": {
+   "values": [
+    "fixed_percent",
+    "law_minimum"
+   ],
+   "class": "engine_method",
+   "note": "The law minimum by service comes from the employment standards edition."
+  },
+  "payroll.vacation_pay_rule.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "payroll.voluntary_deduction.status": {
+   "values": [
+    "approved",
+    "rejected",
+    "requested",
+    "stopped"
+   ],
+   "class": "system_status"
+  },
+  "platform.app_user.status": {
+   "values": [
+    "active",
+    "disabled"
+   ],
+   "class": "system_status"
+  },
+  "platform.approval_task.capability": {
+   "values": [
+    "executive",
+    "finance",
+    "hr",
+    "labour_relations",
+    "manager",
+    "other",
+    "payroll"
+   ],
+   "class": "taxonomy",
+   "note": "executive added by 0009 for routes that need an executive step (docs/23 §2.2)."
+  },
+  "platform.approval_task.status": {
+   "values": [
+    "approved",
+    "delegated",
+    "expired",
+    "open",
+    "rejected"
+   ],
+   "class": "system_status"
+  },
+  "platform.audit_entry.actor_type": {
+   "values": [
+    "assistant",
+    "integration",
+    "system",
+    "user"
+   ],
+   "class": "technical"
+  },
+  "platform.change_set.communication_method": {
+   "values": [
+    "email",
+    "in_person",
+    "letter",
+    "other",
+    "phone",
+    "video"
+   ],
+   "class": "engine_method"
+  },
+  "platform.change_set.source": {
+   "values": [
+    "api",
+    "assistant_draft",
+    "import",
+    "mass_change",
+    "org_chart",
+    "system",
+    "ui_form",
+    "workflow"
+   ],
+   "class": "technical"
+  },
+  "platform.change_set.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "committed",
+    "draft",
+    "pending_approval",
+    "rejected",
+    "scheduled",
+    "validated"
+   ],
+   "class": "system_status"
+  },
+  "platform.change_set.status#change_set_communicated_after_approval": {
+   "values": [
+    "approved",
+    "committed",
+    "scheduled"
+   ],
+   "class": "system_status"
+  },
+  "platform.column_default.source": {
+   "values": [
+    "setting",
+    "tenant_main_language",
+    "tenant_main_locale"
+   ],
+   "class": "technical"
+  },
+  "platform.notification.channel": {
+   "values": [
+    "email",
+    "in_app",
+    "push",
+    "sms"
+   ],
+   "class": "technical"
+  },
+  "platform.notification.status": {
+   "values": [
+    "failed",
+    "queued",
+    "read",
+    "sent"
+   ],
+   "class": "system_status"
+  },
+  "platform.plan.kind": {
+   "values": [
+    "org_chart",
+    "position_budget",
+    "workforce"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R7.1: plans of draft change sets; only the position plan goes through its route (FB-039 for plans made before 0016)."
+  },
+  "platform.plan.status": {
+   "values": [
+    "approved",
+    "discarded",
+    "open",
+    "submitted"
+   ],
+   "class": "system_status"
+  },
+  "platform.provider_access_grant.status": {
+   "values": [
+    "approved",
+    "expired",
+    "requested",
+    "revoked"
+   ],
+   "class": "system_status"
+  },
+  "platform.setting_definition.decision_status": {
+   "values": [
+    "decided",
+    "pending",
+    "spec_default"
+   ],
+   "class": "system_status"
+  },
+  "platform.setting_definition.value_type": {
+   "values": [
+    "boolean",
+    "integer",
+    "integer_array",
+    "json",
+    "number",
+    "text",
+    "text_array"
+   ],
+   "class": "technical"
+  },
+  "platform.setting_definition.value_type#setting_definition_limits_numeric": {
+   "values": [
+    "integer",
+    "number"
+   ],
+   "class": "technical"
+  },
+  "platform.support_access_grant.status": {
+   "values": [
+    "approved",
+    "declined",
+    "expired",
+    "requested",
+    "revoked"
+   ],
+   "class": "system_status"
+  },
+  "platform.tenant.data_isolation": {
+   "values": [
+    "dedicated",
+    "shared"
+   ],
+   "class": "technical",
+   "note": "Decided R7.3: a First Nation chooses at setup between shared with OCAP® controls and its own database."
+  },
+  "platform.tenant_language.for_data": {
+   "values": [
+    "optional",
+    "required"
+   ],
+   "class": "technical"
+  },
+  "platform.tenant_setting.scope_type": {
+   "values": [
+    "legal_entity",
+    "tenant"
+   ],
+   "class": "technical"
+  },
+  "platform.workflow_route.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "platform.workflow_route.subject_type": {
+   "values": [
+    "banked_time_payout",
+    "carrier_invoice",
+    "caution",
+    "comp_decision",
+    "comp_philosophy",
+    "direct_hire",
+    "incentive_payout",
+    "offer",
+    "pay_run",
+    "pay_structure_version",
+    "performance_review",
+    "pip",
+    "position_plan",
+    "probation_extension",
+    "recognition_award",
+    "recognition_publication",
+    "requisition",
+    "salary_disclosure",
+    "status_conversion",
+    "succession_plan",
+    "talent_pool_membership",
+    "timesheet",
+    "training_request",
+    "voluntary_deduction"
+   ],
+   "class": "engine_method",
+   "note": "What a route approves; each subject has code that checks its route (docs/23 §2.2)."
+  },
+  "platform.workflow_route_step.approver_kind": {
+   "values": [
+    "capability",
+    "hiring_manager",
+    "requester_manager",
+    "role",
+    "subject_owner",
+    "unit_head",
+    "user"
+   ],
+   "class": "engine_method",
+   "note": "How a step finds its approvers (docs/23 §2.2)."
+  },
+  "platform.workflow_route_step.capability": {
+   "values": [
+    "executive",
+    "finance",
+    "hr",
+    "labour_relations",
+    "manager",
+    "other",
+    "payroll"
+   ],
+   "class": "taxonomy",
+   "note": "Same capabilities as platform.approval_task.capability."
+  },
+  "platform.workflow_route_step.mode": {
+   "values": [
+    "all",
+    "any"
+   ],
+   "class": "engine_method"
+  },
+  "recruit.application.decided_by_kind": {
+   "values": [
+    "person",
+    "requirement_rule"
+   ],
+   "class": "engine_method",
+   "note": "No AI or assistant value by design: AI never decides (R1.4, AGENTS rule 14)."
+  },
+  "recruit.interview.status": {
+   "values": [
+    "cancelled",
+    "held",
+    "scheduled"
+   ],
+   "class": "system_status"
+  },
+  "recruit.message_template.purpose": {
+   "values": [
+    "general",
+    "interview_invitation",
+    "not_selected",
+    "offer",
+    "shortlisted",
+    "talent_pool"
+   ],
+   "class": "taxonomy",
+   "note": "The organization writes its own templates for each purpose (R2.6)."
+  },
+  "recruit.message_template.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "recruit.offer.hire_path": {
+   "values": [
+    "direct_hire",
+    "requisition"
+   ],
+   "class": "engine_method",
+   "note": "R2.7."
+  },
+  "recruit.offer.internal_move": {
+   "values": [
+    "resign_and_rehire",
+    "transfer"
+   ],
+   "class": "taxonomy",
+   "note": "R4.5: depends on the organization and the position; stated on each internal offer."
+  },
+  "recruit.offer.status": {
+   "values": [
+    "accepted",
+    "approved",
+    "declined",
+    "draft",
+    "expired",
+    "pending_approval",
+    "sent",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "recruit.offer_condition.kind": {
+   "values": [
+    "background_check",
+    "credential_check",
+    "criminal_record_check",
+    "licence_check",
+    "medical",
+    "other",
+    "reference_check",
+    "tell_current_supervisor",
+    "work_authorization"
+   ],
+   "class": "taxonomy",
+   "note": "Checks after a conditional offer (R5.4); tell_current_supervisor for internal moves (R4.5)."
+  },
+  "recruit.offer_condition.status": {
+   "values": [
+    "met",
+    "not_met",
+    "pending",
+    "requested",
+    "waived"
+   ],
+   "class": "system_status"
+  },
+  "recruit.onboarding_plan.hire_kind": {
+   "values": [
+    "contractor",
+    "internal_transfer",
+    "new_hire",
+    "other",
+    "rehire",
+    "student"
+   ],
+   "class": "taxonomy",
+   "note": "R6.3."
+  },
+  "recruit.onboarding_plan.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "recruit.onboarding_plan_item.due_event": {
+   "values": [
+    "benefits_start",
+    "contract_signed",
+    "first_pay",
+    "probation_end",
+    "start_date"
+   ],
+   "class": "engine_method",
+   "note": "R6.2: each form is due relative to its own event."
+  },
+  "recruit.onboarding_plan_item.extra": {
+   "values": [
+    "buddyProgram",
+    "checkInSurveys",
+    "culturalTrack",
+    "welcomeVideos"
+   ],
+   "class": "engine_method",
+   "note": "Keys of the setting onboarding.extras (R6.6)."
+  },
+  "recruit.onboarding_plan_item.form_code": {
+   "values": [
+    "benefits_enrolment",
+    "direct_deposit",
+    "emergency_contact",
+    "policy_acknowledgement",
+    "provincial_tax_form",
+    "s87_declaration",
+    "self_identification",
+    "sin",
+    "td1_federal",
+    "work_authorization"
+   ],
+   "class": "taxonomy",
+   "note": "Forms CanDo knows how to collect; the legal ones (SIN, TD1, TP-1015.3, s. 87) have code behind them (R6.2, FB-024, FB-028)."
+  },
+  "recruit.onboarding_plan_item.kind": {
+   "values": [
+    "access",
+    "document",
+    "equipment",
+    "form",
+    "meeting",
+    "orientation",
+    "survey",
+    "task",
+    "training",
+    "video"
+   ],
+   "class": "taxonomy"
+  },
+  "recruit.onboarding_plan_item.owner_kind": {
+   "values": [
+    "buddy",
+    "communications",
+    "facilities",
+    "finance",
+    "hiring_manager",
+    "hr",
+    "it",
+    "learning",
+    "new_hire",
+    "other",
+    "payroll",
+    "security"
+   ],
+   "class": "taxonomy",
+   "note": "Departments that own onboarding tasks (requirements/02)."
+  },
+  "recruit.onboarding_plan_item.phase": {
+   "values": [
+    "onboarding",
+    "pre_boarding"
+   ],
+   "class": "taxonomy"
+  },
+  "recruit.onboarding_support.role": {
+   "values": [
+    "buddy",
+    "mentor",
+    "trainer"
+   ],
+   "class": "taxonomy",
+   "note": "R6.5."
+  },
+  "recruit.onboarding_task.due_event": {
+   "values": [
+    "benefits_start",
+    "contract_signed",
+    "first_pay",
+    "probation_end",
+    "start_date"
+   ],
+   "class": "engine_method",
+   "note": "Same list as recruit.onboarding_plan_item.due_event."
+  },
+  "recruit.onboarding_task.form_code": {
+   "values": [
+    "benefits_enrolment",
+    "direct_deposit",
+    "emergency_contact",
+    "policy_acknowledgement",
+    "provincial_tax_form",
+    "s87_declaration",
+    "self_identification",
+    "sin",
+    "td1_federal",
+    "work_authorization"
+   ],
+   "class": "taxonomy",
+   "note": "Same list as recruit.onboarding_plan_item.form_code."
+  },
+  "recruit.onboarding_task.owner_kind": {
+   "values": [
+    "buddy",
+    "communications",
+    "facilities",
+    "finance",
+    "hiring_manager",
+    "hr",
+    "it",
+    "learning",
+    "new_hire",
+    "other",
+    "payroll",
+    "security"
+   ],
+   "class": "taxonomy",
+   "note": "Same list as recruit.onboarding_plan_item.owner_kind."
+  },
+  "recruit.onboarding_task.phase": {
+   "values": [
+    "onboarding",
+    "pre_boarding"
+   ],
+   "class": "taxonomy"
+  },
+  "recruit.onboarding_task.status": {
+   "values": [
+    "done",
+    "open",
+    "waived"
+   ],
+   "class": "system_status"
+  },
+  "recruit.posting.audience": {
+   "values": [
+    "internal_and_public",
+    "internal_first",
+    "internal_only",
+    "public_only"
+   ],
+   "class": "engine_method",
+   "note": "Starting value from recruit.posting_audience (R3.1)."
+  },
+  "recruit.posting.missing_requirement": {
+   "values": [
+    "flag",
+    "screen_out"
+   ],
+   "class": "engine_method",
+   "note": "Starting value from recruit.missing_requirement, chosen at setup (R2.5)."
+  },
+  "recruit.posting.pay_basis": {
+   "values": [
+    "incumbent_average",
+    "market_point",
+    "other",
+    "range"
+   ],
+   "class": "engine_method",
+   "note": "Starting value from recruit.posting_pay_basis (R3.2)."
+  },
+  "recruit.posting.pay_unit": {
+   "values": [
+    "day",
+    "hour",
+    "month",
+    "week",
+    "year"
+   ],
+   "class": "taxonomy"
+  },
+  "recruit.posting.status": {
+   "values": [
+    "cancelled",
+    "closed",
+    "draft",
+    "published"
+   ],
+   "class": "system_status"
+  },
+  "recruit.posting_exemption_rule.category": {
+   "values": [
+    "extra_duties",
+    "named_candidate",
+    "on_call",
+    "other",
+    "talent_pool"
+   ],
+   "class": "taxonomy",
+   "note": "Kinds of hiring without a posting the owner named (R2.8); each organization names and limits its own rules."
+  },
+  "recruit.posting_exemption_rule.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "recruit.posting_question.kind": {
+   "values": [
+    "date",
+    "multiple_choice",
+    "number",
+    "text",
+    "yes_no"
+   ],
+   "class": "engine_method",
+   "note": "Question types the owner named (R4.1)."
+  },
+  "recruit.requisition.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "draft",
+    "filled",
+    "on_hold",
+    "pending_approval",
+    "posted"
+   ],
+   "class": "system_status"
+  },
+  "ref.code_item_requirement.strength": {
+   "values": [
+    "may_be_required",
+    "required",
+    "unspecified",
+    "usually_required"
+   ],
+   "class": "published_vocabulary"
+  },
+  "ref.code_item_title.kind": {
+   "values": [
+    "example",
+    "inclusion",
+    "index",
+    "official"
+   ],
+   "class": "published_vocabulary"
+  },
+  "ref.code_mapping.relation": {
+   "values": [
+    "merge",
+    "one_to_one",
+    "partial",
+    "renamed",
+    "split"
+   ],
+   "class": "published_vocabulary"
+  },
+  "ref.code_scheme.purpose": {
+   "values": [
+    "employment_equity",
+    "occupation",
+    "other",
+    "skills"
+   ],
+   "class": "taxonomy"
+  },
+  "ref.code_scheme.structure": {
+   "values": [
+    "flat",
+    "hierarchical"
+   ],
+   "class": "engine_method"
+  },
+  "ref.code_scheme_version.status": {
+   "values": [
+    "announced",
+    "loading",
+    "published",
+    "retired",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "ref.code_scheme_version.status#code_scheme_version_check": {
+   "values": [
+    "announced",
+    "loading"
+   ],
+   "class": "system_status"
+  },
+  "ref.gift_award_rule.status": {
+   "values": [
+    "official",
+    "secondary",
+    "verify_at_load"
+   ],
+   "class": "technical",
+   "note": "How the rule value was verified, as for other rule editions."
+  },
+  "ref.language.direction": {
+   "values": [
+    "ltr",
+    "rtl"
+   ],
+   "class": "technical"
+  },
+  "ref.observance.category": {
+   "values": [
+    "heritage",
+    "indigenous",
+    "other",
+    "pride",
+    "religious"
+   ],
+   "class": "taxonomy",
+   "note": "Module 10 R8.2: the starter observances."
+  },
+  "ref.observance.rule": {
+   "values": [
+    "dated",
+    "fixed_day",
+    "month"
+   ],
+   "class": "engine_method",
+   "note": "How an observance falls in the year; dated ones are loaded each year."
+  },
+  "ref.observance_date.status": {
+   "values": [
+    "official",
+    "secondary",
+    "verify_at_load"
+   ],
+   "class": "technical",
+   "note": "How a yearly date was verified."
+  },
+  "ref.public_wage.basis": {
+   "values": [
+    "annual",
+    "hourly"
+   ],
+   "class": "published_vocabulary"
+  },
+  "ref.public_wage.estimation": {
+   "values": [
+    "direct",
+    "other_geography",
+    "other_source",
+    "small_area"
+   ],
+   "class": "published_vocabulary"
+  },
+  "ref.public_wage.geo_level": {
+   "values": [
+    "national",
+    "province",
+    "region"
+   ],
+   "class": "published_vocabulary"
+  },
+  "ref.public_wage_edition.status": {
+   "values": [
+    "loading",
+    "published",
+    "retired",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "ref.reward_practice.richer_when": {
+   "values": [
+    "higher",
+    "lower",
+    "none",
+    "yes"
+   ],
+   "class": "engine_method"
+  },
+  "ref.reward_practice.value_type": {
+   "values": [
+    "boolean",
+    "count",
+    "days",
+    "enum",
+    "money",
+    "months",
+    "multiple_of_salary",
+    "percent",
+    "text",
+    "weeks"
+   ],
+   "class": "technical"
+  },
+  "ref.rule_edition.family": {
+   "values": [
+    "employer_taxes",
+    "employment_standards",
+    "quebec_tax",
+    "statutory"
+   ],
+   "class": "taxonomy"
+  },
+  "ref.rule_edition.status": {
+   "values": [
+    "active",
+    "draft",
+    "retired",
+    "tested"
+   ],
+   "class": "system_status"
+  },
+  "ref.training_requirement.status": {
+   "values": [
+    "official",
+    "secondary",
+    "verify_at_load"
+   ],
+   "class": "technical",
+   "note": "Where the value comes from; verify_at_load is never applied (RULE_NOT_VERIFIED)."
+  },
+  "ref.training_requirement.topic": {
+   "values": [
+    "accessibility",
+    "harassment_violence",
+    "hazardous_products",
+    "health_safety",
+    "human_rights",
+    "indigenous_awareness",
+    "orientation",
+    "other",
+    "privacy",
+    "role",
+    "sector"
+   ],
+   "class": "taxonomy",
+   "note": "Module 08 R1.3: what the law requires training on; reports and the compliance view group by it."
+  },
+  "talent.action_item.status": {
+   "values": [
+    "done",
+    "dropped",
+    "in_progress",
+    "planned"
+   ],
+   "class": "system_status"
+  },
+  "talent.action_plan.status": {
+   "values": [
+    "agreed",
+    "cancelled",
+    "done",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "talent.adverse_record.basis": {
+   "values": [
+    "agreement",
+    "organization"
+   ],
+   "class": "engine_method",
+   "note": "Module 07 R7.2: the sunset comes from the agreement, or from performance.non_union_sunset."
+  },
+  "talent.adverse_record.subject_type": {
+   "values": [
+    "other",
+    "pip",
+    "review"
+   ],
+   "class": "technical"
+  },
+  "talent.announcement.status": {
+   "values": [
+    "draft",
+    "published",
+    "scheduled",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "talent.announcement_channel.channel": {
+   "values": [
+    "app",
+    "email",
+    "push",
+    "slack",
+    "sms",
+    "teams"
+   ],
+   "class": "engine_method",
+   "note": "Module 10 R6.2, R6.4: SMS only for urgent alerts; Teams and Slack at launch."
+  },
+  "talent.apprenticeship.status": {
+   "values": [
+    "active",
+    "completed",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "talent.apprenticeship_hours.kind": {
+   "values": [
+    "on_the_job",
+    "technical_training"
+   ],
+   "class": "taxonomy"
+  },
+  "talent.apprenticeship_hours.source": {
+   "values": [
+    "manual",
+    "school_record",
+    "timesheet"
+   ],
+   "class": "technical"
+  },
+  "talent.career_path_step.move_type": {
+   "values": [
+    "cross_functional",
+    "lateral",
+    "vertical"
+   ],
+   "class": "taxonomy",
+   "note": "Module 09 R5.1."
+  },
+  "talent.career_path_step.source": {
+   "values": [
+    "hr",
+    "job_architecture",
+    "observed_moves"
+   ],
+   "class": "technical",
+   "note": "Module 09 R5.1: from the job architecture and the moves people actually made; HR edits them."
+  },
+  "talent.career_path_step.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "talent.celebration_consent.kind": {
+   "values": [
+    "birthday",
+    "other"
+   ],
+   "class": "taxonomy",
+   "note": "Personal celebrations shown only with the employee's opt-in."
+  },
+  "talent.comment_flag.category": {
+   "values": [
+    "harassment",
+    "safety",
+    "self_harm"
+   ],
+   "class": "taxonomy",
+   "note": "Module 10 R2.2: comments flagged by rule to the named HR contact, without identity."
+  },
+  "talent.comment_flag.status": {
+   "values": [
+    "handled",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "talent.competency.indicators_status": {
+   "values": [
+    "as_provided",
+    "proposed",
+    "reviewed"
+   ],
+   "class": "system_status"
+  },
+  "talent.competency_assessment.context": {
+   "values": [
+    "development",
+    "other",
+    "performance_review",
+    "probation",
+    "promotion",
+    "selection",
+    "succession"
+   ],
+   "class": "taxonomy"
+  },
+  "talent.competency_assessment.source": {
+   "values": [
+    "assessment",
+    "calibrated",
+    "evidence",
+    "manager",
+    "peer_360",
+    "self"
+   ],
+   "class": "technical"
+  },
+  "talent.competency_assessment.status": {
+   "values": [
+    "draft",
+    "final",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "talent.competency_framework.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "talent.competency_framework_version.status": {
+   "values": [
+    "draft",
+    "published",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "talent.competency_target.criticality": {
+   "values": [
+    "critical",
+    "important",
+    "useful"
+   ],
+   "class": "taxonomy"
+  },
+  "talent.competency_target.source": {
+   "values": [
+    "assistant",
+    "career_level_default",
+    "job",
+    "manual",
+    "position"
+   ],
+   "class": "technical"
+  },
+  "talent.competency_target.status": {
+   "values": [
+    "active",
+    "proposed"
+   ],
+   "class": "system_status"
+  },
+  "talent.competency_target.target_type": {
+   "values": [
+    "job",
+    "position"
+   ],
+   "class": "technical"
+  },
+  "talent.credential.kind": {
+   "values": [
+    "driver_licence",
+    "operator_ticket",
+    "other",
+    "professional_licence",
+    "registration",
+    "safety_certificate",
+    "screening",
+    "trade_certificate"
+   ],
+   "class": "taxonomy"
+  },
+  "talent.credential.status": {
+   "values": [
+    "pending",
+    "revoked",
+    "suspended",
+    "valid"
+   ],
+   "class": "system_status",
+   "note": "Module 08 R3.3: pending until HR or its delegate verifies it."
+  },
+  "talent.credential.verification_method": {
+   "values": [
+    "document",
+    "issuer_contact",
+    "public_registry"
+   ],
+   "class": "engine_method",
+   "note": "Module 08 R3.3, R3.4: manual checks at launch; registry links later."
+  },
+  "talent.critical_role.status": {
+   "values": [
+    "confirmed",
+    "proposed",
+    "retired"
+   ],
+   "class": "system_status",
+   "note": "Module 09 R2.1: leaders score and propose; HR confirms the critical list."
+  },
+  "talent.development_action.kind": {
+   "values": [
+    "experience",
+    "formal",
+    "relationship"
+   ],
+   "class": "taxonomy",
+   "note": "Module 08 R4.4: the 70-20-10 view, guidance only."
+  },
+  "talent.development_action.status": {
+   "values": [
+    "done",
+    "dropped",
+    "in_progress",
+    "planned"
+   ],
+   "class": "system_status"
+  },
+  "talent.development_plan.status": {
+   "values": [
+    "agreed",
+    "closed",
+    "draft",
+    "proposed"
+   ],
+   "class": "system_status",
+   "note": "Module 08 R4.3: agreed by both, like goals."
+  },
+  "talent.feedback_message.author": {
+   "values": [
+    "employee",
+    "hr"
+   ],
+   "class": "technical",
+   "note": "Module 10 R6.3: the anonymous box; the employee is never named."
+  },
+  "talent.feedback_rater.rater_group": {
+   "values": [
+    "direct_report",
+    "manager",
+    "other",
+    "peer"
+   ],
+   "class": "taxonomy",
+   "note": "Module 07 R5.2: groups are shown only from performance.rater_group_min answers; the manager is never anonymous."
+  },
+  "talent.feedback_rater.status": {
+   "values": [
+    "declined",
+    "invited",
+    "submitted"
+   ],
+   "class": "system_status"
+  },
+  "talent.feedback_request.kind": {
+   "values": [
+    "360",
+    "ad_hoc"
+   ],
+   "class": "engine_method"
+  },
+  "talent.feedback_request.purpose": {
+   "values": [
+    "development",
+    "rating"
+   ],
+   "class": "engine_method",
+   "note": "Module 07 R5.3."
+  },
+  "talent.feedback_request.status": {
+   "values": [
+    "closed",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "talent.feedback_thread.status": {
+   "values": [
+    "answered",
+    "closed",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "talent.flight_risk_assessment.level": {
+   "values": [
+    "high",
+    "low",
+    "medium"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R1.2: the manager's own assessment with a note; no prediction model."
+  },
+  "talent.gap_strategy.draft_kind": {
+   "values": [
+    "contingent_budget",
+    "position_plan",
+    "process_change",
+    "requisition_forecast",
+    "retention_action",
+    "training_plan"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R6.5: what a strategy drafts in its own module; nothing happens until approved there."
+  },
+  "talent.gap_strategy.status": {
+   "values": [
+    "drafted",
+    "dropped",
+    "proposed",
+    "released"
+   ],
+   "class": "system_status"
+  },
+  "talent.gap_strategy.strategy": {
+   "values": [
+    "bind",
+    "borrow",
+    "bot",
+    "build",
+    "buy",
+    "redeploy",
+    "reduce"
+   ],
+   "class": "taxonomy",
+   "note": "Module 09 R6.5: the workforce planning strategies (the 6 Bs and reduction)."
+  },
+  "talent.goal.kind": {
+   "values": [
+    "development",
+    "job_standard",
+    "objective",
+    "training"
+   ],
+   "class": "taxonomy",
+   "note": "Module 07 R2.1: training goals point to the learning the role needs (Module 08)."
+  },
+  "talent.goal.level": {
+   "values": [
+    "department",
+    "individual",
+    "mission",
+    "organization",
+    "team"
+   ],
+   "class": "taxonomy",
+   "note": "Module 07 R2.1: goals align upward from the individual to the mission."
+  },
+  "talent.goal.status": {
+   "values": [
+    "agreed",
+    "cancelled",
+    "completed",
+    "draft",
+    "proposed"
+   ],
+   "class": "system_status"
+  },
+  "talent.grant_claim.status": {
+   "values": [
+    "draft",
+    "paid",
+    "rejected",
+    "submitted"
+   ],
+   "class": "system_status"
+  },
+  "talent.idea.status": {
+   "values": [
+    "declined",
+    "done",
+    "planned",
+    "submitted",
+    "under_review"
+   ],
+   "class": "system_status"
+  },
+  "talent.language_proficiency.level": {
+   "values": [
+    "A",
+    "B",
+    "C",
+    "E",
+    "X"
+   ],
+   "class": "published_vocabulary",
+   "note": "Module 09 R7.7: the federal public service's second language results (Treasury Board qualification standards): A, B and C, X below A, E exempt from further testing (Level C held indefinitely)."
+  },
+  "talent.language_proficiency.source": {
+   "values": [
+    "hr",
+    "manager",
+    "self_declared",
+    "test"
+   ],
+   "class": "technical"
+  },
+  "talent.learning_assignment.event": {
+   "values": [
+    "hire",
+    "job_change",
+    "location_transfer",
+    "promotion",
+    "return_from_leave"
+   ],
+   "class": "taxonomy",
+   "note": "Module 08 R2.6: events that assign the roles and locations training (learning.assignment_events)."
+  },
+  "talent.learning_assignment.source": {
+   "values": [
+    "development_plan",
+    "law_change",
+    "manager",
+    "onboarding",
+    "rule",
+    "self_enrolment",
+    "suggestion"
+   ],
+   "class": "technical",
+   "note": "How the training was assigned; suggestions are rule-based, never AI (Module 08 R1.4)."
+  },
+  "talent.learning_assignment.source#learning_assignment_rule": {
+   "values": [
+    "law_change",
+    "rule"
+   ],
+   "class": "technical",
+   "note": "The sources that come from a training rule."
+  },
+  "talent.learning_assignment.status": {
+   "values": [
+    "assigned",
+    "cancelled",
+    "completed",
+    "in_progress",
+    "waived"
+   ],
+   "class": "system_status"
+  },
+  "talent.learning_completion.source": {
+   "values": [
+    "external_certificate",
+    "hr_entry",
+    "lms_import",
+    "on_the_job_signoff",
+    "policy_acknowledgement",
+    "provider_import",
+    "session_attendance"
+   ],
+   "class": "technical",
+   "note": "Module 08 R1.1: where a completion came from; CanDo records learning outside any LMS."
+  },
+  "talent.learning_item.kind": {
+   "values": [
+    "certification",
+    "classroom",
+    "conference",
+    "document_ack",
+    "elearning",
+    "external_course",
+    "job_shadowing",
+    "mentoring",
+    "on_the_job",
+    "video",
+    "virtual"
+   ],
+   "class": "taxonomy",
+   "note": "Module 08 R1.1: courses run in the LMS or provider; CanDo records the rest."
+  },
+  "talent.learning_item.provider_kind": {
+   "values": [
+    "customer_lms",
+    "external_provider",
+    "government",
+    "internal",
+    "partner_library"
+   ],
+   "class": "engine_method",
+   "note": "Module 08 R1.1, R1.2: where the course runs; integration-first, no CanDo course player."
+  },
+  "talent.learning_item.standard": {
+   "values": [
+    "cmi5",
+    "lti",
+    "none",
+    "provider_api",
+    "scorm_1_2",
+    "scorm_2004",
+    "xapi"
+   ],
+   "class": "published_vocabulary",
+   "note": "Learning content standards (ADL, IMS Global) and the provider API."
+  },
+  "talent.learning_item.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "talent.mentoring_pair.status": {
+   "values": [
+    "active",
+    "ended"
+   ],
+   "class": "system_status"
+  },
+  "talent.nine_box_placement.performance": {
+   "values": [
+    "high",
+    "low",
+    "moderate"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R3.2: the nine-box axes; box names and actions are the organization's (succession.nine_box_boxes)."
+  },
+  "talent.nine_box_placement.potential": {
+   "values": [
+    "high",
+    "low",
+    "moderate"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R3.2: the nine-box axes."
+  },
+  "talent.observance.category": {
+   "values": [
+    "community",
+    "heritage",
+    "indigenous",
+    "other",
+    "pride",
+    "religious"
+   ],
+   "class": "taxonomy",
+   "note": "Module 10 R8.2: the organization adds community events, ceremonies and land-based activities."
+  },
+  "talent.observance.rule": {
+   "values": [
+    "dated",
+    "fixed_day",
+    "month"
+   ],
+   "class": "engine_method"
+  },
+  "talent.observance.source": {
+   "values": [
+    "organization",
+    "starter"
+   ],
+   "class": "technical"
+  },
+  "talent.pip.outcome": {
+   "values": [
+    "closed",
+    "extended",
+    "role_change",
+    "successful",
+    "termination"
+   ],
+   "class": "taxonomy",
+   "note": "Module 07 R6: the outcome of a plan, recorded with a reason."
+  },
+  "talent.pip.status": {
+   "values": [
+    "active",
+    "approved",
+    "cancelled",
+    "completed",
+    "draft",
+    "extended",
+    "submitted"
+   ],
+   "class": "system_status"
+  },
+  "talent.pip_meeting.representation": {
+   "values": [
+    "not_required",
+    "offered_declined",
+    "support_person",
+    "union_representative"
+   ],
+   "class": "taxonomy",
+   "note": "Module 07 R6.4: as the agreement says for unionized staff; a support person may come otherwise."
+  },
+  "talent.plan_assumption.kind": {
+   "values": [
+    "burden",
+    "increase",
+    "other",
+    "overtime",
+    "vacancy"
+   ],
+   "class": "taxonomy",
+   "note": "Module 09 R7.3."
+  },
+  "talent.plan_assumption.source": {
+   "values": [
+    "agreement",
+    "comp_cycle",
+    "history",
+    "payroll_benefits",
+    "planner"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R7.3: from actuals; the planner edits with a reason."
+  },
+  "talent.plan_assumption.unit": {
+   "values": [
+    "amount",
+    "percent"
+   ],
+   "class": "technical"
+  },
+  "talent.pool_member.source": {
+   "values": [
+    "applied",
+    "nominated"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R4.6: managers nominate and employees can apply."
+  },
+  "talent.pool_member.status": {
+   "values": [
+    "approved",
+    "declined",
+    "exited",
+    "proposed"
+   ],
+   "class": "system_status"
+  },
+  "talent.potential_assessment.potential": {
+   "values": [
+    "high",
+    "low",
+    "moderate"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R3.1, R3.2: the three potential levels of the nine-box; the organization edits the criteria and descriptions."
+  },
+  "talent.rating_history.stage": {
+   "values": [
+    "after_final",
+    "calibration"
+   ],
+   "class": "system_status"
+  },
+  "talent.rating_scale.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "talent.recognition.visibility": {
+   "values": [
+    "private",
+    "public",
+    "public_requested",
+    "removed"
+   ],
+   "class": "system_status",
+   "note": "Module 10 R4.1, R4.2: private until the recipient asks; public once the organization's route approves."
+  },
+  "talent.repayment_rule.method": {
+   "values": [
+    "full",
+    "none",
+    "prorated"
+   ],
+   "class": "engine_method",
+   "note": "Module 08 R5.3: the organizations repayment rules; no CanDo starting rule."
+  },
+  "talent.repayment_rule.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "talent.retirement_outlook.eligibility_source": {
+   "values": [
+    "agreement",
+    "organization_policy",
+    "pension_plan"
+   ],
+   "class": "technical",
+   "note": "Module 09 R2.3: where the eligibility date comes from; age is never stored or shown per person."
+  },
+  "talent.review.hr_review_outcome": {
+   "values": [
+    "reopened",
+    "upheld"
+   ],
+   "class": "system_status",
+   "note": "Module 07 R3.3: HR decides, with a reason, whether to reopen a review the employee asked about."
+  },
+  "talent.review.overall_method": {
+   "values": [
+    "fte_weighted",
+    "none",
+    "primary_manager"
+   ],
+   "class": "engine_method"
+  },
+  "talent.review.rating_mode": {
+   "values": [
+    "agreement_form",
+    "development_only",
+    "not_rated",
+    "rated"
+   ],
+   "class": "engine_method",
+   "note": "Module 07 R2.2, R2.3, R7.1: whether a review carries ratings; the agreement library, the review type and the hire date decide."
+  },
+  "talent.review.status": {
+   "values": [
+    "calibration",
+    "closed",
+    "manager",
+    "not_started",
+    "one_up",
+    "released",
+    "self",
+    "signed"
+   ],
+   "class": "system_status",
+   "note": "Module 07 R3: calibration, the one-up look and HR on a concern come before release; signed means seen."
+  },
+  "talent.review_cycle.feedback_360_use": {
+   "values": [
+    "development_only",
+    "informs_ratings"
+   ],
+   "class": "engine_method",
+   "note": "Module 07 R5.3: 360 results for development only unless the cycle lets them inform ratings (performance.feedback_360_use)."
+  },
+  "talent.review_cycle.status": {
+   "values": [
+    "calibration",
+    "closed",
+    "draft",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "talent.review_section.status": {
+   "values": [
+    "in_progress",
+    "not_started",
+    "signed",
+    "submitted"
+   ],
+   "class": "system_status"
+  },
+  "talent.reward.cra_bucket": {
+   "values": [
+    "general",
+    "long_service",
+    "taxable_in_full"
+   ],
+   "class": "engine_method",
+   "note": "Module 10 R5.2: which CRA limit a reward counts against."
+  },
+  "talent.reward.kind": {
+   "values": [
+    "cash",
+    "gift_card",
+    "near_cash",
+    "non_cash"
+   ],
+   "class": "published_vocabulary",
+   "note": "CRA's gift and award policy: cash and near-cash are taxable; a gift card counts as non-cash only on CRA's conditions."
+  },
+  "talent.reward.occasion": {
+   "values": [
+    "long_service",
+    "performance",
+    "recognition",
+    "special_occasion"
+   ],
+   "class": "published_vocabulary",
+   "note": "CRA's gift and award policy: gifts for special occasions, awards for employment-related accomplishments, long-service awards; performance rewards are taxable."
+  },
+  "talent.reward.payroll_status": {
+   "values": [
+    "confirmed",
+    "not_taxable",
+    "to_confirm"
+   ],
+   "class": "system_status",
+   "note": "Module 10 R5.2: payroll confirms any taxable amount."
+  },
+  "talent.reward.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "given",
+    "proposed"
+   ],
+   "class": "system_status"
+  },
+  "talent.session_attendee.status": {
+   "values": [
+    "attended",
+    "cancelled",
+    "no_show",
+    "registered",
+    "waitlisted"
+   ],
+   "class": "system_status"
+  },
+  "talent.strengths_view.author": {
+   "values": [
+    "employee",
+    "manager"
+   ],
+   "class": "technical"
+  },
+  "talent.succession_plan.status": {
+   "values": [
+    "approved",
+    "draft",
+    "retired",
+    "submitted"
+   ],
+   "class": "system_status",
+   "note": "Module 09 R4.1: approved through the organization's route."
+  },
+  "talent.succession_view_log.subject_type": {
+   "values": [
+    "continuity_sheet",
+    "nine_box_placement",
+    "potential_assessment",
+    "succession_plan",
+    "talent_pool",
+    "talent_review"
+   ],
+   "class": "technical",
+   "note": "Module 09 R1.4: every view of succession data is logged."
+  },
+  "talent.successor.status": {
+   "values": [
+    "approved",
+    "proposed",
+    "removed"
+   ],
+   "class": "system_status"
+  },
+  "talent.supply_rate.kind": {
+   "values": [
+    "attrition",
+    "internal_in",
+    "internal_out",
+    "retirement"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R6.1."
+  },
+  "talent.supply_rate.source": {
+   "values": [
+    "history",
+    "next_level",
+    "planner"
+   ],
+   "class": "engine_method",
+   "note": "Module 09 R6.1, R6.3: the segment's history, the next level up when thin, or the planner with a reason."
+  },
+  "talent.survey.kind": {
+   "values": [
+    "ad_hoc",
+    "census",
+    "enps",
+    "inclusion",
+    "lifecycle",
+    "pulse"
+   ],
+   "class": "taxonomy",
+   "note": "Module 10 survey types; each organization names its own surveys."
+  },
+  "talent.survey.lifecycle_event": {
+   "values": [
+    "exit",
+    "onboarding_30",
+    "onboarding_90",
+    "promotion",
+    "return_from_leave"
+   ],
+   "class": "engine_method",
+   "note": "Module 10 R3.4: events that send a lifecycle survey (engagement.lifecycle_surveys)."
+  },
+  "talent.survey.mode": {
+   "values": [
+    "anonymous",
+    "confidential"
+   ],
+   "class": "engine_method",
+   "note": "Module 10 R1.3, R8.4: confidential by default (engagement.default_mode); anonymous only for an employer covered by a freedom-of-information law."
+  },
+  "talent.survey.source": {
+   "values": [
+    "cando",
+    "imported_results",
+    "uploaded_questions"
+   ],
+   "class": "engine_method",
+   "note": "Module 10 R1.1, R2.1: CanDo's own tool, an uploaded questionnaire, or results from another tool."
+  },
+  "talent.survey.status": {
+   "values": [
+    "closed",
+    "draft",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "talent.survey_invitation.channel": {
+   "values": [
+    "app",
+    "email"
+   ],
+   "class": "engine_method",
+   "note": "Module 10 R2.3: surveys reach people by email and the app at launch."
+  },
+  "talent.survey_question.kind": {
+   "values": [
+    "choice",
+    "enps",
+    "likert_5",
+    "multi_choice",
+    "open_text",
+    "ranking",
+    "yes_no"
+   ],
+   "class": "engine_method",
+   "note": "Question types the survey tool scores or lists."
+  },
+  "talent.survey_question.kind#survey_question_choices": {
+   "values": [
+    "choice",
+    "multi_choice",
+    "ranking"
+   ],
+   "class": "technical",
+   "note": "The question types that carry their choices."
+  },
+  "talent.survey_question.source": {
+   "values": [
+    "library",
+    "organization",
+    "partner"
+   ],
+   "class": "technical",
+   "note": "Module 10 R2.1: where a question came from."
+  },
+  "talent.talent_pool.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "talent.talent_review.status": {
+   "values": [
+    "closed",
+    "draft",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "talent.training_request.kind": {
+   "values": [
+    "certification",
+    "conference",
+    "course",
+    "degree_program",
+    "other"
+   ],
+   "class": "taxonomy",
+   "note": "Repayment rules are written by kind of training (Module 08 R5.3)."
+  },
+  "talent.training_request.primarily_for": {
+   "values": [
+    "employee",
+    "employer"
+   ],
+   "class": "published_vocabulary",
+   "note": "CRAs test for training paid by the employer: mainly for the employee is a taxable benefit (Module 08 R5.4)."
+  },
+  "talent.training_request.repayment_method": {
+   "values": [
+    "full",
+    "none",
+    "prorated"
+   ],
+   "class": "engine_method"
+  },
+  "talent.training_request.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "completed",
+    "draft",
+    "reimbursed",
+    "rejected",
+    "submitted"
+   ],
+   "class": "system_status"
+  },
+  "talent.training_rule.source": {
+   "values": [
+    "law",
+    "organization"
+   ],
+   "class": "engine_method",
+   "note": "Module 08 R1.3: a law rule is never looser than the law (TRAINING_RULE_LOOSER_THAN_LAW)."
+  },
+  "talent.training_rule.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "talent.turnover_history.source": {
+   "values": [
+    "cando",
+    "upload"
+   ],
+   "class": "technical",
+   "note": "Module 09 R6.3: CanDo's own records, and history uploaded from a previous system."
+  },
+  "talent.vacancy_risk.kind": {
+   "values": [
+    "authorization_end",
+    "other",
+    "term_end"
+   ],
+   "class": "taxonomy",
+   "note": "Module 09 R2.4: why a role may become vacant on a date, seen by HR only; no immigration details."
+  },
+  "talent.wellbeing_resource.kind": {
+   "values": [
+    "crisis_line",
+    "eap",
+    "financial",
+    "mental_health",
+    "other",
+    "wellness_account"
+   ],
+   "class": "taxonomy",
+   "note": "Module 10 R7.2: the wellbeing hub links; no health data."
+  },
+  "talent.workforce_scenario.status": {
+   "values": [
+    "draft",
+    "saved"
+   ],
+   "class": "system_status",
+   "note": "Module 09 R6.4: a saved version is kept as it was."
+  },
+  "timeleave.attendance_program.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.attendance_stage.kind": {
+   "values": [
+    "disciplinary",
+    "supportive"
+   ],
+   "class": "taxonomy",
+   "note": "Module 06 R1.4: HR reviews a disciplinary stage before it is issued."
+  },
+  "timeleave.attendance_stage.status": {
+   "values": [
+    "draft",
+    "issued",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.averaging_arrangement.kind": {
+   "values": [
+    "collective_agreement",
+    "government_permit",
+    "written_agreement"
+   ],
+   "class": "published_vocabulary",
+   "note": "Module 06 R3.2: the instruments employment standards allow for averaging."
+  },
+  "timeleave.banked_time_payout_request.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "paid",
+    "rejected",
+    "requested"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.banked_time_policy.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.banked_time_policy.year_end_action": {
+   "values": [
+    "carry_over",
+    "carry_then_pay",
+    "pay_out"
+   ],
+   "class": "engine_method",
+   "note": "R3.3: per organization policy, mixes allowed."
+  },
+  "timeleave.leave_ledger.kind": {
+   "values": [
+    "accrual",
+    "adjustment",
+    "carryover",
+    "expiry",
+    "opening",
+    "payout",
+    "taken"
+   ],
+   "class": "engine_method"
+  },
+  "timeleave.leave_plan.accrual_method": {
+   "values": [
+    "front_loaded",
+    "none",
+    "per_hour",
+    "per_pay_period",
+    "percent_of_wages"
+   ],
+   "class": "engine_method",
+   "note": "docs/09 §3."
+  },
+  "timeleave.leave_plan.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.leave_plan.termination_payout": {
+   "values": [
+    "all",
+    "none",
+    "statutory_only"
+   ],
+   "class": "engine_method",
+   "note": "Module 06 R5.3: set per plan, starting from leave.termination_payout_starter; vacation never none."
+  },
+  "timeleave.leave_plan.tier_step_basis": {
+   "values": [
+    "hire_anniversary",
+    "plan_entry",
+    "service_anniversary",
+    "year_start"
+   ],
+   "class": "engine_method",
+   "note": "Module 06 R5.4."
+  },
+  "timeleave.leave_plan.year_basis": {
+   "values": [
+    "calendar",
+    "fiscal",
+    "hire_anniversary",
+    "plan_entry",
+    "service_anniversary"
+   ],
+   "class": "engine_method",
+   "note": "Module 06 R5.4: each plan its own year; plan_entry follows the event that brought the person into the plan."
+  },
+  "timeleave.leave_request.protected_reason": {
+   "values": [
+    "accommodation",
+    "disability",
+    "human_rights_other",
+    "workers_comp"
+   ],
+   "class": "taxonomy",
+   "note": "Module 06 R1.4: absences HR knows are protected under human rights law are never counted by the attendance program."
+  },
+  "timeleave.leave_request.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "declined",
+    "partially_approved",
+    "requested",
+    "taken"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.leave_request_component.decline_category": {
+   "values": [
+    "balance",
+    "blackout",
+    "other",
+    "staffing"
+   ],
+   "class": "taxonomy",
+   "note": "Module 06 R6.2: a statutory leave is never declined for staffing or a blackout period."
+  },
+  "timeleave.leave_request_component.status": {
+   "values": [
+    "approved",
+    "cancelled",
+    "declined",
+    "partially_approved",
+    "requested",
+    "taken"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.plan_entry.event": {
+   "values": [
+    "agreement_move",
+    "became_exempt",
+    "hire",
+    "location_move",
+    "other",
+    "promotion"
+   ],
+   "class": "taxonomy",
+   "note": "Module 06 R5.4."
+  },
+  "timeleave.punch.kind": {
+   "values": [
+    "break_confirmed",
+    "break_end",
+    "break_start",
+    "in",
+    "job_switch",
+    "out"
+   ],
+   "class": "engine_method",
+   "note": "Module 06 R2.2: break_confirmed records the employee confirming an unpunched break was taken; only then is it deducted."
+  },
+  "timeleave.punch.source": {
+   "values": [
+    "clock",
+    "import",
+    "kiosk",
+    "manual",
+    "mobile",
+    "web"
+   ],
+   "class": "technical",
+   "note": "Module 06 R1.2: how the punch reached CanDo."
+  },
+  "timeleave.recording_rule.method": {
+   "values": [
+    "exceptions",
+    "punch",
+    "timesheet"
+   ],
+   "class": "engine_method",
+   "note": "Module 06 R3.4."
+  },
+  "timeleave.recording_rule.status": {
+   "values": [
+    "active",
+    "retired"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.shift_offer.method": {
+   "values": [
+    "equal_hours",
+    "manager_choice",
+    "open_board",
+    "rotation",
+    "seniority"
+   ],
+   "class": "engine_method",
+   "note": "Module 06 R7.2: unionized staff by the agreement's order; others by the manager or the open-shift board."
+  },
+  "timeleave.shift_offer.response": {
+   "values": [
+    "accepted",
+    "declined",
+    "no_answer",
+    "pending",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.shift_offer.response#shift_offer_answered": {
+   "values": [
+    "pending",
+    "withdrawn"
+   ],
+   "class": "system_status",
+   "note": "A response other than these has a time."
+  },
+  "timeleave.shift_swap.status": {
+   "values": [
+    "agreed",
+    "approved",
+    "cancelled",
+    "declined",
+    "requested"
+   ],
+   "class": "system_status"
+  },
+  "timeleave.time_exception.kind": {
+   "values": [
+    "hours_limit",
+    "missed_punch",
+    "rest_period",
+    "schedule_variance",
+    "unapproved_overtime",
+    "unconfirmed_break"
+   ],
+   "class": "engine_method",
+   "note": "Module 06 R2.2, R2.3, R3.1: what the time engine flags; a flag never removes paid hours."
+  },
+  "timeleave.time_exception.kind#time_exception_acknowledged": {
+   "values": [
+    "hours_limit",
+    "rest_period"
+   ],
+   "class": "decided",
+   "note": "Module 06 R3.1: only rest-period and hours-limit flags are acknowledged through the caution."
+  },
+  "timeleave.time_exception.status": {
+   "values": [
+    "acknowledged",
+    "approved",
+    "corrected",
+    "not_authorized",
+    "open"
+   ],
+   "class": "system_status",
+   "note": "Module 06 R2.3: not_authorized hours are still paid."
+  },
+  "timeleave.time_line.rate_basis": {
+   "values": [
+    "flat",
+    "minimum_wage",
+    "regular_rate"
+   ],
+   "class": "engine_method"
+  },
+  "timeleave.timesheet.status": {
+   "values": [
+    "approved",
+    "corrected",
+    "locked",
+    "open",
+    "submitted"
+   ],
+   "class": "system_status"
+  }
+ },
+ "column_defaults": {
+  "benefits.change_decision.status": {
+   "default": "'proposed'::text",
+   "class": "initial_state"
+  },
+  "benefits.practice.enabled": {
+   "default": "true",
+   "class": "neutral_choice"
+  },
+  "benefits.practice_market.masked": {
+   "default": "false",
+   "class": "technical"
+  },
+  "comp.decision.out_of_guideline": {
+   "default": "false",
+   "class": "initial_state",
+   "note": "Set when the recommendation leaves the guideline (docs/25 §6.3)."
+  },
+  "comp.je_factor.display_order": {
+   "default": "100",
+   "class": "display_order"
+  },
+  "comp.je_plan.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "comp.je_plan_version.source": {
+   "default": "'tenant'::text",
+   "class": "technical"
+  },
+  "comp.je_plan_version.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "comp.job_evaluation.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "comp.market_composite.is_benchmark": {
+   "default": "true",
+   "class": "neutral_choice"
+  },
+  "comp.market_definition.adjust_pct": {
+   "default": "0",
+   "class": "neutral_choice",
+   "note": "No adjustment unless the definition sets one."
+  },
+  "comp.market_definition.is_default": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "comp.market_definition.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "comp.market_definition_source.geo_differential_pct": {
+   "default": "0",
+   "class": "neutral_choice",
+   "note": "No geographic differential unless the source has one."
+  },
+  "comp.market_pricing_run.stale": {
+   "default": "false",
+   "class": "technical"
+  },
+  "comp.market_pricing_run.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "comp.pay_structure.location_method": {
+   "default": "'none'::text",
+   "class": "neutral_choice",
+   "note": "No location pay until the structure chooses ranges per location or a premium (docs/25 §4.4)."
+  },
+  "comp.pay_structure.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "comp.pay_structure_version.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "comp.survey.participates": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "comp.survey.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "comp.survey_edition.status": {
+   "default": "'loading'::text",
+   "class": "initial_state"
+  },
+  "comp.survey_pseudonym.pseudonym": {
+   "default": "('P'::text || upper(encode(gen_random_bytes(6), 'hex'::text)))",
+   "class": "technical"
+  },
+  "comp.survey_submission.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "comp.survey_submission_row.vacant": {
+   "default": "false",
+   "class": "technical"
+  },
+  "comp.total_rewards_component.display_order": {
+   "default": "100",
+   "class": "display_order"
+  },
+  "comp.total_rewards_component.include_in_benchmark": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "comp.total_rewards_component.show_on_statement": {
+   "default": "true",
+   "class": "neutral_choice"
+  },
+  "compliance.case_file.restricted": {
+   "default": "true",
+   "class": "safety"
+  },
+  "core.approval_part.status": {
+   "default": "'pending'::text",
+   "class": "initial_state"
+  },
+  "core.assignment_version.assignment_type": {
+   "default": "'regular'::text",
+   "class": "technical",
+   "note": "A regular assignment unless it is recorded as acting, term, pool, secondment, overlap or job share; each of those has its own engine behaviour."
+  },
+  "core.assignment_version.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "core.change_reason.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "core.code_assignment.slot": {
+   "default": "''::text",
+   "class": "technical"
+  },
+  "core.code_assignment.unique_code": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.code_scheme.display_order": {
+   "default": "100",
+   "class": "display_order"
+  },
+  "core.code_scheme.override_needs_reason": {
+   "default": "true",
+   "class": "safety"
+  },
+  "core.code_scheme.shares_total_100": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.code_scheme.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "core.code_scheme_rule.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "core.code_suggestion.status": {
+   "default": "'open'::text",
+   "class": "initial_state"
+  },
+  "core.employee_number_counter.last_value": {
+   "default": "0",
+   "class": "counter"
+  },
+  "core.end_reason.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "core.job_version.overtime_eligible": {
+   "default": "true",
+   "class": "law_until_exemption",
+   "note": "Employment standards overtime applies unless the job is recorded as exempt (for example a manager under the statute)."
+  },
+  "core.list_value.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "core.location_version.on_reserve": {
+   "default": "false",
+   "class": "law_until_exemption"
+  },
+  "core.location_version.remote_work_site": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.org_level_type.approval_level": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.org_level_type.is_cost_object": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.org_level_type.may_anchor_security_scope": {
+   "default": "true",
+   "class": "neutral_choice"
+  },
+  "core.org_level_type.may_be_bargaining_employer": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.org_level_type.owns_budget": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.org_unit_version.bargaining_employer": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.org_unit_version.confidential": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.org_unit_version.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "core.pay_rate.component": {
+   "default": "'base'::text",
+   "class": "technical"
+  },
+  "core.position.origin": {
+   "default": "'planned'::text",
+   "class": "technical",
+   "note": "How the position came to exist; set by the path that creates it."
+  },
+  "core.position_control_override.status": {
+   "default": "'pending'::text",
+   "class": "initial_state"
+  },
+  "core.position_version.confidential": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.probation.extended_by": {
+   "default": "0",
+   "class": "counter"
+  },
+  "core.probation.status": {
+   "default": "'in_progress'::text",
+   "class": "initial_state"
+  },
+  "core.recoding_campaign.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "core.rehire_reason.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "core.relationship_type.is_line": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.self_id_category.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "core.similarity_profile.must_meet_required": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "core.work_requirement.display_order": {
+   "default": "100",
+   "class": "display_order"
+  },
+  "core.work_requirement.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "finance.calendar_period.status": {
+   "default": "'future'::text",
+   "class": "initial_state"
+  },
+  "finance.segment_definition.required": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "payroll.bank_change_request.status": {
+   "default": "'pending_verification'::text",
+   "class": "initial_state"
+  },
+  "payroll.deduction_arrears.recovered": {
+   "default": "0",
+   "class": "counter"
+  },
+  "payroll.duty.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "payroll.overpayment.recovered_amount": {
+   "default": "0",
+   "class": "counter"
+  },
+  "payroll.overpayment.status": {
+   "default": "'held'::text",
+   "class": "initial_state"
+  },
+  "payroll.pay_code.cpp_pensionable": {
+   "default": "true",
+   "class": "law_until_exemption"
+  },
+  "payroll.pay_code.ei_insurable": {
+   "default": "true",
+   "class": "law_until_exemption"
+  },
+  "payroll.pay_code.non_periodic": {
+   "default": "false",
+   "class": "law_until_exemption"
+  },
+  "payroll.pay_code.taxable": {
+   "default": "true",
+   "class": "law_until_exemption"
+  },
+  "payroll.pay_code.vacationable": {
+   "default": "true",
+   "class": "law_until_exemption"
+  },
+  "payroll.pay_result.is_simulation": {
+   "default": "false",
+   "class": "technical"
+  },
+  "payroll.pay_run.tax_method": {
+   "default": "'auto'::text",
+   "class": "technical",
+   "note": "The engine picks the T4127 method from the run and the pay codes."
+  },
+  "payroll.pay_run_partition.attempts": {
+   "default": "0",
+   "class": "counter"
+  },
+  "payroll.payroll_profile_version.additional_tax_per_period": {
+   "default": "0",
+   "class": "law_until_exemption"
+  },
+  "payroll.payroll_profile_version.annual_deductions_f1": {
+   "default": "0",
+   "class": "law_until_exemption"
+  },
+  "payroll.payroll_profile_version.non_resident": {
+   "default": "false",
+   "class": "law_until_exemption"
+  },
+  "payroll.payroll_profile_version.northern_deduction_hd": {
+   "default": "0",
+   "class": "law_until_exemption"
+  },
+  "payroll.payroll_profile_version.on_dependants_disabled": {
+   "default": "0",
+   "class": "law_until_exemption"
+  },
+  "payroll.payroll_profile_version.on_dependants_under_19": {
+   "default": "0",
+   "class": "law_until_exemption"
+  },
+  "payroll.payroll_profile_version.other_federal_credits_k3": {
+   "default": "0",
+   "class": "law_until_exemption"
+  },
+  "payroll.payroll_profile_version.other_provincial_credits_k3p": {
+   "default": "0",
+   "class": "law_until_exemption"
+  },
+  "payroll.payroll_profile_version.s87_cpp_elected": {
+   "default": "false",
+   "class": "law_until_exemption"
+  },
+  "payroll.payroll_profile_version.s87_status": {
+   "default": "'not_applicable'::text",
+   "class": "law_until_exemption",
+   "note": "Tax applies until an Indian Act s. 87 exemption is recorded (docs/22 FB-024)."
+  },
+  "platform.app_user.mfa_required": {
+   "default": "true",
+   "class": "safety",
+   "note": "A setting may allow single sign-on to satisfy MFA; never off by default."
+  },
+  "platform.app_user.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "platform.change_set.is_correction": {
+   "default": "false",
+   "class": "technical"
+  },
+  "platform.change_set.reaches_finalized_pay": {
+   "default": "false",
+   "class": "technical"
+  },
+  "platform.change_set_operation.added_by_cascade": {
+   "default": "false",
+   "class": "technical"
+  },
+  "platform.document.legal_hold": {
+   "default": "false",
+   "class": "technical"
+  },
+  "platform.outbox.attempts": {
+   "default": "0",
+   "class": "counter"
+  },
+  "platform.role_grant.valid_period": {
+   "default": "daterange(CURRENT_DATE, NULL::date)",
+   "class": "technical"
+  },
+  "platform.setting_definition.locked": {
+   "default": "false",
+   "class": "technical"
+  },
+  "platform.setting_definition.scopes": {
+   "default": "ARRAY['tenant'::text]",
+   "class": "technical"
+  },
+  "platform.support_access_grant.status": {
+   "default": "'requested'::text",
+   "class": "initial_state"
+  },
+  "platform.tenant.assistant_enabled": {
+   "default": "false",
+   "class": "safety"
+  },
+  "platform.tenant.ocap_controls": {
+   "default": "false",
+   "class": "decided",
+   "note": "Decided R7.3; set at setup for a First Nation customer."
+  },
+  "platform.tenant.org_mode": {
+   "default": "'position'::text",
+   "class": "technical"
+  },
+  "platform.tenant_setting.scope_type": {
+   "default": "'tenant'::text",
+   "class": "technical"
+  },
+  "recruit.application.interviewed": {
+   "default": "false",
+   "class": "technical"
+  },
+  "recruit.candidate.talent_pool_consent": {
+   "default": "false",
+   "class": "safety",
+   "note": "A candidate joins the talent pool only by saying so (R1.5)."
+  },
+  "recruit.onboarding_task.escalation_level": {
+   "default": "0",
+   "class": "counter",
+   "note": "No escalation until recruit.tasks_to_escalate moves it on."
+  },
+  "recruit.requisition.openings": {
+   "default": "1",
+   "class": "technical",
+   "note": "One opening unless the requisition says more."
+  },
+  "ref.holiday.statutory": {
+   "default": "true",
+   "class": "law_until_exemption"
+  },
+  "ref.public_wage.estimation": {
+   "default": "'direct'::text",
+   "class": "technical"
+  },
+  "ref.reward_practice.display_order": {
+   "default": "100",
+   "class": "display_order"
+  },
+  "talent.competency.display_order": {
+   "default": "100",
+   "class": "display_order"
+  },
+  "talent.competency.indicators_status": {
+   "default": "'as_provided'::text",
+   "class": "initial_state"
+  },
+  "talent.competency_assessment.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "talent.competency_framework.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "talent.competency_framework_version.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "talent.competency_target.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "talent.learning_record.credential": {
+   "default": "false",
+   "class": "technical"
+  },
+  "talent.review_section.rated": {
+   "default": "true",
+   "class": "neutral_choice"
+  },
+  "talent.review_section.status": {
+   "default": "'not_started'::text",
+   "class": "initial_state"
+  },
+  "timeleave.shift.published": {
+   "default": "false",
+   "class": "technical"
+  },
+  "timeleave.time_line.provisional": {
+   "default": "false",
+   "class": "technical"
+  }
+ },
+ "function_defaults": {
+  "core.assignment_as_of(p_assignment uuid, p_date date, p_known timestamp with time zone)": {
+   "default": "now()",
+   "class": "technical",
+   "note": "p_known defaults to now(): what was known at the time of the call (bi-temporal reads)."
+  },
+  "core.org_units_without_head(p_as_of date)": {
+   "default": "CURRENT_DATE",
+   "class": "technical",
+   "note": "As of today unless a date is given."
+  },
+  "core.position_title_for(p_position uuid, p_purpose text, p_as_of date, p_lang text, p_funding_source uuid)": {
+   "default": "NULL::uuid",
+   "class": "technical",
+   "note": "No funding source unless the caller asks for a funder's title."
+  },
+  "core.rehire_signal(p_person uuid, p_as_of date)": {
+   "default": "CURRENT_DATE",
+   "class": "technical",
+   "note": "As of today unless a date is given."
+  },
+  "platform.employee_sees_change(p_change_set uuid, p_viewer_user uuid, p_as_of date)": {
+   "default": "CURRENT_DATE",
+   "class": "technical",
+   "note": "As of today unless a date is given."
+  },
+  "platform.setting(p_tenant uuid, p_key text, p_as_of date, p_legal_entity uuid)": {
+   "default": "CURRENT_DATE, NULL::uuid",
+   "class": "technical",
+   "note": "As of today and for the organization as a whole unless a date or legal entity is given."
+  },
+  "platform.setting_number(p_tenant uuid, p_key text, p_as_of date, p_legal_entity uuid)": {
+   "default": "CURRENT_DATE, NULL::uuid",
+   "class": "technical",
+   "note": "As platform.setting."
+  },
+  "platform.setting_text(p_tenant uuid, p_key text, p_as_of date, p_legal_entity uuid)": {
+   "default": "CURRENT_DATE, NULL::uuid",
+   "class": "technical",
+   "note": "As platform.setting."
+  },
+  "ref.search_code_titles(p_version text, p_query text, p_lang text, p_limit integer)": {
+   "default": "10",
+   "class": "technical",
+   "note": "Ten results per page unless the caller asks for more."
+  },
+  "talent.continuity_sheet_can_see(p_sheet uuid, p_user uuid, p_on date)": {
+   "default": "CURRENT_DATE",
+   "class": "technical",
+   "note": "Who sees the sheet today unless the caller asks about another date."
+  }
+ },
+ "api_defaults": {
+  "openapi-codes.yaml#limit=20": {
+   "class": "technical",
+   "note": "Page size"
+  },
+  "openapi-codes.yaml#limit=50": {
+   "class": "technical",
+   "note": "Page size"
+  },
+  "openapi-several-positions.yaml#limit=100": {
+   "class": "technical",
+   "note": "Page size"
+  },
+  "openapi-total-rewards.yaml#deleteOnExpiry=false": {
+   "class": "neutral_choice",
+   "note": "Licence term recorded from the licence"
+  },
+  "openapi-total-rewards.yaml#dryRun=true": {
+   "class": "safety",
+   "note": "An import validates without loading unless the caller says to load"
+  },
+  "openapi-total-rewards.yaml#employeesMaySee=false": {
+   "class": "safety",
+   "note": "Survey data is hidden from employees unless the licence allows it"
+  },
+  "openapi-total-rewards.yaml#final=false": {
+   "class": "initial_state",
+   "note": "An assessment starts as a draft"
+  },
+  "openapi-total-rewards.yaml#format=xlsx": {
+   "class": "technical",
+   "note": "File format of an export"
+  },
+  "openapi-total-rewards.yaml#includeSelf=false": {
+   "class": "neutral_choice",
+   "note": "Self-assessments are shown beside a gap and counted only when asked (docs/20 §5.4)"
+  },
+  "openapi-total-rewards.yaml#includeVacant=false": {
+   "class": "neutral_choice",
+   "note": "Vacant positions are left out of a submission unless included"
+  },
+  "openapi-total-rewards.yaml#limit=100": {
+   "class": "technical",
+   "note": "Page size"
+  },
+  "openapi-total-rewards.yaml#participates=false": {
+   "class": "neutral_choice",
+   "note": "The organization does not submit data unless it says so"
+  },
+  "openapi.yaml#approvedTime=true": {
+   "class": "technical",
+   "note": "A pay run includes every input unless the caller leaves one out"
+  },
+  "openapi.yaml#benefits=true": {
+   "class": "technical",
+   "note": "A pay run includes every input unless the caller leaves one out"
+  },
+  "openapi.yaml#depth=3": {
+   "class": "technical",
+   "note": "Org chart levels shown"
+  },
+  "openapi.yaml#isCorrection=false": {
+   "class": "initial_state",
+   "note": "A change is a new change unless marked a correction"
+  },
+  "openapi.yaml#leave=true": {
+   "class": "technical",
+   "note": "A pay run includes every input unless the caller leaves one out"
+  },
+  "openapi.yaml#limit=50": {
+   "class": "technical",
+   "note": "Page size"
+  },
+  "openapi.yaml#mode=position": {
+   "class": "technical",
+   "note": "Org chart drawn by position"
+  },
+  "openapi.yaml#recurringDeductions=true": {
+   "class": "technical",
+   "note": "A pay run includes every input unless the caller leaves one out"
+  },
+  "openapi.yaml#salaryAndHourly=true": {
+   "class": "technical",
+   "note": "A pay run includes every input unless the caller leaves one out"
+  },
+  "openapi.yaml#taxMethod=auto": {
+   "class": "technical",
+   "note": "The engine picks the T4127 method from the run and the pay codes"
+  }
+ }
+}

@@ -1,0 +1,1485 @@
+{
+  "description": "Payroll test cases for the CanDo engine. The TypeScript engine must reproduce every case. 'official' cases come from CRA publications; 'official-table' cases come from CRA T4032 tables (tolerance $0.05 because tables round); 'reference-only' cases are regression fixtures from the reference implementation and must be confirmed in CRA's Payroll Deductions Online Calculator (PDOC) before go-live.",
+  "generated": "2026-10-18",
+  "cases": [
+    {
+      "id": "CRA-T4127-122-bonus-example",
+      "source": "CRA T4127 122nd edition, chapter 4, bonus worked example (federal part). Exact CRA figures.",
+      "verification": "official",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-03-13",
+        "P": 52,
+        "I": 1000,
+        "B": 2500,
+        "B1": 1500,
+        "F5BYTD": 14.6,
+        "D_cpp_ytd": 1698.62,
+        "D1_ei_ytd": 497.15,
+        "PR": 23,
+        "PIYTD": 30500,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "cpp_employee": "204.25"
+      },
+      "expected_trace": {
+        "bonus_step1.A": "55450.76",
+        "bonus_step1.K1": "2303.28",
+        "bonus_step1.K2": "491.63",
+        "bonus_step1.K4": "210.14",
+        "bonus_step1.T3": "4758.06",
+        "bonus_step2.A": "52975.28",
+        "bonus_step2.K2": "468.60",
+        "bonus_step2.T3": "4434.52"
+      }
+    },
+    {
+      "id": "T4032-AB-january-26pp-2500-cc1",
+      "source": "CRA T4032AB January 2026, biweekly provincial/territorial table, range 2500 to 2524, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "AB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2512.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "119.00"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-AB-january-26pp-2500-cc0",
+      "source": "CRA T4032AB January 2026, biweekly provincial/territorial table, range 2500 to 2524, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "AB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2512.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "189.05"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-AB-january-26pp-1500-cc1",
+      "source": "CRA T4032AB January 2026, biweekly provincial/territorial table, range 1500 to 1508, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "AB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1504.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "41.80"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-AB-january-26pp-1500-cc0",
+      "source": "CRA T4032AB January 2026, biweekly provincial/territorial table, range 1500 to 1508, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "AB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1504.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "111.85"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-MB-january-26pp-2497-cc1",
+      "source": "CRA T4032MB January 2026, biweekly provincial/territorial table, range 2497 to 2521, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "MB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2509.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "198.95"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-MB-january-26pp-2497-cc0",
+      "source": "CRA T4032MB January 2026, biweekly provincial/territorial table, range 2497 to 2521, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "MB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2509.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "264.50"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-MB-january-26pp-1497-cc1",
+      "source": "CRA T4032MB January 2026, biweekly provincial/territorial table, range 1497 to 1513, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "MB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1505.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "85.55"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-MB-january-26pp-1497-cc0",
+      "source": "CRA T4032MB January 2026, biweekly provincial/territorial table, range 1497 to 1513, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "MB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1505.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "151.10"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NB-january-26pp-2481-cc1",
+      "source": "CRA T4032NB January 2026, biweekly provincial/territorial table, range 2481 to 2505, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2493.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "188.95"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NB-january-26pp-2481-cc0",
+      "source": "CRA T4032NB January 2026, biweekly provincial/territorial table, range 2481 to 2505, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2493.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "238.35"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NB-january-26pp-1489-cc1",
+      "source": "CRA T4032NB January 2026, biweekly provincial/territorial table, range 1489 to 1505, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1497.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "81.40"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NB-january-26pp-1489-cc0",
+      "source": "CRA T4032NB January 2026, biweekly provincial/territorial table, range 1489 to 1505, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NB",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1497.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "130.80"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NS-january-26pp-2481-cc1",
+      "source": "CRA T4032NS January 2026, biweekly provincial/territorial table, range 2481 to 2505, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NS",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2493.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "243.02"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NS-january-26pp-2481-cc0",
+      "source": "CRA T4032NS January 2026, biweekly provincial/territorial table, range 2481 to 2505, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NS",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2493.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "283.36"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NS-january-26pp-1497-cc1",
+      "source": "CRA T4032NS January 2026, biweekly provincial/territorial table, range 1497 to 1513, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NS",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1505.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "101.07"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NS-january-26pp-1497-cc0",
+      "source": "CRA T4032NS January 2026, biweekly provincial/territorial table, range 1497 to 1513, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NS",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1505.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "141.41"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-SK-january-26pp-2496-cc1",
+      "source": "CRA T4032SK January 2026, biweekly provincial/territorial table, range 2496 to 2520, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "SK",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2508.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "169.65"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-SK-january-26pp-2496-cc0",
+      "source": "CRA T4032SK January 2026, biweekly provincial/territorial table, range 2496 to 2520, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "SK",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2508.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "251.95"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-SK-january-26pp-1496-cc1",
+      "source": "CRA T4032SK January 2026, biweekly provincial/territorial table, range 1496 to 1512, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "SK",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1504.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "64.50"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-SK-january-26pp-1496-cc0",
+      "source": "CRA T4032SK January 2026, biweekly provincial/territorial table, range 1496 to 1512, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "SK",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1504.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "146.80"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-YT-january-26pp-2492-cc1",
+      "source": "CRA T4032YT January 2026, biweekly provincial/territorial table, range 2492 to 2516, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "YT",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2504.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "110.40"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-YT-january-26pp-2492-cc0",
+      "source": "CRA T4032YT January 2026, biweekly provincial/territorial table, range 2492 to 2516, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "YT",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2504.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "150.90"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-YT-january-26pp-1492-cc1",
+      "source": "CRA T4032YT January 2026, biweekly provincial/territorial table, range 1492 to 1508, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "YT",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1500.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "45.05"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-YT-january-26pp-1492-cc0",
+      "source": "CRA T4032YT January 2026, biweekly provincial/territorial table, range 1492 to 1508, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "YT",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1500.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "85.55"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NT-january-26pp-2478-cc1",
+      "source": "CRA T4032NT January 2026, biweekly provincial/territorial table, range 2478 to 2502, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NT",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2490.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "106.50"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NT-january-26pp-2478-cc0",
+      "source": "CRA T4032NT January 2026, biweekly provincial/territorial table, range 2478 to 2502, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NT",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2490.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "147.80"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NT-january-26pp-1486-cc1",
+      "source": "CRA T4032NT January 2026, biweekly provincial/territorial table, range 1486 to 1502, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NT",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1494.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "40.65"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NT-january-26pp-1486-cc0",
+      "source": "CRA T4032NT January 2026, biweekly provincial/territorial table, range 1486 to 1502, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NT",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1494.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "81.95"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NU-january-26pp-2491-cc1",
+      "source": "CRA T4032NU January 2026, biweekly provincial/territorial table, range 2491 to 2515, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NU",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2503.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "72.60"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NU-january-26pp-2491-cc0",
+      "source": "CRA T4032NU January 2026, biweekly provincial/territorial table, range 2491 to 2515, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NU",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2503.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "102.85"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NU-january-26pp-1499-cc1",
+      "source": "CRA T4032NU January 2026, biweekly provincial/territorial table, range 1499 to 1515, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NU",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1507.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "25.80"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NU-january-26pp-1499-cc0",
+      "source": "CRA T4032NU January 2026, biweekly provincial/territorial table, range 1499 to 1515, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NU",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1507.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "56.05"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-ON-january-26pp-2481-cc1",
+      "source": "CRA T4032ON January 2026, biweekly provincial/territorial table, range 2481 to 2505, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2493.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "130.85"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-ON-january-26pp-2481-cc0",
+      "source": "CRA T4032ON January 2026, biweekly provincial/territorial table, range 2481 to 2505, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2493.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "156.10"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-ON-january-26pp-1193-cc1",
+      "source": "CRA T4032ON January 2026, biweekly provincial/territorial table, range 1193 to 1201, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1197.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "42.60"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-ON-january-26pp-1193-cc0",
+      "source": "CRA T4032ON January 2026, biweekly provincial/territorial table, range 1193 to 1201, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1197.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "67.80"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-BC-january-26pp-2494-cc1",
+      "source": "CRA T4032BC January 2026, biweekly provincial/territorial table, range 2494 to 2510, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2502.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "105.95"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-BC-january-26pp-2494-cc0",
+      "source": "CRA T4032BC January 2026, biweekly provincial/territorial table, range 2494 to 2510, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2502.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "131.70"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-BC-january-26pp-1494-cc1",
+      "source": "CRA T4032BC January 2026, biweekly provincial/territorial table, range 1494 to 1502, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1498.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "40.45"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-BC-january-26pp-1494-cc0",
+      "source": "CRA T4032BC January 2026, biweekly provincial/territorial table, range 1494 to 1502, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1498.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "66.20"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-BC-july-26pp-2492-cc1",
+      "source": "CRA T4032BC July 2026, biweekly provincial/territorial table, range 2492 to 2508, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 2500.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "119.55"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-BC-july-26pp-2492-cc0",
+      "source": "CRA T4032BC July 2026, biweekly provincial/territorial table, range 2492 to 2508, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 2500.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "150.75"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-BC-july-26pp-1500-cc1",
+      "source": "CRA T4032BC July 2026, biweekly provincial/territorial table, range 1500 to 1508, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 1504.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "41.70"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-BC-july-26pp-1500-cc0",
+      "source": "CRA T4032BC July 2026, biweekly provincial/territorial table, range 1500 to 1508, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 1504.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "72.90"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NL-july-26pp-2489-cc1",
+      "source": "CRA T4032NL July 2026, biweekly provincial/territorial table, range 2489 to 2513, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NL",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 2501.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "195.65"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NL-july-26pp-2489-cc0",
+      "source": "CRA T4032NL July 2026, biweekly provincial/territorial table, range 2489 to 2513, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NL",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 2501.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "245.80"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NL-july-26pp-1497-cc1",
+      "source": "CRA T4032NL July 2026, biweekly provincial/territorial table, range 1497 to 1513, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NL",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 1505.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "71.50"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-NL-july-26pp-1497-cc0",
+      "source": "CRA T4032NL July 2026, biweekly provincial/territorial table, range 1497 to 1513, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "NL",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 1505.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "121.70"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-PE-july-26pp-2489-cc1",
+      "source": "CRA T4032PE July 2026, biweekly provincial/territorial table, range 2489 to 2513, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "PE",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 2501.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "212.10"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-PE-july-26pp-2489-cc0",
+      "source": "CRA T4032PE July 2026, biweekly provincial/territorial table, range 2489 to 2513, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "PE",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 2501.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "266.90"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-PE-july-26pp-1497-cc1",
+      "source": "CRA T4032PE July 2026, biweekly provincial/territorial table, range 1497 to 1513, claim code 1. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "PE",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 1505.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "85.50"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-PE-july-26pp-1497-cc0",
+      "source": "CRA T4032PE July 2026, biweekly provincial/territorial table, range 1497 to 1513, claim code 0. Tables use the range midpoint and round to $0.05.",
+      "verification": "official-table",
+      "input": {
+        "province": "PE",
+        "pay_date": "2026-10-16",
+        "P": 26,
+        "I": 1505.0,
+        "TCP": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "provincial_tax_regular": "140.30"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-federal-january-26pp-2491-cc1",
+      "source": "CRA T4032ON January 2026, biweekly federal table, range 2491 to 2515, claim code 1.",
+      "verification": "official-table",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2503,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "federal_tax_regular": "243.20"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-federal-january-26pp-2491-cc0",
+      "source": "CRA T4032ON January 2026, biweekly federal table, range 2491 to 2515, claim code 0.",
+      "verification": "official-table",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 2503,
+        "TC": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "federal_tax_regular": "331.75"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-federal-january-26pp-1195-cc1",
+      "source": "CRA T4032ON January 2026, biweekly federal table, range 1195 to 1203, claim code 1.",
+      "verification": "official-table",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1199,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "federal_tax_regular": "59.60"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "T4032-federal-january-26pp-1195-cc0",
+      "source": "CRA T4032ON January 2026, biweekly federal table, range 1195 to 1203, claim code 0.",
+      "verification": "official-table",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-03-13",
+        "P": 26,
+        "I": 1199,
+        "TC": 0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected_within": {
+        "federal_tax_regular": "148.20"
+      },
+      "tolerance": "0.05"
+    },
+    {
+      "id": "edition-switch-BC-jun30",
+      "source": "CanDo reference implementation. BC pay dated 30 June uses the January edition",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-06-30",
+        "P": 26,
+        "I": 2500,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "140.74",
+        "cpp2_employee": "0.00",
+        "ei_employee": "40.75",
+        "income_tax": "348.40",
+        "ei_employer": "57.05",
+        "net_pay": "1970.11"
+      }
+    },
+    {
+      "id": "edition-switch-BC-jul02",
+      "source": "CanDo reference implementation. Same pay dated 2 July uses the July edition (prorated 6.14%)",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "BC",
+        "pay_date": "2026-07-02",
+        "P": 26,
+        "I": 2500,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-07-01",
+        "cpp_employee": "140.74",
+        "cpp2_employee": "0.00",
+        "ei_employee": "40.75",
+        "income_tax": "362.12",
+        "ei_employer": "57.05",
+        "net_pay": "1956.39"
+      }
+    },
+    {
+      "id": "daily-one-day-ON",
+      "source": "CanDo reference implementation. One day of pay as its own daily pay period (P=240)",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-11-06",
+        "P": 240,
+        "I": 320,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-07-01",
+        "cpp_employee": "18.17",
+        "cpp2_employee": "0.00",
+        "ei_employee": "5.22",
+        "income_tax": "55.15",
+        "ei_employer": "7.31",
+        "net_pay": "241.46"
+      }
+    },
+    {
+      "id": "bonus-only-offcycle-AB",
+      "source": "CanDo reference implementation. Off-cycle bonus with no regular pay in the run; regular pay already took the CPP exemption; income annualized from the most recent regular pay (I_recent).",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "AB",
+        "pay_date": "2026-12-18",
+        "P": 26,
+        "I": 0,
+        "B": 5000,
+        "B1": 0,
+        "apply_cpp_exemption": false,
+        "D_cpp_ytd": 3200,
+        "D1_ei_ytd": 900,
+        "PIYTD": 60000,
+        "PR": 1,
+        "I_recent": 2300,
+        "PM": 12
+      },
+      "expected": {
+        "edition": "CA-2026-07-01",
+        "cpp_employee": "297.50",
+        "cpp2_employee": "0.00",
+        "ei_employee": "81.50",
+        "income_tax": "1409.37",
+        "ei_employer": "114.10",
+        "net_pay": "3211.63"
+      }
+    },
+    {
+      "id": "retro-lump-sum-ON",
+      "source": "CanDo reference implementation. Retro increase paid as a lump sum (bonus method) after ratification",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-11-20",
+        "P": 26,
+        "I": 2800,
+        "B": 1850,
+        "B1": 0,
+        "D_cpp_ytd": 3000,
+        "D1_ei_ytd": 950,
+        "PIYTD": 58000,
+        "PR": 4,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-07-01",
+        "cpp_employee": "268.67",
+        "cpp2_employee": "0.00",
+        "ei_employee": "75.80",
+        "income_tax": "1112.03",
+        "ei_employer": "106.12",
+        "net_pay": "3193.50"
+      }
+    },
+    {
+      "id": "cpp-max-reached-SK",
+      "source": "CanDo reference implementation. CPP stops at the annual maximum",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "SK",
+        "pay_date": "2026-11-27",
+        "P": 26,
+        "I": 4200,
+        "D_cpp_ytd": 4200.0,
+        "D1_ei_ytd": 1123.07,
+        "PIYTD": 88200,
+        "D2_cpp2_ytd": 416.0,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-07-01",
+        "cpp_employee": "30.45",
+        "cpp2_employee": "0.00",
+        "ei_employee": "0.00",
+        "income_tax": "1010.86",
+        "ei_employer": "0.00",
+        "net_pay": "3158.69"
+      }
+    },
+    {
+      "id": "cpp2-starts-NS",
+      "source": "CanDo reference implementation. Pay crosses the YMPE: CPP2 starts",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "NS",
+        "pay_date": "2026-09-18",
+        "P": 26,
+        "I": 4000,
+        "D_cpp_ytd": 4000,
+        "PIYTD": 73000,
+        "D1_ei_ytd": 1123.07,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-07-01",
+        "cpp_employee": "229.99",
+        "cpp2_employee": "96.00",
+        "ei_employee": "0.00",
+        "income_tax": "1009.13",
+        "ei_employer": "0.00",
+        "net_pay": "2664.88"
+      }
+    },
+    {
+      "id": "ei-max-reached-MB",
+      "source": "CanDo reference implementation. EI stops at the annual maximum",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "MB",
+        "pay_date": "2026-10-30",
+        "P": 26,
+        "I": 3000,
+        "D1_ei_ytd": 1100.0,
+        "D_cpp_ytd": 3300,
+        "PIYTD": 63000,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-07-01",
+        "cpp_employee": "170.49",
+        "cpp2_employee": "0.00",
+        "ei_employee": "23.07",
+        "income_tax": "604.89",
+        "ei_employer": "32.30",
+        "net_pay": "2201.55"
+      }
+    },
+    {
+      "id": "weekly-53-NB",
+      "source": "CanDo reference implementation. 53-period weekly year",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "NB",
+        "pay_date": "2026-12-31",
+        "P": 53,
+        "I": 1200,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-07-01",
+        "cpp_employee": "67.47",
+        "cpp2_employee": "0.00",
+        "ei_employee": "19.56",
+        "income_tax": "203.53",
+        "ei_employer": "27.38",
+        "net_pay": "909.44"
+      }
+    },
+    {
+      "id": "s87-cpp-exempt-MB",
+      "source": "CanDo reference implementation. Indian Act s.87 exempt income of $2,200: no income tax, CPP not deducted (no election), EI deducted on insurable earnings.",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "MB",
+        "pay_date": "2026-08-14",
+        "P": 26,
+        "I": 0,
+        "PI": 0,
+        "IE": 2200,
+        "cpp_exempt": true,
+        "non_taxable_earnings": 2200,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-07-01",
+        "cpp_employee": "0.00",
+        "cpp2_employee": "0.00",
+        "ei_employee": "35.86",
+        "income_tax": "0.00",
+        "ei_employer": "50.20",
+        "net_pay": "2164.14"
+      }
+    },
+    {
+      "id": "yukon-K4P",
+      "source": "CanDo reference implementation. Yukon employment credit K4P applies",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "YT",
+        "pay_date": "2026-05-15",
+        "P": 26,
+        "I": 2300,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "128.84",
+        "cpp2_employee": "0.00",
+        "ei_employee": "37.49",
+        "income_tax": "296.89",
+        "ei_employer": "52.49",
+        "net_pay": "1836.78"
+      }
+    },
+    {
+      "id": "alberta-K5P",
+      "source": "CanDo reference implementation. Alberta supplemental credit with large TD1AB claim",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "AB",
+        "pay_date": "2026-05-15",
+        "P": 26,
+        "I": 3500,
+        "TCP": 45000,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "200.24",
+        "cpp2_employee": "0.00",
+        "ei_employee": "57.05",
+        "income_tax": "589.44",
+        "ei_employer": "79.87",
+        "net_pay": "2653.27"
+      }
+    },
+    {
+      "id": "ontario-health-premium-band",
+      "source": "CanDo reference implementation. Ontario health premium band 48,000-72,000 and surtax",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-05-15",
+        "P": 12,
+        "I": 5500,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "309.90",
+        "cpp2_employee": "0.00",
+        "ei_employee": "89.65",
+        "income_tax": "833.84",
+        "ei_employer": "125.51",
+        "net_pay": "4266.61"
+      }
+    },
+    {
+      "id": "ontario-reduction-dependants",
+      "source": "CanDo reference implementation. Ontario tax reduction with two dependants under 19",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-05-15",
+        "P": 26,
+        "I": 1300,
+        "Y_dependants_under_19": 2,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "69.34",
+        "cpp2_employee": "0.00",
+        "ei_employee": "21.19",
+        "income_tax": "84.19",
+        "ei_employer": "29.67",
+        "net_pay": "1125.28"
+      }
+    },
+    {
+      "id": "manitoba-bpa-phaseout",
+      "source": "CanDo reference implementation. Manitoba BPA phases out above $200,000",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "MB",
+        "pay_date": "2026-05-15",
+        "P": 12,
+        "I": 25000,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "1470.15",
+        "cpp2_employee": "0.00",
+        "ei_employee": "407.50",
+        "income_tax": "9483.31",
+        "ei_employer": "570.50",
+        "net_pay": "13639.04"
+      }
+    },
+    {
+      "id": "federal-bpa-phaseout-NU",
+      "source": "CanDo reference implementation. Federal BPA phase-out between $181,440 and $258,482",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "NU",
+        "pay_date": "2026-05-15",
+        "P": 12,
+        "I": 18000,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "1053.65",
+        "cpp2_employee": "0.00",
+        "ei_employee": "293.40",
+        "income_tax": "4871.05",
+        "ei_employer": "410.76",
+        "net_pay": "11781.90"
+      }
+    },
+    {
+      "id": "rrsp-union-dues-ON",
+      "source": "CanDo reference implementation. RRSP at source and union dues reduce taxable income, not CPP/EI earnings",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-05-15",
+        "P": 26,
+        "I": 2500,
+        "F": 100,
+        "U1": 35,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "140.74",
+        "cpp2_employee": "0.00",
+        "ei_employee": "40.75",
+        "income_tax": "334.01",
+        "ei_employer": "57.05",
+        "net_pay": "1849.50"
+      }
+    },
+    {
+      "id": "northern-deduction-NT",
+      "source": "CanDo reference implementation. Northern residents deduction (HD) on TD1",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "NT",
+        "pay_date": "2026-05-15",
+        "P": 26,
+        "I": 3000,
+        "HD": 8030,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "170.49",
+        "cpp2_employee": "0.00",
+        "ei_employee": "48.90",
+        "income_tax": "399.94",
+        "ei_employer": "68.46",
+        "net_pay": "2380.67"
+      }
+    },
+    {
+      "id": "small-bonus-rule",
+      "source": "CanDo reference implementation. Annual income with payment under $5,000: 15% flat",
+      "verification": "reference-only: confirm in CRA PDOC before go-live and set verification to pdoc",
+      "input": {
+        "province": "ON",
+        "pay_date": "2026-05-15",
+        "P": 26,
+        "I": 0,
+        "B": 800,
+        "apply_cpp_exemption": true,
+        "PM": 12,
+        "I_recent": 0
+      },
+      "expected": {
+        "edition": "CA-2026-01-01",
+        "cpp_employee": "39.59",
+        "cpp2_employee": "0.00",
+        "ei_employee": "13.04",
+        "income_tax": "120.00",
+        "ei_employer": "18.26",
+        "net_pay": "627.37"
+      }
+    },
+    {
+      "id": "no-edition-2027",
+      "source": "Pay dated in 2027 before the 2027 edition is loaded must stop the run, never fall back to 2026 values.",
+      "verification": "design-rule",
+      "input": {
+        "province": "ON",
+        "pay_date": "2027-01-08",
+        "P": 26,
+        "I": 2500,
+        "PM": 12,
+        "apply_cpp_exemption": true
+      },
+      "expect_error": "No statutory rule edition loaded"
+    }
+  ]
+}

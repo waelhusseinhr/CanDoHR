@@ -1,0 +1,11 @@
+---
+description: Rules for test fixtures, reference implementations and acceptance suites
+globs: tests/**,reference/**
+alwaysApply: false
+---
+
+Files in `tests/` and `reference/` are the acceptance oracle for CanDo. They are protected by `CODEOWNERS`.
+
+- Never change an expected value, a test vector, a reference implementation or a case's verification status to make code pass.
+- If you believe a case is wrong, stop work that depends on it and open a separate pull request that explains why, with the official source (CRA, Service Canada, the statute or the agreement article).
+- New cases may be added in a separate pull request, with their source and verification status.

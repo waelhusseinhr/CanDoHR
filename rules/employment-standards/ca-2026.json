@@ -1,0 +1,140 @@
+{
+  "id": "CA-EMPLOYMENT-STANDARDS-2026",
+  "purpose": "Starter dataset of statutory minimums the rules engine applies before collective agreement and policy rules. The engine always applies the greater right.",
+  "verified_on": "2026-10-18",
+  "status_legend": {
+    "secondary": "From reputable secondary sources gathered in October 2026; confirm against the statute or the government page before go-live",
+    "verify_at_load": "Drawn from the CanDo module specifications or general knowledge; must be checked against the statute before it is activated"
+  },
+  "activation_rule": "A rule set with any entry still marked verify_at_load cannot be activated in production. The rules admin screen shows each entry's status and source.",
+  "jurisdictions": {
+    "FED": {
+      "name": "Federal (Canada Labour Code Part III)",
+      "minimum_wage": { "general": 18.15, "effective_from": "2026-04-01", "status": "secondary" },
+      "overtime": { "daily_after": 8, "weekly_after": 40, "rule": "either", "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 5, "weeks": 3, "pay_percent": 6 }, { "service_years": 10, "weeks": 4, "pay_percent": 8 }], "status": "verify_at_load" },
+      "paid_sick_days": { "days_per_year": 10, "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "bands": [{ "from_months": 3, "weeks": 2 }, { "from_years": 3, "weeks": 3 }, { "from_years": 4, "weeks": 4 }, { "from_years": 5, "weeks": 5 }, { "from_years": 6, "weeks": 6 }, { "from_years": 7, "weeks": 7 }, { "from_years": 8, "weeks": 8 }], "status": "verify_at_load" }
+    },
+    "NL": {
+      "name": "Newfoundland and Labrador",
+      "minimum_wage": { "general": 16.35, "effective_from": "2026-04-01", "status": "secondary" },
+      "overtime": { "weekly_after": 40, "multiplier": 1.5, "rate_basis": "minimum_wage", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 15, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "bands": [{ "from_months": 3, "weeks": 1 }, { "from_years": 2, "weeks": 2 }, { "from_years": 5, "weeks": 3 }, { "from_years": 10, "weeks": 4 }, { "from_years": 15, "weeks": 6 }], "status": "verify_at_load" }
+    },
+    "PE": {
+      "name": "Prince Edward Island",
+      "minimum_wage": { "general": 17.3, "effective_from": "2026-10-01", "next": { "general": 17.6, "effective_from": "2027-04-01" }, "status": "secondary" },
+      "overtime": { "weekly_after": 48, "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 8, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "bands": [{ "from_months": 6, "weeks": 2 }, { "from_years": 5, "weeks": 4 }, { "from_years": 10, "weeks": 6 }, { "from_years": 15, "weeks": 8 }], "status": "verify_at_load" },
+      "pay_transparency": { "salary_range_in_postings": true, "status": "verify_at_load" }
+    },
+    "NS": {
+      "name": "Nova Scotia",
+      "minimum_wage": { "general": 17.0, "effective_from": "2026-10-01", "status": "secondary" },
+      "overtime": { "weekly_after": 48, "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 8, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "bands": [{ "from_months": 3, "weeks": 1 }, { "from_years": 2, "weeks": 2 }, { "from_years": 5, "weeks": 4 }, { "from_years": 10, "weeks": 8 }], "status": "verify_at_load" }
+    },
+    "NB": {
+      "name": "New Brunswick",
+      "minimum_wage": { "general": 15.9, "effective_from": "2026-04-01", "status": "secondary" },
+      "overtime": { "weekly_after": 44, "multiplier": 1.5, "rate_basis": "minimum_wage", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 8, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "bands": [{ "from_months": 6, "weeks": 2 }, { "from_years": 5, "weeks": 4 }], "status": "verify_at_load" }
+    },
+    "QC": {
+      "name": "Quebec",
+      "minimum_wage": { "general": 16.6, "effective_from": "2026-05-01", "status": "secondary" },
+      "overtime": { "weekly_after": 40, "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 3, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "paid_sick_days": { "days_per_year": 2, "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "bands": [{ "from_months": 3, "weeks": 1 }, { "from_years": 1, "weeks": 2 }, { "from_years": 5, "weeks": 4 }, { "from_years": 10, "weeks": 8 }], "status": "verify_at_load" }
+    },
+    "ON": {
+      "name": "Ontario",
+      "minimum_wage": { "general": 17.95, "effective_from": "2026-10-01", "status": "secondary" },
+      "overtime": { "weekly_after": 44, "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "excess_hours": { "weekly_limit_without_agreement": 48, "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 5, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "continue_required", "cite": "ESA 2000 ss. 60(1)(c) and 61(1)(b): benefit plan contributions continue until the end of the statutory notice period", "status": "secondary" },
+      "termination_notice": { "bands": [{ "from_months": 3, "weeks": 1 }, { "from_years": 1, "weeks": 2 }, { "from_years": 3, "weeks": 3 }, { "from_years": 4, "weeks": 4 }, { "from_years": 5, "weeks": 5 }, { "from_years": 6, "weeks": 6 }, { "from_years": 7, "weeks": 7 }, { "from_years": 8, "weeks": 8 }], "status": "verify_at_load" },
+      "public_holiday_pay": { "formula": "Regular wages earned in the 4 work weeks before the work week of the holiday, plus vacation pay payable in that period, divided by 20", "status": "verify_at_load" },
+      "pay_transparency": { "applies_to_employers_with": 25, "effective_from": "2026-01-01", "max_range_width": 50000, "rules": ["Pay or range in public postings", "Disclose AI use in screening", "State whether the vacancy exists", "No Canadian experience requirement", "Tell interviewed applicants the outcome within 45 days", "Keep posting records 3 years"], "status": "secondary" }
+    },
+    "MB": {
+      "name": "Manitoba",
+      "minimum_wage": { "general": 16.4, "effective_from": "2026-10-01", "status": "secondary" },
+      "overtime": { "daily_after": 8, "weekly_after": 40, "rule": "either", "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 5, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "bands": [{ "from_days": 30, "weeks": 1 }, { "from_years": 1, "weeks": 2 }, { "from_years": 3, "weeks": 4 }, { "from_years": 5, "weeks": 6 }, { "from_years": 10, "weeks": 8 }], "status": "verify_at_load" }
+    },
+    "SK": {
+      "name": "Saskatchewan",
+      "minimum_wage": { "general": 15.7, "effective_from": "2026-10-01", "status": "secondary" },
+      "overtime": { "daily_after": 8, "weekly_after": 40, "rule": "either", "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 3, "pay_fraction": "3/52" }, { "service_years": 10, "weeks": 4, "pay_fraction": "4/52" }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "bands": [{ "from_weeks": 13, "weeks": 1 }, { "from_years": 1, "weeks": 2 }, { "from_years": 3, "weeks": 4 }, { "from_years": 5, "weeks": 6 }, { "from_years": 10, "weeks": 8 }], "status": "verify_at_load" }
+    },
+    "AB": {
+      "name": "Alberta",
+      "minimum_wage": { "general": 15.0, "effective_from": "2019-06-26", "status": "secondary" },
+      "overtime": { "daily_after": 8, "weekly_after": 44, "rule": "greater_of_daily_or_weekly_total", "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 5, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "bands": [{ "from_days": 90, "weeks": 1 }, { "from_years": 2, "weeks": 2 }, { "from_years": 4, "weeks": 4 }, { "from_years": 6, "weeks": 5 }, { "from_years": 8, "weeks": 6 }, { "from_years": 10, "weeks": 8 }], "status": "verify_at_load" }
+    },
+    "BC": {
+      "name": "British Columbia",
+      "minimum_wage": { "general": 18.25, "effective_from": "2026-06-01", "status": "secondary" },
+      "overtime": { "daily_after": 8, "weekly_after": 40, "rule": "both", "multiplier": 1.5, "double_time_daily_after": 12, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 5, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "paid_sick_days": { "days_per_year": 5, "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "not_explicit", "cite": "No explicit duty found to continue benefits with pay in lieu; working notice is invalid if conditions of employment are changed during it. Common-law reasonable notice may still include benefits", "status": "secondary" },
+      "termination_notice": { "bands": [{ "from_months": 3, "weeks": 1 }, { "from_months": 12, "weeks": 2 }, { "from_years": 3, "weeks": 3 }, { "from_years": 4, "weeks": 4 }, { "from_years": 5, "weeks": 5 }, { "from_years": 6, "weeks": 6 }, { "from_years": 7, "weeks": 7 }, { "from_years": 8, "weeks": 8 }], "status": "verify_at_load" },
+      "pay_transparency": { "salary_range_in_postings": true, "pay_history_questions_banned": true, "effective_from": "2023-11-01", "status": "verify_at_load" }
+    },
+    "YT": {
+      "name": "Yukon",
+      "minimum_wage": { "general": 18.51, "effective_from": "2026-04-01", "status": "secondary" },
+      "overtime": { "daily_after": 8, "weekly_after": 40, "rule": "either", "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "max_weeks": 8, "bands_status": "load from the Employment Standards Act before activation", "status": "verify_at_load" }
+    },
+    "NT": {
+      "name": "Northwest Territories",
+      "minimum_wage": { "general": 17.2, "effective_from": "2026-09-01", "status": "secondary" },
+      "overtime": { "daily_after": 8, "weekly_after": 40, "rule": "either", "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 6, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "max_weeks": 8, "bands_status": "load from the Employment Standards Act before activation", "status": "verify_at_load" }
+    },
+    "NU": {
+      "name": "Nunavut",
+      "minimum_wage": { "general": 20.17, "effective_from": "2026-09-01", "status": "secondary" },
+      "overtime": { "daily_after": 8, "weekly_after": 40, "rule": "either", "multiplier": 1.5, "rate_basis": "regular_rate", "status": "verify_at_load" },
+      "vacation": { "tiers": [{ "service_years": 1, "weeks": 2, "pay_percent": 4 }, { "service_years": 6, "weeks": 3, "pay_percent": 6 }], "status": "verify_at_load" },
+      "benefits_during_notice": { "rule": "verify_at_load", "cite": "Not yet researched", "status": "verify_at_load" },
+      "termination_notice": { "max_weeks": 8, "bands_status": "load from the Labour Standards Act before activation", "status": "verify_at_load" }
+    }
+  },
+  "holiday_calendars": {
+    "note": "Generated per jurisdiction and year from rules (fixed date, nth weekday, observed-date rules) and reviewed each year. Examples of jurisdiction-specific days: Nunavut Day (9 July), National Indigenous Peoples Day in NT (21 June), Discovery Day (YT), Islander Day (PE), Heritage Day (NS), Louis Riel Day (MB), Fête nationale (QC), National Day for Truth and Reconciliation (30 September, federal and several provinces and territories).",
+    "status": "verify_at_load"
+  },
+  "minimum_wage_sources": [
+    "https://www.canooq.ca/blog/minimum-wage-in-canada",
+    "https://www.govdocs.com/canada-minimum-wage-rate-updates-for-employers/"
+  ]
+}

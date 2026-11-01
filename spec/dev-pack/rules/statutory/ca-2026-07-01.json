@@ -1,0 +1,330 @@
+{
+  "id": "CA-2026-07-01",
+  "title": "Canada payroll deductions, T4127 123rd edition",
+  "applies_to": "Remuneration with a pay date from 2026-07-01 to 2026-12-31 inclusive. The pay date, not the work period, selects the edition.",
+  "effective_from": "2026-07-01",
+  "effective_to": "2026-12-31",
+  "tax_year": 2026,
+  "sources": [
+    {
+      "name": "CRA T4127 Payroll Deductions Formulas, 123rd edition, effective July 1, 2026",
+      "url": "https://www.canada.ca/en/revenue-agency/services/forms-publications/payroll/t4127-payroll-deductions-formulas/t4127-jul/t4127-jul-payroll-deductions-formulas.html"
+    },
+    {
+      "name": "CRA T4127 Payroll Deductions Formulas, 122nd edition, effective January 1, 2026 (formulas, CPP, EI chapters)",
+      "url": "https://www.canada.ca/en/revenue-agency/services/forms-publications/payroll/t4127-payroll-deductions-formulas/t4127-jan/t4127-jan-payroll-deductions-formulas-computer-programs.html"
+    }
+  ],
+  "verified_on": "2026-10-18",
+  "notes": [
+    "BC, NL and PE values in this edition are prorated so that the full-year 2026 tax is right after six months at the January values. Do not use these values for pay dates before 2026-07-01.",
+    "Option 2 (cumulative averaging) values differ for BC, NL and PE and are not loaded here. CanDo uses Option 1 only.",
+    "Quebec provincial tax is not in T4127; see quebec block (phase 2)."
+  ],
+  "rounding": {
+    "tax_per_period": "Round T to the nearest cent: if the third decimal is 5 or more, round up, otherwise drop it.",
+    "cpp_basic_exemption_per_period": "3500 / P, drop the third decimal (truncate to cents).",
+    "cpp_ei_amounts": "Round to the nearest cent.",
+    "bpa_formula": "Do not round the phase-out ratio; round the resulting amount to the cent with standard rounding."
+  },
+  "federal": {
+    "brackets": [
+      { "threshold": 0, "rate": 0.14, "constant": 0 },
+      { "threshold": 58523, "rate": 0.205, "constant": 3804 },
+      { "threshold": 117045, "rate": 0.26, "constant": 10241 },
+      { "threshold": 181440, "rate": 0.29, "constant": 15685 },
+      { "threshold": 258482, "rate": 0.33, "constant": 26024 }
+    ],
+    "lowest_rate": 0.14,
+    "basic_personal_amount": {
+      "type": "income_tested",
+      "max": 16452,
+      "min": 14829,
+      "phase_out_start": 181440,
+      "phase_out_end": 258482,
+      "income_measure": "NI = A + HD"
+    },
+    "canada_employment_amount": 1501,
+    "labour_sponsored_funds_credit": { "rate": 0.15, "annual_max": 750 },
+    "quebec_abatement": 0.165,
+    "outside_canada_surtax": 0.48,
+    "index_rate": 0.02
+  },
+  "cpp": {
+    "rate": 0.0595,
+    "base_rate": 0.0495,
+    "first_additional_rate": 0.01,
+    "ympe": 74600,
+    "basic_exemption": 3500,
+    "max_employee_contribution": 4230.45,
+    "max_base_contribution_for_credit": 3519.45,
+    "employer_matches_employee": true,
+    "age_rules": {
+      "start": "First pay dated in the month after the employee turns 18.",
+      "stop_at_70": "Continue through the last pay dated in the month the employee turns 70.",
+      "election": "CPT30 election to stop (age 65 to 70, receiving CPP/QPP pension) takes effect the first day of the month after the employer receives it."
+    }
+  },
+  "cpp2": {
+    "rate": 0.04,
+    "yampe": 85000,
+    "max_employee_contribution": 416.0,
+    "employer_matches_employee": true,
+    "fully_deductible": true
+  },
+  "ei": {
+    "rate": 0.0163,
+    "max_insurable_earnings": 68900,
+    "max_employee_premium": 1123.07,
+    "employer_multiplier": 1.4,
+    "quebec": { "rate": 0.013, "max_employee_premium": 895.7 },
+    "reduced_rate_programme": "Employers with a registered wage-loss plan use their CRA-assigned reduced employer rate instead of 1.4."
+  },
+  "qpp": {
+    "phase": 2,
+    "rate": 0.063,
+    "base_rate": 0.053,
+    "first_additional_rate": 0.01,
+    "max_employee_contribution": 4479.3,
+    "max_base_contribution_for_credit": 3768.3,
+    "qpp2": { "rate": 0.04, "max_employee_contribution": 416.0 }
+  },
+  "qpip": {
+    "phase": 2,
+    "max_insurable_earnings": 103000,
+    "employee_rate": 0.0043,
+    "employee_max": 442.9,
+    "employer_rate": 0.00602,
+    "employer_max": 620.06
+  },
+  "non_periodic": {
+    "method": "Bonus method: tax on the payment = annual tax with the payment minus annual tax without it (T4127 Chapter 4).",
+    "small_payment_rule": {
+      "text": "If annual income including the payment (Step 1 A) is $5,000 or less, T4127 says to withhold 15% (10% in Quebec) of the payment instead.",
+      "federal_rate": 0.15,
+      "quebec_rate": 0.1,
+      "threshold": 5000,
+      "verify": "T4127 still prints 15% although the lowest federal rate is 14%. Keep as printed; re-check each edition."
+    },
+    "k2_includes_contributions_on_payment": true
+  },
+  "pay_periods": {
+    "allowed_P": [1, 4, 10, 12, 13, 22, 24, 26, 27, 52, 53, 240],
+    "daily": { "P": 240, "cpp_basic_exemption_per_period": 14.58 },
+    "rule": "P is fixed for the pay group at the start of the year (26 or 27 bi-weekly, 52 or 53 weekly). The per-period CPP exemption stays the same all year, even for partial periods or unpaid leave."
+  },
+  "provinces": {
+    "AB": {
+      "name": "Alberta",
+      "brackets": [
+        { "threshold": 0, "rate": 0.08, "constant": 0 },
+        { "threshold": 61200, "rate": 0.1, "constant": 1224 },
+        { "threshold": 154259, "rate": 0.12, "constant": 4309 },
+        { "threshold": 185111, "rate": 0.13, "constant": 6160 },
+        { "threshold": 246813, "rate": 0.14, "constant": 8628 },
+        { "threshold": 370220, "rate": 0.15, "constant": 12331 }
+      ],
+      "lowest_rate": 0.08,
+      "basic_personal_amount": { "type": "fixed", "amount": 22769 },
+      "supplemental_credit_K5P": { "formula": "max(0, ((K1P + K2P) - 4896.00) * 0.25)", "threshold": 4896.0, "rate": 0.25 }
+    },
+    "BC": {
+      "name": "British Columbia",
+      "brackets": [
+        { "threshold": 0, "rate": 0.0614, "constant": 0 },
+        { "threshold": 50363, "rate": 0.077, "constant": 786 },
+        { "threshold": 100728, "rate": 0.105, "constant": 3606 },
+        { "threshold": 115648, "rate": 0.1229, "constant": 5676 },
+        { "threshold": 140430, "rate": 0.147, "constant": 9061 },
+        { "threshold": 190405, "rate": 0.168, "constant": 13059 },
+        { "threshold": 265545, "rate": 0.205, "constant": 22884 }
+      ],
+      "lowest_rate": 0.0614,
+      "basic_personal_amount": { "type": "fixed", "amount": 13216 },
+      "tax_reduction_S": {
+        "amount": 805,
+        "income_threshold": 25570,
+        "phase_out_rate": 0.0356,
+        "income_cap": 44952,
+        "formula": "If A <= 25570: S = min(T4, 805). If 25570 < A <= 44952: S = min(T4, max(0, 805 - (A - 25570) * 0.0356)). If A > 44952: S = 0."
+      },
+      "prorated": "Lowest rate 6.14% and reduction $805 are prorated for July to December (legislated: 5.60% and $690)."
+    },
+    "MB": {
+      "name": "Manitoba",
+      "brackets": [
+        { "threshold": 0, "rate": 0.108, "constant": 0 },
+        { "threshold": 47000, "rate": 0.1275, "constant": 917 },
+        { "threshold": 100000, "rate": 0.174, "constant": 5567 }
+      ],
+      "lowest_rate": 0.108,
+      "basic_personal_amount": {
+        "type": "income_tested",
+        "max": 15780,
+        "min": 0,
+        "phase_out_start": 200000,
+        "phase_out_end": 400000,
+        "income_measure": "NI = A + HD"
+      },
+      "labour_sponsored_funds_credit": { "rate": 0.15, "annual_max": 1800 }
+    },
+    "NB": {
+      "name": "New Brunswick",
+      "brackets": [
+        { "threshold": 0, "rate": 0.094, "constant": 0 },
+        { "threshold": 52333, "rate": 0.14, "constant": 2407 },
+        { "threshold": 104666, "rate": 0.16, "constant": 4501 },
+        { "threshold": 193861, "rate": 0.195, "constant": 11286 }
+      ],
+      "lowest_rate": 0.094,
+      "basic_personal_amount": { "type": "fixed", "amount": 13664 },
+      "labour_sponsored_funds_credit": { "rate": 0.2, "annual_max": 2000 }
+    },
+    "NL": {
+      "name": "Newfoundland and Labrador",
+      "brackets": [
+        { "threshold": 0, "rate": 0.087, "constant": 0 },
+        { "threshold": 44678, "rate": 0.145, "constant": 2591 },
+        { "threshold": 89354, "rate": 0.158, "constant": 3753 },
+        { "threshold": 159528, "rate": 0.178, "constant": 6943 },
+        { "threshold": 223340, "rate": 0.198, "constant": 11410 },
+        { "threshold": 285319, "rate": 0.208, "constant": 14263 },
+        { "threshold": 570638, "rate": 0.213, "constant": 17117 },
+        { "threshold": 1141275, "rate": 0.218, "constant": 22823 }
+      ],
+      "lowest_rate": 0.087,
+      "basic_personal_amount": { "type": "fixed", "amount": 15000 },
+      "prorated": "BPA $15,000 is prorated for July to December (legislated 2026 BPA: $13,094). Employees who filed a TD1NL before July 1 need not refile."
+    },
+    "NS": {
+      "name": "Nova Scotia",
+      "brackets": [
+        { "threshold": 0, "rate": 0.0879, "constant": 0 },
+        { "threshold": 30995, "rate": 0.1495, "constant": 1909 },
+        { "threshold": 61991, "rate": 0.1667, "constant": 2976 },
+        { "threshold": 97417, "rate": 0.175, "constant": 3784 },
+        { "threshold": 157124, "rate": 0.21, "constant": 9283 }
+      ],
+      "lowest_rate": 0.0879,
+      "basic_personal_amount": { "type": "fixed", "amount": 11932 },
+      "labour_sponsored_funds_credit": { "rate": 0.2, "annual_max": 2000 },
+      "note": "The income-tested BPANS formula was removed for 2026; the BPA is a fixed amount."
+    },
+    "NT": {
+      "name": "Northwest Territories",
+      "brackets": [
+        { "threshold": 0, "rate": 0.059, "constant": 0 },
+        { "threshold": 53003, "rate": 0.086, "constant": 1431 },
+        { "threshold": 106009, "rate": 0.122, "constant": 5247 },
+        { "threshold": 172346, "rate": 0.1405, "constant": 8436 }
+      ],
+      "lowest_rate": 0.059,
+      "basic_personal_amount": { "type": "fixed", "amount": 18198 }
+    },
+    "NU": {
+      "name": "Nunavut",
+      "brackets": [
+        { "threshold": 0, "rate": 0.04, "constant": 0 },
+        { "threshold": 55801, "rate": 0.07, "constant": 1674 },
+        { "threshold": 111602, "rate": 0.09, "constant": 3906 },
+        { "threshold": 181439, "rate": 0.115, "constant": 8442 }
+      ],
+      "lowest_rate": 0.04,
+      "basic_personal_amount": { "type": "fixed", "amount": 19659 }
+    },
+    "ON": {
+      "name": "Ontario",
+      "brackets": [
+        { "threshold": 0, "rate": 0.0505, "constant": 0 },
+        { "threshold": 53891, "rate": 0.0915, "constant": 2210 },
+        { "threshold": 107785, "rate": 0.1116, "constant": 4376 },
+        { "threshold": 150000, "rate": 0.1216, "constant": 5876 },
+        { "threshold": 220000, "rate": 0.1316, "constant": 8076 }
+      ],
+      "lowest_rate": 0.0505,
+      "basic_personal_amount": { "type": "fixed", "amount": 12989 },
+      "surtax_V1": {
+        "tiers": [
+          { "over": 5818, "rate": 0.2 },
+          { "over": 7446, "rate": 0.36 }
+        ],
+        "base": "T4 (basic provincial tax)"
+      },
+      "health_premium_V2": {
+        "base": "A (annual taxable income)",
+        "bands": [
+          { "over": 0, "upto": 20000, "base": 0, "rate": 0, "cap": 0, "formula": "0" },
+          { "over": 20000, "upto": 36000, "base": 0, "rate": 0.06, "cap": 300, "formula": "min(300, 0.06 * (A - 20000))" },
+          { "over": 36000, "upto": 48000, "base": 300, "rate": 0.06, "cap": 450, "formula": "min(450, 300 + 0.06 * (A - 36000))" },
+          { "over": 48000, "upto": 72000, "base": 450, "rate": 0.25, "cap": 600, "formula": "min(600, 450 + 0.25 * (A - 48000))" },
+          { "over": 72000, "upto": 200000, "base": 600, "rate": 0.25, "cap": 750, "formula": "min(750, 600 + 0.25 * (A - 72000))" },
+          { "over": 200000, "upto": null, "base": 750, "rate": 0.25, "cap": 900, "formula": "min(900, 750 + 0.25 * (A - 200000))" }
+        ],
+        "note": "Not reduced by S. Included in provincial tax withheld.",
+        "calculation": "For annual taxable income A, take the last band whose 'over' is below A (the first band when A is 0 or less): premium = min(cap, base + rate × (A − over)). 'formula' states the same in words."
+      },
+      "tax_reduction_S": {
+        "basic_amount_S2": 300,
+        "per_dependant_Y": 554,
+        "formula": "S = max(0, min(T4 + V1, 2 * (300 + Y) - (T4 + V1))), Y = 554 * (dependants under 19) + 554 * (dependants with a disability), from TD1ON"
+      }
+    },
+    "PE": {
+      "name": "Prince Edward Island",
+      "brackets": [
+        { "threshold": 0, "rate": 0.095, "constant": 0 },
+        { "threshold": 33928, "rate": 0.1347, "constant": 1347 },
+        { "threshold": 65820, "rate": 0.166, "constant": 3407 },
+        { "threshold": 106890, "rate": 0.1762, "constant": 4497 },
+        { "threshold": 142520, "rate": 0.19, "constant": 6464 },
+        { "threshold": 200000, "rate": 0.21, "constant": 10464 }
+      ],
+      "lowest_rate": 0.095,
+      "basic_personal_amount": { "type": "fixed", "amount": 15000 },
+      "prorated": "Top rate 21% is prorated for July to December (legislated: 20% over $200,000)."
+    },
+    "SK": {
+      "name": "Saskatchewan",
+      "brackets": [
+        { "threshold": 0, "rate": 0.105, "constant": 0 },
+        { "threshold": 54532, "rate": 0.125, "constant": 1091 },
+        { "threshold": 155805, "rate": 0.145, "constant": 4207 }
+      ],
+      "lowest_rate": 0.105,
+      "basic_personal_amount": { "type": "fixed", "amount": 20381 },
+      "labour_sponsored_funds_credit": { "rate": 0.175, "annual_max": 875 }
+    },
+    "YT": {
+      "name": "Yukon",
+      "brackets": [
+        { "threshold": 0, "rate": 0.064, "constant": 0 },
+        { "threshold": 58523, "rate": 0.09, "constant": 1522 },
+        { "threshold": 117045, "rate": 0.109, "constant": 3745 },
+        { "threshold": 181440, "rate": 0.128, "constant": 7193 },
+        { "threshold": 500000, "rate": 0.15, "constant": 18193 }
+      ],
+      "lowest_rate": 0.064,
+      "basic_personal_amount": { "type": "same_as_federal" },
+      "employment_credit_K4P": { "rate": 0.064, "amount": 1501, "formula": "min(0.064 * gross annual employment income, 0.064 * 1501)" }
+    }
+  },
+  "quebec": {
+    "phase": 2,
+    "provincial_tax": "Revenu Québec formulas (TP-1015.F). Load the edition in force for the pay date before Quebec payroll is switched on. Not in this file.",
+    "federal_side": "Federal tax for Quebec employees uses the federal brackets above, the 16.5% Quebec abatement, QPP in K2Q and QPIP in K2Q."
+  },
+  "territorial_payroll_tax": {
+    "NT": { "rate": 0.02, "base": "Gross remuneration for work performed in the NWT", "remit_to": "GNWT Department of Finance", "on_t4": false },
+    "NU": {
+      "rate": 0.02,
+      "base": "Gross remuneration for work performed in Nunavut",
+      "remit_to": "Government of Nunavut Department of Finance",
+      "on_t4": false,
+      "exemption": "Employees who normally work outside Nunavut are exempt until they earn $5,000 in Nunavut in the year (verify against the Government of Nunavut payroll tax guide before go-live)."
+    }
+  },
+  "upcoming": [
+    { "date": "2027-01-01", "item": "BC: indexation of brackets and credits paused at 2026 levels for 2027 to 2030 (except the renter's credit)." },
+    { "date": "2027-01-01", "item": "CPP: base rate proposed to fall from 9.90% to 9.50% (4.75% each for employee and employer). Proposed only; load when CRA publishes the 2027 edition." }
+  ]
+}

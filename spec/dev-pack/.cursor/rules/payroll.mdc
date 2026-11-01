@@ -1,0 +1,16 @@
+---
+description: Rules for the payroll engine, pay runs, retro and payroll jobs
+globs: packages/payroll-engine/**,packages/modules/payroll/**,apps/jobs/**
+alwaysApply: false
+---
+
+Follow `AGENTS.md` rules 3 to 7, 13, 15, 16, 19 to 22, 26 and 27, and `docs/06`, `docs/07` and `docs/17` §8 to §10.
+
+- `packages/payroll-engine` is a pure library: no I/O, no Workers APIs, no database. It mirrors `reference/payroll_reference.py` line by line, with the same input names, outputs and trace labels.
+- `tests/payroll/cases.json` is the oracle. Never change an expected value. If a case fails, fix the engine; if you believe the case is wrong, stop and explain with CRA sources.
+- The pay date selects the rule edition and the tax year. The work date selects rates, agreements and cost centres.
+- A locked run reads data with `knownAt = inputs_known_at` and rules only by pinned content hash.
+- One Queue message per bucket. The consumer claims the bucket with `FOR UPDATE SKIP LOCKED`, writes in one transaction, acknowledges after commit, and does nothing on redelivery of a finished bucket. YTD is written only at finalization.
+- Every pay result line is distributed to the cent into `payroll.pay_result_line_distribution` with largest-remainder rounding.
+- Queue messages and Workflow step outputs carry identifiers only: run ID, bucket number, counts, hashes. Never names, SINs, amounts per person or bank details.
+- Quebec provincial tax throws `QUEBEC_PHASE_2`.

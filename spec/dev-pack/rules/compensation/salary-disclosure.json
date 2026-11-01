@@ -1,0 +1,58 @@
+{
+ "$comment": "Public salary and remuneration disclosure rules read by compliance.salary_disclosure.statute (docs/25 §10.1). CanDo drafts the list from amounts paid by the statute's definitions; HR and finance review it and the organization's route approves it before publication. Every entry is verify_at_load until checked against the statute; an organization that needs a statute with no entry adds it with HR, never from code.",
+ "version": "2026-10-28",
+ "source_decisions": "claude/review/04-compensation-decisions.md; docs/25",
+ "statutes": {
+  "ON_PSSDA": {
+   "name_en": "Ontario Public Sector Salary Disclosure Act, 1996",
+   "jurisdiction": "ON",
+   "who": "Ontario public sector employers covered by the Act",
+   "threshold": 100000,
+   "basis": "salary paid and taxable benefits in the calendar year",
+   "publishes": "name, position, salary paid, taxable benefits",
+   "cite": "Public Sector Salary Disclosure Act, 1996 (Ontario)",
+   "status": "verify_at_load"
+  },
+  "BC_FIA_REMUNERATION": {
+   "name_en": "BC Financial Information Act: schedule of employee remuneration and expenses",
+   "jurisdiction": "BC",
+   "who": "Public bodies the Act names (including municipalities and other local public bodies)",
+   "threshold": 75000,
+   "basis": "remuneration paid in the fiscal year, with expenses",
+   "publishes": "name, remuneration, expenses",
+   "cite": "Financial Information Act (BC) and its regulation; UBCM, Amendment to SOFI reporting legislation (threshold still $75,000)",
+   "checked_on": "2026-10-28",
+   "status": "verify_at_load"
+  },
+  "BC_PSEC_EXECUTIVE": {
+   "name_en": "BC public sector executive compensation disclosure",
+   "jurisdiction": "BC",
+   "who": "Public sector employers under the Public Sector Employers Act",
+   "threshold": null,
+   "basis": "executive compensation as the Public Sector Employers' Council's guidelines define it",
+   "publishes": "each executive's compensation",
+   "cite": "Public Sector Employers Act (BC); BC government, Executive compensation disclosures",
+   "status": "verify_at_load"
+  },
+  "BC_SOCIETIES_ACT": {
+   "name_en": "BC Societies Act: remuneration disclosure in the financial statements",
+   "jurisdiction": "BC",
+   "who": "Societies under the BC Societies Act",
+   "threshold": 75000,
+   "basis": "remuneration paid to directors, and to employees and contractors paid at least the threshold (up to ten highest)",
+   "publishes": "in the society's financial statements",
+   "cite": "Societies Act (BC), s. 36; secondary: Canadian Council of Christian Charities, Remuneration disclosure obligations of B.C.'s new Societies Act",
+   "status": "verify_at_load"
+  },
+  "FN_FNFTA": {
+   "name_en": "First Nations Financial Transparency Act: schedule of remuneration and expenses",
+   "jurisdiction": "FED",
+   "who": "First Nations under the Act",
+   "threshold": null,
+   "basis": "remuneration and expenses paid to the chief and each councillor",
+   "publishes": "schedule with the audited financial statements",
+   "cite": "First Nations Financial Transparency Act (Canada), s. 5",
+   "status": "verify_at_load"
+  }
+ }
+}

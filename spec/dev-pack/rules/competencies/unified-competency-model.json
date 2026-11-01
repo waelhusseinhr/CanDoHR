@@ -1,0 +1,841 @@
+{
+ "framework_code": "UCM",
+ "name_en": "Unified Competency Model",
+ "name_fr": "Modèle unifié de compétences",
+ "version": "1.0",
+ "status": "published_starter",
+ "accepted": "Accepted as written by the owner on 28 Oct 2026 (Module 04 review, R7.4; docs/25 §9): CanDo's published starting framework, which each organization copies and edits.",
+ "source": "Provided by the owner (Unified Competency Model with Behavioral Examples, October 2026). Core and Leadership indicators as provided; Functional indicators proposed in docs/19 §3.5 and accepted by the owner.",
+ "scale": [
+  {
+   "level": 1,
+   "code": "FOUNDATIONAL",
+   "name_en": "Foundational",
+   "name_fr": "Fondamental",
+   "descriptor_en": "Applies the competency in routine, well-defined situations with guidance. Influence: own tasks.",
+   "descriptor_fr": "Applique la compétence dans des situations courantes et bien définies, avec encadrement. Influence : ses propres tâches."
+  },
+  {
+   "level": 2,
+   "code": "APPLIED",
+   "name_en": "Applied",
+   "name_fr": "Appliqué",
+   "descriptor_en": "Applies the competency independently in typical situations and adapts it to the person or situation. Influence: own work and clients.",
+   "descriptor_fr": "Applique la compétence de façon autonome dans des situations habituelles et l’adapte à la personne ou à la situation. Influence : son travail et sa clientèle."
+  },
+  {
+   "level": 3,
+   "code": "PROFICIENT",
+   "name_en": "Proficient",
+   "name_fr": "Maîtrisé",
+   "descriptor_en": "Applies the competency in complex or unfamiliar situations and coaches others. Influence: the team.",
+   "descriptor_fr": "Applique la compétence dans des situations complexes ou nouvelles et accompagne les autres. Influence : l’équipe."
+  },
+  {
+   "level": 4,
+   "code": "ADVANCED",
+   "name_en": "Advanced",
+   "name_fr": "Avancé",
+   "descriptor_en": "Shapes how the competency is practised across a program, function or department, through standards, systems and partnerships. Influence: the unit and its partners.",
+   "descriptor_fr": "Façonne la pratique de la compétence dans un programme, une fonction ou un service, au moyen de normes, de systèmes et de partenariats. Influence : l’unité et ses partenaires."
+  },
+  {
+   "level": 5,
+   "code": "STRATEGIC",
+   "name_en": "Strategic",
+   "name_fr": "Stratégique",
+   "descriptor_en": "Sets direction for the competency across the organization or the wider system. Influence: the organization, funders and community.",
+   "descriptor_fr": "Oriente la compétence à l’échelle de l’organisation ou du système. Influence : l’organisation, les bailleurs de fonds et la communauté."
+  }
+ ],
+ "domains": [
+  {
+   "code": "CORE",
+   "name_en": "Core – Organizational",
+   "name_fr": "Compétences de base – organisationnelles"
+  },
+  {
+   "code": "LEAD",
+   "name_en": "Leadership",
+   "name_fr": "Leadership"
+  },
+  {
+   "code": "FUNC",
+   "name_en": "Functional",
+   "name_fr": "Compétences fonctionnelles"
+  }
+ ],
+ "competencies": [
+  {
+   "code": "VAL",
+   "domain": "CORE",
+   "name_en": "Values & Ethics",
+   "name_fr": "Valeurs et éthique",
+   "definition_en": "Upholds and models integrity, equity, inclusion, and respect for people.",
+   "definition_fr": null,
+   "indicators_status": "as_provided",
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Acknowledges organizational values and codes of conduct.",
+      "Follows basic confidentiality rules in day-to-day tasks.",
+      "Avoids participating in workplace gossip.",
+      "Asks questions when unsure about the ethical course of action.",
+      "Recognizes and respects diversity in personal interactions."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Consistently demonstrates honesty in communications.",
+      "Reports minor ethical concerns to the appropriate supervisor.",
+      "Fulfills obligations even when unsupervised.",
+      "Maintains neutrality in political or cultural discussions at work.",
+      "Stays transparent about workload capacity and commitments."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Speaks up against discriminatory remarks or behavior.",
+      "Escalates ethical issues even when doing so is unpopular.",
+      "Mentors others on proper conduct in challenging situations.",
+      "Ensures fair treatment of all team members in delegating work.",
+      "Models equitable behavior during service delivery."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Leads discussions about equity and ethics during team meetings.",
+      "Creates tools or resources to help others understand ethics policies.",
+      "Intervenes constructively when witnessing workplace bias.",
+      "Promotes a speak-up culture without fear of retaliation.",
+      "Assesses and corrects fairness issues in HR or hiring processes."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Champions the integration of equity in strategic planning.",
+      "Leads initiatives that address systemic ethical concerns.",
+      "Advises senior leadership on embedding ethics into policies.",
+      "Creates an internal ethics committee or system for peer review.",
+      "Implements training programs on unconscious bias and integrity."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "CLI",
+   "domain": "CORE",
+   "name_en": "Client-Centered Practice",
+   "name_fr": "Pratique centrée sur la clientèle",
+   "definition_en": "Consistently seeks to understand and meet the needs of clients from diverse backgrounds.",
+   "definition_fr": null,
+   "indicators_status": "as_provided",
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Greets clients warmly and listens when they speak.",
+      "Provides basic information to clients upon request.",
+      "Refers clients to others when unsure about their needs.",
+      "Avoids making assumptions about client backgrounds.",
+      "Checks in to ensure basic satisfaction after service."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Clarifies client needs using simple questioning.",
+      "Follows up to ensure referrals were received.",
+      "Adapts approach for clients with language barriers.",
+      "Maintains respect and confidentiality with clients.",
+      "Uses checklists or forms to ensure all needs are assessed."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Creates individualized service plans based on assessment.",
+      "Advocates for client needs within and beyond the organization.",
+      "Balances empathy with professional boundaries.",
+      "Collaborates with other service providers to support the client.",
+      "Adjusts services based on evolving client situations."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Leads initiatives to improve client experience organization-wide.",
+      "Coaches colleagues on client-centered practices.",
+      "Develops feedback loops to gather client input regularly.",
+      "Customizes resources to reflect cultural and demographic needs.",
+      "Proactively resolves complex client service challenges."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Designs service models rooted in co-creation with clients.",
+      "Establishes partnerships to address systemic service gaps.",
+      "Implements organization-wide standards for inclusive service.",
+      "Leads advocacy campaigns based on client experience data.",
+      "Influences sector policy to enhance client-centered frameworks."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "COM",
+   "domain": "CORE",
+   "name_en": "Communication & Collaboration",
+   "name_fr": "Communication et collaboration",
+   "definition_en": "Communicates effectively and works constructively with others to achieve results.",
+   "definition_fr": null,
+   "indicators_status": "as_provided",
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Responds politely to emails and phone calls.",
+      "Participates in team discussions when prompted.",
+      "Uses basic tools to share information with others.",
+      "Clarifies own understanding when confused.",
+      "Keeps others informed of availability and task status."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Explains ideas clearly and listens to feedback.",
+      "Asks for help when needed to complete group tasks.",
+      "Uses culturally sensitive language in conversations.",
+      "Works respectfully with others from diverse backgrounds.",
+      "Offers suggestions during group meetings."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Leads small group discussions to solve problems.",
+      "Gives and receives constructive feedback regularly.",
+      "Tailors communication to different audiences.",
+      "Facilitates consensus during decision-making.",
+      "Supports colleagues during high-pressure periods."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Mediates conflicts between team members.",
+      "Designs communication strategies for difficult topics.",
+      "Builds collaboration with external partners.",
+      "Mentors others on professional communication.",
+      "Encourages cross-functional knowledge sharing."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Establishes strategic communication frameworks.",
+      "Advises executives on sensitive communication issues.",
+      "Champions organization-wide collaboration norms.",
+      "Develops inclusive language guidelines for the organization.",
+      "Leads cross-sector communication initiatives."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "ADA",
+   "domain": "CORE",
+   "name_en": "Adaptability & Learning Agility",
+   "name_fr": "Adaptabilité et agilité d’apprentissage",
+   "definition_en": "Adjusts to change, learns continuously, and supports a culture of growth and innovation.",
+   "definition_fr": null,
+   "indicators_status": "as_provided",
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Responds calmly to minor changes in schedule.",
+      "Accepts new tools or processes after some explanation.",
+      "Adjusts workflow slightly when required by supervisor.",
+      "Attends required training sessions without complaint.",
+      "Seeks help when facing new tasks."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Volunteers for small changes in team assignments.",
+      "Learns from experience and applies it to future tasks.",
+      "Asks questions to improve understanding of new systems.",
+      "Adapts communication style to different team members.",
+      "Implements feedback received from supervisors."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Quickly integrates new policies or procedures into daily work.",
+      "Improves outdated practices with innovative suggestions.",
+      "Self-initiates learning on new tools or trends.",
+      "Shares learning tips with peers after training.",
+      "Adjusts service delivery for remote or hybrid environments."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Coaches team members through transitions and change.",
+      "Creates learning plans tailored to team or project needs.",
+      "Models growth mindset in response to setbacks.",
+      "Leads debrief sessions to capture lessons learned.",
+      "Adapts workflows quickly in crisis or ambiguity."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Drives organizational agility through strategy and process.",
+      "Champions continuous improvement initiatives.",
+      "Builds a learning culture that supports experimentation.",
+      "Identifies long-term learning trends for strategic planning.",
+      "Establishes cross-training programs across departments."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "RES",
+   "domain": "CORE",
+   "name_en": "Results Orientation",
+   "name_fr": "Orientation vers les résultats",
+   "definition_en": "Focuses on achieving high-quality outcomes and improving performance.",
+   "definition_fr": null,
+   "indicators_status": "as_provided",
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Completes assigned tasks on time with supervision.",
+      "Double-checks work for basic accuracy.",
+      "Asks for clarification when unclear about goals.",
+      "Meets minimum standards for quality.",
+      "Communicates delays when they arise."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Sets daily or weekly goals to manage time effectively.",
+      "Takes ownership of assigned tasks from start to finish.",
+      "Suggests small improvements to processes.",
+      "Regularly tracks progress toward deliverables.",
+      "Adjusts pace to meet tight deadlines when needed."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Identifies barriers to results and addresses them.",
+      "Improves efficiency of recurring work tasks.",
+      "Leads a small project to completion within scope.",
+      "Uses performance data to improve quality.",
+      "Mentors peers on effective goal setting."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Drives high performance through coaching and structure.",
+      "Sets ambitious but achievable targets for programs.",
+      "Optimizes cross-functional workflows for better outcomes.",
+      "Aligns team activities with strategic goals.",
+      "Holds others accountable with support and feedback."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Champions a results-driven culture across the organization.",
+      "Integrates performance data into decision-making processes.",
+      "Designs systems to track and report key success metrics.",
+      "Drives innovation to improve service outcomes.",
+      "Aligns strategic planning with measurable results."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "TLD",
+   "domain": "LEAD",
+   "name_en": "Team Leadership",
+   "name_fr": "Leadership d’équipe",
+   "definition_en": "Leads, motivates, and develops individuals and teams to deliver results.",
+   "definition_fr": null,
+   "indicators_status": "as_provided",
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Shares clear instructions and basic expectations with team members.",
+      "Participates in team check-ins without directing others.",
+      "Supports peer collaboration without formal leadership role.",
+      "Offers to coordinate small group efforts when asked.",
+      "Recognizes others' contributions informally."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Delegates tasks based on individual strengths.",
+      "Monitors team progress and provides encouragement.",
+      "Addresses minor team issues with guidance from a supervisor.",
+      "Clarifies team roles and responsibilities.",
+      "Encourages mutual respect among team members."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Sets team goals and aligns individual work accordingly.",
+      "Facilitates team problem-solving sessions.",
+      "Resolves interpersonal conflicts diplomatically.",
+      "Recognizes high performance and provides constructive feedback.",
+      "Mentors junior team members to build capability."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Drives team accountability and fosters collaboration.",
+      "Builds a strong, inclusive team culture.",
+      "Coaches team members for career growth.",
+      "Leads cross-functional initiatives to drive impact.",
+      "Anticipates and addresses team capacity issues proactively."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Develops long-term talent strategies for the organization.",
+      "Builds high-performance teams aligned to strategic goals.",
+      "Models distributed leadership and empowerment.",
+      "Establishes systems to measure team effectiveness and engagement.",
+      "Leads organizational culture and values through leadership behavior."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "STR",
+   "domain": "LEAD",
+   "name_en": "Strategic Thinking",
+   "name_fr": "Pensée stratégique",
+   "definition_en": "Aligns daily work to long-term organizational objectives and future trends.",
+   "definition_fr": null,
+   "indicators_status": "as_provided",
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Understands and supports team’s overall mission.",
+      "Focuses on immediate tasks without losing sight of big picture.",
+      "Follows direction on new strategic initiatives.",
+      "Connects own work to team goals.",
+      "Expresses curiosity about organization’s long-term plans."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Identifies how short-term tasks align with long-term goals.",
+      "Suggests improvements based on client or team feedback.",
+      "Analyzes patterns in service delivery.",
+      "Participates in planning meetings with constructive input.",
+      "Balances daily responsibilities with future impact in mind."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Contributes to operational planning aligned with strategy.",
+      "Uses data to shape program or team objectives.",
+      "Anticipates client or community needs based on trends.",
+      "Aligns team activities to strategic priorities.",
+      "Links decisions to long-term value and sustainability."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Leads strategic planning sessions.",
+      "Translates vision into actionable team goals.",
+      "Forecasts trends and prepares scenarios.",
+      "Aligns resources with changing priorities.",
+      "Integrates insights from multiple functions into planning."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Develops and communicates a compelling vision for the future.",
+      "Shapes long-term strategy through policy and partnerships.",
+      "Influences sector-wide strategic direction.",
+      "Creates a culture of strategic alignment across teams.",
+      "Evaluates risk and opportunity across multiple time horizons."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "CHG",
+   "domain": "LEAD",
+   "name_en": "Change Leadership",
+   "name_fr": "Leadership du changement",
+   "definition_en": "Drives and manages change initiatives while supporting others through transitions.",
+   "definition_fr": null,
+   "indicators_status": "as_provided",
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Accepts new procedures or technologies with guidance.",
+      "Expresses openness to change even if uncertain.",
+      "Asks questions to understand reasons for changes.",
+      "Supports colleagues who are struggling with change.",
+      "Shares feedback about how change affects daily work."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Explains the purpose of changes to others in plain language.",
+      "Adjusts own work processes in response to change.",
+      "Keeps a positive tone when discussing change.",
+      "Provides examples of how change has led to improvements.",
+      "Encourages peers to try new approaches."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Coordinates implementation of a new process within the team.",
+      "Gathers and responds to feedback during transitions.",
+      "Models flexible behavior under pressure.",
+      "Coaches others on adapting to new systems or tools.",
+      "Aligns project goals with organizational change plans."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Leads planning and communication for major change initiatives.",
+      "Creates action plans to address change resistance.",
+      "Designs feedback loops during rollout phases.",
+      "Engages key stakeholders in co-creating the change process.",
+      "Builds morale and clarity during uncertainty."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Develops organization-wide change strategies.",
+      "Leads culture change aligned to vision and values.",
+      "Champions adaptive leadership across teams.",
+      "Uses change management frameworks (e.g., ADKAR, Kotter).",
+      "Advises executives and boards on transformation readiness."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "CCR",
+   "domain": "FUNC",
+   "name_en": "Cross-Cultural Responsiveness",
+   "name_fr": "Sensibilité interculturelle",
+   "definition_en": "Understands, respects, and adapts services to different cultural, linguistic, and social perspectives.",
+   "definition_fr": null,
+   "indicators_status": "reviewed",
+   "note": "The workbook repeats the same five examples at every level. They are kept as original_examples (they read as level 2 practice); the progression below was proposed in docs/19 §3.5 and accepted by the owner on 28 Oct 2026.",
+   "original_examples": [
+    "Seeks translation support to improve client experience.",
+    "Learns about clients’ cultural norms before conducting an interview.",
+    "Modifies program delivery to accommodate cultural holidays.",
+    "Responds respectfully to religious accommodation requests.",
+    "Participates in cultural safety training and shares learnings with peers."
+   ],
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Uses respectful, plain language and checks that clients from different backgrounds have understood.",
+      "Asks clients how they prefer to be addressed and which language they prefer to use.",
+      "Requests an interpreter when a client needs one, following the program's procedure.",
+      "Learns about the communities the program serves through orientation and training.",
+      "Notices cultural needs that procedures do not cover and asks a supervisor how to respond."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Learns about a client's cultural norms before an interview and adjusts the approach.",
+      "Arranges interpretation or translated materials without being asked.",
+      "Adjusts scheduling and program delivery for cultural and religious observances.",
+      "Responds respectfully to religious and cultural accommodation requests.",
+      "Takes part in cultural safety training and shares what was learned with peers."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Adapts assessments and service plans to a client's cultural, linguistic and family context.",
+      "Recognizes when a policy or practice creates a barrier for a community and proposes a change.",
+      "Builds working relationships with cultural and community organizations to improve referrals.",
+      "Coaches colleagues on culturally safe practice in difficult situations.",
+      "Brings cultural and language considerations into case reviews and program feedback."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Designs or revises programs with input from the communities they serve.",
+      "Leads culturally safe and trauma-informed practice across a team or program.",
+      "Analyses service data by language or community to find gaps in access and outcomes.",
+      "Develops partnerships that bring community leaders and knowledge keepers into program design.",
+      "Builds cultural safety into staff orientation, supervision and quality reviews."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Sets organization-wide commitments and measures for cultural safety and inclusion.",
+      "Embeds reconciliation and anti-racism principles in strategy, policy and governance.",
+      "Represents the organization with funders, governments and communities on culturally responsive service.",
+      "Ensures interpretation, translation and community liaison resources are funded and sustained.",
+      "Holds leaders accountable for culturally responsive outcomes."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "NAV",
+   "domain": "FUNC",
+   "name_en": "Needs Assessment & Navigation",
+   "name_fr": "Évaluation des besoins et orientation",
+   "definition_en": "Identifies client needs and connects them to relevant supports, services, or systems.",
+   "definition_fr": null,
+   "indicators_status": "reviewed",
+   "note": "The workbook repeats the same five examples at every level. They are kept as original_examples (they read as level 2 practice); the progression below was proposed in docs/19 §3.5 and accepted by the owner on 28 Oct 2026.",
+   "original_examples": [
+    "Uses a structured intake form to uncover hidden client needs.",
+    "Links newcomer families to food security programs proactively.",
+    "Assists a client in applying for income support based on their unique needs.",
+    "Explains government benefits in a culturally appropriate way.",
+    "Refers a youth to a mentorship program based on career goals."
+   ],
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Completes the standard intake accurately and on time.",
+      "Gives clients accurate information about the program's services and eligibility.",
+      "Refers clients to services from an established resource list.",
+      "Recognizes urgent safety concerns and escalates them right away.",
+      "Records referrals and follow-ups in the client file."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Uses a structured intake to uncover needs a client may not mention at first.",
+      "Links clients and families to community programs, such as food security or income support, based on their needs.",
+      "Helps clients apply for benefits and programs, explaining them in plain, culturally appropriate language.",
+      "Matches referrals to the client's own goals, such as a youth's career interests.",
+      "Follows up to confirm that the client was connected and the referral helped."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Assesses complex situations with several needs and sets priorities with the client.",
+      "Guides clients through several systems at once, such as housing, health, income and legal services.",
+      "Advocates with other agencies when a client is wrongly refused a service.",
+      "Uses assessment tools consistently and explains the findings to the team.",
+      "Coaches newer staff on intake and referral practice."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Designs or selects assessment tools and referral pathways for a program.",
+      "Builds referral agreements with partner agencies and monitors how well they work.",
+      "Reviews assessment quality across the team and acts on gaps.",
+      "Uses needs data to identify service gaps and propose new services.",
+      "Leads case conferences for the most complex situations."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Sets the organization's approach to assessment, navigation and coordinated access.",
+      "Shapes referral networks across the system with funders and partners.",
+      "Uses community needs data to guide strategy and funding requests.",
+      "Represents the organization at system planning tables.",
+      "Ensures navigation services are evaluated for outcomes and equity."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "SPC",
+   "domain": "FUNC",
+   "name_en": "Service Planning & Coordination",
+   "name_fr": "Planification et coordination des services",
+   "definition_en": "Develops and executes structured plans to support clients or projects effectively.",
+   "definition_fr": null,
+   "indicators_status": "reviewed",
+   "note": "The workbook repeats the same five examples at every level. They are kept as original_examples (they read as level 2 practice); the progression below was proposed in docs/19 §3.5 and accepted by the owner on 28 Oct 2026.",
+   "original_examples": [
+    "Creates a multi-step action plan aligned with client goals.",
+    "Coordinates with housing providers to align client move-in timelines.",
+    "Follows up with partner organizations to ensure service delivery.",
+    "Adjusts service timelines when new barriers emerge.",
+    "Uses a project management tool to track tasks across partners."
+   ],
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Follows each client's service plan and completes assigned tasks on time.",
+      "Keeps client files and schedules up to date.",
+      "Tells a supervisor when a plan is not working or a deadline is at risk.",
+      "Coordinates appointments and logistics for clients.",
+      "Prepares materials for program sessions."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Develops service plans with clients, with clear goals, steps and dates.",
+      "Coordinates with the other staff and agencies involved in a client's plan.",
+      "Reviews progress with the client and adjusts the plan.",
+      "Organizes program sessions or small events from start to finish.",
+      "Documents outcomes against the plan's goals."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Plans and coordinates services for clients with complex, multi-agency plans.",
+      "Manages a caseload or small project, balancing priorities and deadlines.",
+      "Leads case conferences and coordinates partners' roles.",
+      "Identifies risks in a plan and puts mitigation in place.",
+      "Improves planning templates or workflows for the team."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Plans and manages a program or major project, including budget, staffing and timelines.",
+      "Sets service standards and monitors caseloads and outcomes.",
+      "Coordinates several teams or partner agencies toward shared goals.",
+      "Reports progress and outcomes to funders.",
+      "Adjusts program plans based on evaluation results."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Sets multi-year service plans aligned with strategy and funding.",
+      "Coordinates services across programs and sites.",
+      "Secures and allocates resources for service delivery.",
+      "Establishes the organization's evaluation and outcome framework.",
+      "Leads system-level planning with funders and partners."
+     ]
+    }
+   ]
+  },
+  {
+   "code": "DIG",
+   "domain": "FUNC",
+   "name_en": "Digital & Information Literacy",
+   "name_fr": "Littératie numérique et informationnelle",
+   "definition_en": "Uses technology to deliver services, document interactions, and manage data ethically.",
+   "definition_fr": null,
+   "indicators_status": "reviewed",
+   "note": "The workbook repeats the same five examples at every level. They are kept as original_examples (they read as level 2 practice); the progression below was proposed in docs/19 §3.5 and accepted by the owner on 28 Oct 2026.",
+   "original_examples": [
+    "Uses digital tools to create accessible service documents.",
+    "Teaches clients how to use online portals for immigration updates.",
+    "Logs case notes accurately into a centralized CRM system.",
+    "Troubleshoots tech issues for a remote client consultation.",
+    "Supports staff by developing a how-to guide for a new database."
+   ],
+   "levels": [
+    {
+     "level": 1,
+     "indicators_en": [
+      "Uses the organization's core systems, such as email, calendar and the client database, for daily work.",
+      "Records case notes accurately and on time in the client system.",
+      "Follows privacy and security rules for client information, including passwords and screen locks.",
+      "Asks for help when a system or tool is unfamiliar.",
+      "Recognizes and reports suspicious emails and links."
+     ]
+    },
+    {
+     "level": 2,
+     "indicators_en": [
+      "Creates accessible documents and digital materials for clients.",
+      "Helps clients use online portals and services, such as government or immigration portals.",
+      "Supports remote consultations and solves common technical issues.",
+      "Uses reports from the client system to track own caseload.",
+      "Protects personal information when sharing documents and messages."
+     ]
+    },
+    {
+     "level": 3,
+     "indicators_en": [
+      "Writes how-to guides and trains colleagues on a new system or tool.",
+      "Uses data from the client system to spot trends in own program.",
+      "Improves digital forms or workflows to save time or reduce errors.",
+      "Advises the team on privacy-safe ways to use technology with clients.",
+      "Tests new tools and gives structured feedback before roll-out."
+     ]
+    },
+    {
+     "level": 4,
+     "indicators_en": [
+      "Leads the adoption of a system or digital service for a program or department.",
+      "Defines data quality standards and checks that the team meets them.",
+      "Builds reports and dashboards that inform program decisions.",
+      "Assesses the privacy and security risks of new tools with the privacy lead.",
+      "Plans digital access support for clients with limited connectivity or skills."
+     ]
+    },
+    {
+     "level": 5,
+     "indicators_en": [
+      "Sets the organization's digital and data strategy for service delivery.",
+      "Ensures data governance, privacy and security meet legal and funder requirements.",
+      "Invests in systems that connect services and reduce duplication.",
+      "Uses data and evidence in strategic decisions and public reporting.",
+      "Champions digital inclusion for clients and staff."
+     ]
+    }
+   ]
+  }
+ ],
+ "french": "Domain, competency and level names and level descriptors are in French; definitions and behavioural indicators still need French versions before French-speaking tenants use the framework (docs/16 Q28).",
+ "counts": {
+  "domains": 3,
+  "competencies": 12,
+  "levels": 5,
+  "indicators": 300
+ }
+}

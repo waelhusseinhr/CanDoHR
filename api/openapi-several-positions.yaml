@@ -1,0 +1,541 @@
+openapi: 3.1.0
+info:
+  title: CanDo HRIS API — people in several positions
+  version: 1.0.0-draft
+  description: |
+    Contract for docs/20. Merge these paths and component schemas into api/openapi.yaml in their own pull request:
+    approvals and splitting in Step 11, pay items in Step 9, benefits in Steps 15 and 16, review sections in Step 17.
+    Servers, security, the Idempotency-Key header, RFC 9457 errors and the asOf/knownAt rules are those of
+    api/openapi.yaml. Policies, coverage, pay items, duties, end reasons and benefit-change rules are committed through
+    /change-sets; endpoints here that propose such changes return the change set they created. Decisions on approval
+    parts and on benefit-change decisions are workflow actions with their own audit. Hours are decimal strings with
+    two places; minutes are integers.
+servers:
+  - url: https://api.cando.example/v1
+    description: Production (Canada)
+tags:
+  - name: Approvals
+  - name: Pay items
+  - name: Review sections
+  - name: Benefit changes
+
+paths:
+  # ------------------------------------------------------------------ Approvals (§2, §3)
+  /approval-policies:
+    get:
+      tags: [Approvals]
+      operationId: listApprovalPolicies
+      summary: Approval policies and coverage for a position or an assignment, as of a date
+      parameters:
+        - { name: targetType, in: query, required: true, schema: { type: string, enum: [position, assignment] } }
+        - { name: targetId, in: query, required: true, schema: { type: string, format: uuid } }
+        - { $ref: '#/components/parameters/AsOf' }
+      responses:
+        '200':
+          description: The policy per capability (the organization's approvals.multi_manager_* settings when the position sets none) and every coverage row
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [policies, coverage]
+                properties:
+                  policies: { type: array, items: { $ref: '#/components/schemas/ApprovalPolicy' } }
+                  coverage: { type: array, items: { $ref: '#/components/schemas/ApprovalCoverage' } }
+    put:
+      tags: [Approvals]
+      operationId: setApprovalPolicy
+      summary: Set the policy and coverage of a position or an assignment from a date (one change set)
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetType, targetId, effectiveFrom]
+              properties:
+                targetType: { type: string, enum: [position, assignment] }
+                targetId: { type: string, format: uuid }
+                effectiveFrom: { type: string, format: date }
+                policies: { type: array, items: { $ref: '#/components/schemas/ApprovalPolicy' } }
+                coverage: { type: array, items: { $ref: '#/components/schemas/ApprovalCoverage' } }
+      responses:
+        '201': { $ref: '#/components/responses/ChangeSetCreated' }
+        '422': { $ref: '#/components/responses/Refused' }
+
+  /routing/split-preview:
+    post:
+      tags: [Approvals]
+      operationId: previewSplit
+      summary: Show how a request would split across positions and managers before it is submitted
+      description: Same calculation as reference/several_positions_reference.py split_request. Nothing is stored.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [employmentId, start, end, capability]
+              properties:
+                employmentId: { type: string, format: uuid }
+                start: { type: string, format: date-time }
+                end: { type: string, format: date-time }
+                capability: { $ref: '#/components/schemas/Capability' }
+                leaveTypeCode: { type: string }
+                assignmentIds: { type: array, items: { type: string, format: uuid }, description: Default every active assignment }
+      responses:
+        '200':
+          description: Components per assignment with their parts, and skipped assignments
+          content: { application/json: { schema: { $ref: '#/components/schemas/SplitResult' } } }
+        '422': { $ref: '#/components/responses/Refused' }
+
+  /approval-parts:
+    get:
+      tags: [Approvals]
+      operationId: listApprovalParts
+      summary: The parts of one request, or the caller's pending parts (inbox)
+      parameters:
+        - { name: subjectType, in: query, schema: { type: string, enum: [leave_request, timesheet, overtime_preauth, availability_change] } }
+        - { name: subjectId, in: query, schema: { type: string, format: uuid } }
+        - { name: inbox, in: query, description: true returns parts where one of the caller's assignments is an approver and the part is pending, schema: { type: boolean } }
+        - { $ref: '#/components/parameters/Cursor' }
+        - { $ref: '#/components/parameters/Limit' }
+      responses:
+        '200':
+          description: Parts with the roll-up of each component and of the request
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/ApprovalPart' } }
+                  rollUp: { type: object, properties: { request: { $ref: '#/components/schemas/RollUpStatus' }, components: { type: object, additionalProperties: { $ref: '#/components/schemas/RollUpStatus' } } } }
+                  nextCursor: { type: string }
+
+  /approval-parts/{partId}/decisions:
+    post:
+      tags: [Approvals]
+      operationId: decideApprovalPart
+      summary: Approve or decline a part as one of its approvers
+      description: Refused with DECISION_NOT_ALLOWED when the caller's assignment is not an approver, DECISION_TWICE when it has already decided, APPROVAL_PART_IMMUTABLE when the part is no longer pending.
+      parameters: [ { $ref: '#/components/parameters/PartId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [asAssignmentId, decision]
+              properties:
+                asAssignmentId: { type: string, format: uuid, description: The approver's own assignment acting on the part }
+                decision: { type: string, enum: [approve, decline] }
+                comment: { type: string, maxLength: 2000 }
+      responses:
+        '200': { description: The part with its new status and the roll-up, content: { application/json: { schema: { $ref: '#/components/schemas/ApprovalPart' } } } }
+        '422': { $ref: '#/components/responses/Refused' }
+
+  /approval-parts/{partId}/cancel:
+    post:
+      tags: [Approvals]
+      operationId: cancelApprovalPart
+      summary: The requester cancels a pending or approved part (for example after a partial approval)
+      parameters: [ { $ref: '#/components/parameters/PartId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      responses:
+        '200': { description: Cancelled; components and request rolled up again, content: { application/json: { schema: { $ref: '#/components/schemas/ApprovalPart' } } } }
+        '422': { $ref: '#/components/responses/Refused' }
+
+  # ------------------------------------------------------------------ Pay items and duties (§4)
+  /duties:
+    get:
+      tags: [Pay items]
+      operationId: listDuties
+      summary: The tenant's duties and their pay codes
+      responses:
+        '200': { description: Duties, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Duty' } } } } }
+    put:
+      tags: [Pay items]
+      operationId: setDuties
+      summary: Add, rename or retire duties (one change set)
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Duty' } } } }
+      responses:
+        '201': { $ref: '#/components/responses/ChangeSetCreated' }
+        '422': { $ref: '#/components/responses/Refused' }
+
+  /assignments/{assignmentId}/pay-items:
+    get:
+      tags: [Pay items]
+      operationId: listPayItems
+      summary: Allowances, stipends, duty rates and on-call pay of one position, as of a date
+      parameters: [ { $ref: '#/components/parameters/AssignmentId' }, { $ref: '#/components/parameters/AsOf' } ]
+      responses:
+        '200': { description: Pay items, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/PayItem' } } } } }
+    post:
+      tags: [Pay items]
+      operationId: setPayItem
+      summary: Start, change or end a pay item from a date (one change set)
+      parameters: [ { $ref: '#/components/parameters/AssignmentId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/PayItem' } } }
+      responses:
+        '201': { $ref: '#/components/responses/ChangeSetCreated' }
+        '422': { $ref: '#/components/responses/Refused' }
+
+  # ------------------------------------------------------------------ Review sections (§5)
+  /reviews/{reviewId}/sections:
+    get:
+      tags: [Review sections]
+      operationId: listReviewSections
+      summary: Sections of a review, one per position held in the cycle, with the overall rating
+      parameters: [ { $ref: '#/components/parameters/ReviewId' } ]
+      responses:
+        '200':
+          description: Sections and overall
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sections, overallMethod]
+                properties:
+                  sections: { type: array, items: { $ref: '#/components/schemas/ReviewSection' } }
+                  overallMethod: { type: string, enum: [fte_weighted, primary_manager, none] }
+                  overall: { type: [string, 'null'] }
+                  score: { type: [string, 'null'] }
+                  weightsPct: { type: object, additionalProperties: { type: string } }
+    post:
+      tags: [Review sections]
+      operationId: openReviewSections
+      summary: Create the sections from the assignments held in the cycle, with owners, contributors, FTE and days
+      parameters: [ { $ref: '#/components/parameters/ReviewId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      responses:
+        '201': { description: Sections created, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/ReviewSection' } } } } }
+        '422': { $ref: '#/components/responses/Refused' }
+
+  /review-sections/{sectionId}:
+    patch:
+      tags: [Review sections]
+      operationId: rateReviewSection
+      summary: The section owner rates or submits a section; the overall rating is recomputed
+      parameters: [ { $ref: '#/components/parameters/SectionId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ratingScore: { type: string }
+                ratingLabel: { type: string }
+                status: { type: string, enum: [in_progress, submitted, signed] }
+                competencyAssessments:
+                  type: array
+                  description: Assessments made in this section; stored with the section's assignment
+                  items: { type: object, required: [competencyCode, assessedLevel], properties: { competencyCode: { type: string }, assessedLevel: { type: integer, minimum: 1 } } }
+      responses:
+        '200': { description: Updated section, content: { application/json: { schema: { $ref: '#/components/schemas/ReviewSection' } } } }
+        '422': { $ref: '#/components/responses/Refused' }
+
+  # ------------------------------------------------------------------ Benefit changes (§6)
+  /end-reasons:
+    get:
+      tags: [Benefit changes]
+      operationId: listEndReasons
+      summary: The tenant's end reasons with their categories
+      responses:
+        '200': { description: End reasons, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/EndReason' } } } } }
+    put:
+      tags: [Benefit changes]
+      operationId: setEndReasons
+      summary: Add or change end reasons (one change set)
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/EndReason' } } } }
+      responses:
+        '201': { $ref: '#/components/responses/ChangeSetCreated' }
+
+  /benefit-change-rules:
+    get:
+      tags: [Benefit changes]
+      operationId: listBenefitChangeRules
+      summary: The organization's rules in priority order, as of a date
+      parameters: [ { $ref: '#/components/parameters/AsOf' } ]
+      responses:
+        '200': { description: Rules, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/BenefitChangeRule' } } } } }
+    put:
+      tags: [Benefit changes]
+      operationId: setBenefitChangeRules
+      summary: Replace the rule set from a date, optionally starting from rules/benefits/benefit-change-rule-templates.json (one change set)
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [effectiveFrom, rules]
+              properties:
+                effectiveFrom: { type: string, format: date }
+                rules: { type: array, items: { $ref: '#/components/schemas/BenefitChangeRule' } }
+      responses:
+        '201': { $ref: '#/components/responses/ChangeSetCreated' }
+        '422': { $ref: '#/components/responses/Refused' }
+
+  /assignments/{assignmentId}/end/benefit-preview:
+    post:
+      tags: [Benefit changes]
+      operationId: previewBenefitChanges
+      summary: Proposed benefit decisions if this position ends on a date for a reason
+      description: Same calculation as reference/several_positions_reference.py benefit_outcome, for every enrolment the end affects. Nothing is stored; ending the assignment stores the decisions in its change set.
+      parameters: [ { $ref: '#/components/parameters/AssignmentId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [endDate, endReason]
+              properties:
+                endDate: { type: string, format: date }
+                endReason: { type: string }
+                noticeOwedWeeks: { type: integer, minimum: 0, description: Default from the notice calculation in Module 11 }
+      responses:
+        '200': { description: One proposal per affected enrolment, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/BenefitChangeDecision' } } } } }
+
+  /benefit-change-decisions:
+    get:
+      tags: [Benefit changes]
+      operationId: listBenefitChangeDecisions
+      summary: Decisions by status (HR's queue is status=hr_review)
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [proposed, hr_review, decided, applied, cancelled] } }
+        - { $ref: '#/components/parameters/Cursor' }
+        - { $ref: '#/components/parameters/Limit' }
+      responses:
+        '200': { description: Decisions, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/BenefitChangeDecision' } } } } }
+
+  /benefit-change-decisions/{decisionId}/decide:
+    post:
+      tags: [Benefit changes]
+      operationId: decideBenefitChange
+      summary: HR confirms or changes a proposal
+      description: Refused with statutory_floor_respected when coverage would end before the statutory floor, case_by_case_needs_reason when no rule applies and no reason is given, override_needs_reason when the date differs from the proposal without a reason.
+      parameters: [ { $ref: '#/components/parameters/DecisionId' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outcome]
+              properties:
+                outcome: { type: string, enum: [no_change, continue_until, end_on_date] }
+                coverageUntil: { type: string, format: date }
+                offerConversion: { type: boolean }
+                reason: { type: string, maxLength: 4000 }
+      responses:
+        '200': { description: Decided, content: { application/json: { schema: { $ref: '#/components/schemas/BenefitChangeDecision' } } } }
+        '422': { $ref: '#/components/responses/Refused' }
+
+components:
+  parameters:
+    AsOf: { name: asOf, in: query, description: Business date for the read, schema: { type: string, format: date } }
+    Cursor: { name: cursor, in: query, schema: { type: string } }
+    Limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, maxLength: 200 } }
+    AssignmentId: { name: assignmentId, in: path, required: true, schema: { type: string, format: uuid } }
+    PartId: { name: partId, in: path, required: true, schema: { type: string, format: uuid } }
+    ReviewId: { name: reviewId, in: path, required: true, schema: { type: string, format: uuid } }
+    SectionId: { name: sectionId, in: path, required: true, schema: { type: string, format: uuid } }
+    DecisionId: { name: decisionId, in: path, required: true, schema: { type: string, format: uuid } }
+
+  responses:
+    ChangeSetCreated:
+      description: Change set created; commit it through /change-sets
+      content:
+        application/json:
+          schema: { type: object, required: [changeSetId, status], properties: { changeSetId: { type: string, format: uuid }, status: { type: string } } }
+    Refused:
+      description: Refused by a rule; the problem detail carries the code (for example COVERAGE_WINDOW_INVALID, SELF_APPROVAL, DECISION_NOT_ALLOWED, DECISION_TWICE, APPROVAL_PART_IMMUTABLE, NO_EARNINGS_TO_SHARE, SELF_REVIEW, ENROLMENT_NEEDS_ASSIGNMENT, ENROLMENT_AGREEMENT_MISMATCH, statutory_floor_respected)
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            required: [type, title, code]
+            properties:
+              type: { type: string }
+              title: { type: string }
+              code: { type: string }
+              params: { type: object, additionalProperties: true }
+
+  schemas:
+    Decimal: { type: string, pattern: '^-?[0-9]+(\.[0-9]+)?$', examples: ['7.50'] }
+    Capability: { type: string, enum: [leave, time, overtime, expense, availability] }
+    RollUpStatus: { type: string, enum: [requested, approved, partially_approved, declined, cancelled] }
+    ApprovalPolicy:
+      type: object
+      required: [capability, mode]
+      properties:
+        capability: { $ref: '#/components/schemas/Capability' }
+        mode: { type: string, enum: [by_coverage, all, any], description: When not given, the organization's setting approvals.multi_manager_mode }
+        overlap: { type: string, enum: [all, any], description: When not given, the organization's setting approvals.multi_manager_overlap }
+        uncovered: { type: string, enum: [line, hr], description: When not given, the organization's setting approvals.uncovered_time }
+    ApprovalCoverage:
+      type: object
+      required: [approver]
+      properties:
+        approver: { type: string, enum: [line, relationship] }
+        relationshipId: { type: string, format: uuid, description: Required when approver is relationship }
+        capabilities: { type: array, items: { $ref: '#/components/schemas/Capability' }, description: When not given, the organization's setting approvals.coverage_capabilities }
+        daysOfWeek: { type: array, items: { type: integer, minimum: 1, maximum: 7 }, description: ISO weekday of the shift's start }
+        timeWindows: { type: array, items: { type: array, items: { type: string, pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]|24:00$' }, minItems: 2, maxItems: 2 }, examples: [[['08:00', '14:00'], ['22:00', '06:00']]] }
+        locationIds: { type: array, items: { type: string, format: uuid } }
+    SplitResult:
+      type: object
+      required: [components, skipped, totalHours]
+      properties:
+        components:
+          type: array
+          items:
+            type: object
+            required: [assignmentId, minutes, hours, parts]
+            properties:
+              assignmentId: { type: string, format: uuid }
+              planCode: { type: string }
+              minutes: { type: integer }
+              hours: { $ref: '#/components/schemas/Decimal' }
+              intervals: { type: array, items: { type: object, properties: { start: { type: string }, end: { type: string }, workDay: { type: string, format: date } } } }
+              parts:
+                type: array
+                items:
+                  type: object
+                  required: [approvers, rule, minutes, hours]
+                  properties:
+                    approvers: { type: array, items: { type: string, format: uuid } }
+                    rule: { type: string, enum: [all, any] }
+                    routedBy: { type: string, enum: [coverage, uncovered_line, uncovered_hr, all, any, escalated] }
+                    minutes: { type: integer }
+                    hours: { $ref: '#/components/schemas/Decimal' }
+        skipped: { type: array, items: { type: object, properties: { assignmentId: { type: string, format: uuid }, reason: { type: string, enum: [NOT_SCHEDULED, NO_WORK_IN_RANGE] } } } }
+        totalHours: { $ref: '#/components/schemas/Decimal' }
+    ApprovalPart:
+      type: object
+      required: [partId, subjectType, subjectId, assignmentId, approvers, rule, minutes, status]
+      properties:
+        partId: { type: string, format: uuid }
+        subjectType: { type: string, enum: [leave_request, timesheet, overtime_preauth, availability_change] }
+        subjectId: { type: string, format: uuid }
+        assignmentId: { type: string, format: uuid }
+        seq: { type: integer }
+        approvers: { type: array, items: { type: string, format: uuid } }
+        rule: { type: string, enum: [all, any] }
+        minutes: { type: integer }
+        hours: { $ref: '#/components/schemas/Decimal' }
+        routedBy: { type: string, enum: [coverage, uncovered_line, uncovered_hr, all, any, escalated] }
+        status: { type: string, enum: [pending, approved, declined, cancelled] }
+        decisions: { type: array, items: { type: object, properties: { approver: { type: string, format: uuid }, decision: { type: string, enum: [approve, decline] }, at: { type: string, format: date-time } } } }
+    Duty:
+      type: object
+      required: [dutyCode, nameEn, payCode]
+      properties:
+        dutyCode: { type: string, examples: [DRIVING] }
+        nameEn: { type: string }
+        nameFr: { type: string }
+        payCode: { type: string }
+        status: { type: string, enum: [active, retired] }
+    PayItem:
+      type: object
+      required: [kind, payCode, basis, source, effectiveFrom]
+      properties:
+        payItemId: { type: string, format: uuid }
+        kind: { type: string, enum: [allowance, stipend, duty_rate, duty_premium, on_call, other] }
+        payCode: { type: string }
+        dutyCode: { type: string, description: Required for duty_rate and duty_premium }
+        basis: { type: string, enum: [per_pay_period, per_month, per_year, per_day_worked, per_shift, per_hour_worked, per_duty_hour, rate_for_duty_hours, percent_of_base] }
+        amount: { $ref: '#/components/schemas/Decimal' }
+        percent: { $ref: '#/components/schemas/Decimal' }
+        appliesWhen: { type: object, additionalProperties: true }
+        costTarget: { type: string, enum: [assignment, explicit], description: When not given, the organization's setting pay_items.default_cost_target }
+        costLines: { type: array, items: { type: object, additionalProperties: true } }
+        source: { type: string, enum: [agreement, policy, offer, compensation_decision, manual] }
+        reason: { type: string, description: Required when source is manual }
+        effectiveFrom: { type: string, format: date }
+        effectiveTo: { type: string, format: date }
+    ReviewSection:
+      type: object
+      required: [sectionId, assignmentId, ownerAssignmentId, fte, daysInCycle]
+      properties:
+        sectionId: { type: string, format: uuid }
+        assignmentId: { type: string, format: uuid }
+        positionTitle: { type: string }
+        ownerAssignmentId: { type: string, format: uuid }
+        contributorAssignmentIds: { type: array, items: { type: string, format: uuid } }
+        fte: { $ref: '#/components/schemas/Decimal' }
+        daysInCycle: { type: integer }
+        rated: { type: boolean }
+        countsInOverall: { type: boolean, description: False when unrated or held fewer than minSectionDays }
+        ratingScore: { type: [string, 'null'] }
+        ratingLabel: { type: [string, 'null'] }
+        status: { type: string, enum: [not_started, in_progress, submitted, signed] }
+    EndReason:
+      type: object
+      required: [code, nameEn, category, employerInitiated]
+      properties:
+        code: { type: string }
+        nameEn: { type: string }
+        nameFr: { type: string }
+        category: { type: string, enum: [resignation, retirement, end_of_term, layoff, position_eliminated, termination_without_cause, termination_with_cause, reduction_by_employer, transfer, death, other] }
+        employerInitiated: { type: boolean }
+        appliesTo: { type: string, enum: [assignment, employment, both] }
+    BenefitChangeRule:
+      type: object
+      required: [code, nameEn, priority, match, action]
+      properties:
+        ruleId: { type: string, format: uuid }
+        code: { type: string }
+        nameEn: { type: string }
+        nameFr: { type: string }
+        priority: { type: integer }
+        match:
+          type: object
+          properties:
+            planKinds: { type: array, items: { type: string } }
+            planIds: { type: array, items: { type: string, format: uuid } }
+            scopes: { type: array, items: { type: string, enum: [employer, agreement, assignment] } }
+            endReasonCategories: { type: array, items: { type: string } }
+            employerInitiated: { type: boolean }
+            jurisdictions: { type: array, items: { type: string } }
+            agreementIds: { type: array, items: { type: string } }
+            employmentContinues: { type: boolean }
+        action: { type: string, enum: [continue_until, end_on_date, hr_decides] }
+        untilRule: { type: object, properties: { kind: { type: string, enum: [end_of_month, end_of_next_month, days, weeks, end_of_notice, date] }, n: { type: integer }, date: { type: string, format: date } } }
+        offerConversion: { type: boolean }
+        cite: { type: string }
+    BenefitChangeDecision:
+      type: object
+      required: [enrolmentId, planCode, endDate, eligibleAfter, fteAfter, proposedOutcome, outcome, status]
+      properties:
+        decisionId: { type: string, format: uuid }
+        enrolmentId: { type: string, format: uuid }
+        planCode: { type: string }
+        endedAssignmentId: { type: string, format: uuid }
+        endDate: { type: string, format: date }
+        endReason: { type: string }
+        eligibleAfter: { type: boolean }
+        fteAfter: { $ref: '#/components/schemas/Decimal' }
+        ruleCode: { type: [string, 'null'] }
+        statutoryFloorUntil: { type: [string, 'null'], format: date }
+        statutoryBasis: { type: [string, 'null'] }
+        proposedOutcome: { type: string, enum: [no_change, continue_until, end_on_date, hr_decides] }
+        proposedUntil: { type: [string, 'null'], format: date }
+        outcome: { type: string, enum: [no_change, continue_until, end_on_date, hr_decides] }
+        coverageUntil: { type: [string, 'null'], format: date }
+        offerConversion: { type: boolean }
+        reasons: { type: array, items: { type: string }, examples: [['RULE:R20', 'STATUTORY_FLOOR']] }
+        warnings: { type: array, items: { type: string, enum: [COMMON_LAW_REVIEW, RULE_NOT_VERIFIED] } }
+        status: { type: string, enum: [proposed, hr_review, decided, applied, cancelled] }
+        reason: { type: string }

@@ -1,0 +1,111 @@
+{
+  "$comment": "Additions to the employment standards edition from the Core HR review (docs/21 §7.2 and §8.1). Merged into rules/employment-standards/ca-2026.json as new keys of each jurisdiction in Step 7, before the edition is tested; a tested edition is never edited (AGENTS rule 15), so after that the keys go into the next edition. Every entry marked verify_at_load stops activation in production until employment counsel checks it, like every other verify_at_load value.",
+  "version": "2026-10-25",
+  "source_decisions": "claude/review/01-core-hr-decisions.md, rounds 5 and 6",
+  "keys": {
+    "agreement_may_replace": {
+      "meaning": "Which employment standards a collective agreement may replace in this jurisdiction, and how 'never less than the law' is tested. Where a standard is not listed in 'standards', CanDo pays at least the law's minimum even when the agreement's own rule is lower, whatever anyone approves.",
+      "fields": {
+        "status": "verified | secondary | verify_at_load",
+        "standards": "standards an agreement may replace when it addresses the matter (codes as in docs/21 §8.1)",
+        "always_apply": "standards that apply to unionized employees whatever the agreement says",
+        "greater_right_test": "per_standard | per_hour | not_applicable: the test the statute itself uses",
+        "cite": "statute and section",
+        "source": "URL"
+      }
+    },
+    "overpayment_recovery": {
+      "meaning": "Whether wages paid by mistake may be recovered from later pay without the employee's written authorization. CanDo's default (setting payroll.overpayment_recovery) is to require the written authorization everywhere; this key only matters when an organization chooses 'jurisdiction_rule_allows'.",
+      "fields": {
+        "status": "verified | secondary | verify_at_load",
+        "without_authorization": "allowed | not_allowed | verify_at_load",
+        "authorization_form": "what a valid written authorization must contain",
+        "cite": "statute and section",
+        "source": "URL"
+      }
+    }
+  },
+  "jurisdictions": {
+    "BC": {
+      "agreement_may_replace": {
+        "status": "secondary",
+        "standards": [
+          "hours_of_work_and_overtime",
+          "statutory_holidays",
+          "annual_vacation",
+          "special_clothing",
+          "seniority_retention_recall_termination_layoff"
+        ],
+        "exceptions": {
+          "hours_of_work_and_overtime": "not section 37 (averaging agreements)",
+          "statutory_holidays": "not the National Day for Truth and Reconciliation (s. 3(2.1))"
+        },
+        "always_apply": [
+          "minimum_wage",
+          "payroll_records",
+          "employment_of_children",
+          "no_charge_for_hiring",
+          "gratuities",
+          "national_day_for_truth_and_reconciliation"
+        ],
+        "condition": "The agreement's provisions on the matter replace the Act only when, taken together, they meet or exceed the Act's requirements on that matter; if the agreement is silent on a matter, the Act's provisions are deemed part of the agreement (s. 3(3)).",
+        "greater_right_test": "per_standard",
+        "cite": "Employment Standards Act, RSBC 1996, c. 113, s. 3",
+        "source": "https://www2.gov.bc.ca/gov/content/employment-business/employment-standards-advice/employment-standards/forms-resources/igm/esa-part-1-section-3"
+      },
+      "overpayment_recovery": {
+        "status": "verify_at_load",
+        "without_authorization": "verify_at_load",
+        "authorization_form": "verify_at_load",
+        "cite": "Employment Standards Act, RSBC 1996, c. 113, ss. 21–22",
+        "source": null
+      }
+    },
+    "ON": {
+      "agreement_may_replace": {
+        "status": "secondary",
+        "standards": [],
+        "always_apply": ["all"],
+        "condition": "No one can contract out of or waive an employment standard. A provision of a collective agreement that gives a greater right or benefit than a standard on the same subject matter applies instead of that standard; otherwise the standard applies.",
+        "greater_right_test": "per_standard",
+        "cite": "Employment Standards Act, 2000, SO 2000, c. 41, s. 5",
+        "source": "https://www.ontario.ca/laws/statute/00e41"
+      },
+      "overpayment_recovery": {
+        "status": "secondary",
+        "without_authorization": "not_allowed",
+        "authorization_form": "Written authorization that refers to a specific amount or gives a formula from which a specific amount can be calculated",
+        "cite": "Employment Standards Act, 2000, SO 2000, c. 41, s. 13",
+        "source": "https://www.ontario.ca/laws/statute/00e41"
+      }
+    },
+    "FED": { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "NL":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "PE":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "NS":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "NB":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "QC":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "MB":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "SK":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "AB":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "YT":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "NT":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } },
+    "NU":  { "agreement_may_replace": { "status": "verify_at_load" }, "overpayment_recovery": { "status": "verify_at_load", "without_authorization": "verify_at_load" } }
+  },
+  "agreement_schema_addition": {
+    "$comment": "Added to rules/agreements/agreement.schema.json in Step 7 with the families in docs/17 §11.3.",
+    "standardsComparison": {
+      "type": "object",
+      "required": ["method"],
+      "properties": {
+        "method": { "enum": ["per_hour", "whole_standard"], "default": "per_hour" },
+        "confirmedByCounsel": {
+          "type": "object",
+          "description": "Required when method is whole_standard",
+          "properties": { "name": { "type": "string" }, "date": { "type": "string", "format": "date" }, "documentId": { "type": "string" } }
+        }
+      }
+    },
+    "preparedBy": { "enum": ["cando", "partner", "customer"] }
+  }
+}

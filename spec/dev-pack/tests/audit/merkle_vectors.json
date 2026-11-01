@@ -1,0 +1,1007 @@
+{
+  "description": "Audit integrity test vectors produced by reference/audit_merkle_reference.py. The production code must reproduce every hash byte for byte.",
+  "cases": [
+    {
+      "batch_no": 1,
+      "rows": [],
+      "leaf_hashes": [],
+      "merkle_root": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "prev_batch_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "header": {
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "batch_no": 1,
+        "first_audit_id": null,
+        "last_audit_id": null,
+        "leaf_count": 0,
+        "sealed_at": "2026-10-18T15:00:00.000000Z"
+      },
+      "batch_hash": "10650989b15c11d4532ac14511854f248990b9ebd32df13da46f29eae9df691b",
+      "proofs": []
+    },
+    {
+      "batch_no": 2,
+      "rows": [
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1001,
+          "occurred_at": "2026-10-18T14:01:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0001",
+          "change_set_id": "cs-0001",
+          "before": null,
+          "after": {
+            "content_sha256": "648a2d0e628d48c45f875576483e57ca9f6c18aa37ca626ac7541d63fb2418b5"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        }
+      ],
+      "leaf_hashes": [
+        "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a"
+      ],
+      "merkle_root": "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+      "prev_batch_hash": "10650989b15c11d4532ac14511854f248990b9ebd32df13da46f29eae9df691b",
+      "header": {
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "batch_no": 2,
+        "first_audit_id": 1001,
+        "last_audit_id": 1001,
+        "leaf_count": 1,
+        "sealed_at": "2026-10-18T15:00:00.000000Z"
+      },
+      "batch_hash": "c71b1c9b713f20e599959d2951eb8746ff9e3668d5713640e9af6e893a063d5c",
+      "proofs": [
+        {
+          "index": 0,
+          "path": []
+        }
+      ]
+    },
+    {
+      "batch_no": 3,
+      "rows": [
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1001,
+          "occurred_at": "2026-10-18T14:01:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0001",
+          "change_set_id": "cs-0001",
+          "before": null,
+          "after": {
+            "content_sha256": "648a2d0e628d48c45f875576483e57ca9f6c18aa37ca626ac7541d63fb2418b5"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1002,
+          "occurred_at": "2026-10-18T14:02:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0002",
+          "change_set_id": "cs-0002",
+          "before": null,
+          "after": {
+            "content_sha256": "05da017bff325c64873aecbfb3efc954188c0642efa1e02b2e493c680a8f3551"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        }
+      ],
+      "leaf_hashes": [
+        "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+        "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e"
+      ],
+      "merkle_root": "bc8bee9bfc9311e0b10562e5924d4bf28ee93033173ceb8c2ef8a2d25c100c61",
+      "prev_batch_hash": "c71b1c9b713f20e599959d2951eb8746ff9e3668d5713640e9af6e893a063d5c",
+      "header": {
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "batch_no": 3,
+        "first_audit_id": 1001,
+        "last_audit_id": 1002,
+        "leaf_count": 2,
+        "sealed_at": "2026-10-18T15:00:00.000000Z"
+      },
+      "batch_hash": "f102493632538611977309c6c8bc11e7cc138c16b04cf844ddc2da30886d27e6",
+      "proofs": [
+        {
+          "index": 0,
+          "path": [
+            "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e"
+          ]
+        },
+        {
+          "index": 1,
+          "path": [
+            "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a"
+          ]
+        }
+      ]
+    },
+    {
+      "batch_no": 4,
+      "rows": [
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1001,
+          "occurred_at": "2026-10-18T14:01:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0001",
+          "change_set_id": "cs-0001",
+          "before": null,
+          "after": {
+            "content_sha256": "648a2d0e628d48c45f875576483e57ca9f6c18aa37ca626ac7541d63fb2418b5"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1002,
+          "occurred_at": "2026-10-18T14:02:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0002",
+          "change_set_id": "cs-0002",
+          "before": null,
+          "after": {
+            "content_sha256": "05da017bff325c64873aecbfb3efc954188c0642efa1e02b2e493c680a8f3551"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1003,
+          "occurred_at": "2026-10-18T14:03:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0003",
+          "change_set_id": "cs-0003",
+          "before": null,
+          "after": {
+            "content_sha256": "8fa5308588b0e18507527c6e35ba3f9e2eeb2c89f7943b200d3521a5d1ff0ddd"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        }
+      ],
+      "leaf_hashes": [
+        "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+        "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e",
+        "e95b239dcfa3d962f669dab17ba8d5f57616e07eb6acbb98e4d9bb755934f920"
+      ],
+      "merkle_root": "455da3551120be9c12d955f4077863bee8ecd1a613191d7e9da40057f4d382ea",
+      "prev_batch_hash": "f102493632538611977309c6c8bc11e7cc138c16b04cf844ddc2da30886d27e6",
+      "header": {
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "batch_no": 4,
+        "first_audit_id": 1001,
+        "last_audit_id": 1003,
+        "leaf_count": 3,
+        "sealed_at": "2026-10-18T15:00:00.000000Z"
+      },
+      "batch_hash": "81a5c9b54cd36b1ce2707c021e500885458903bcfd6f42e36c5c608af4880b19",
+      "proofs": [
+        {
+          "index": 0,
+          "path": [
+            "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e",
+            "e95b239dcfa3d962f669dab17ba8d5f57616e07eb6acbb98e4d9bb755934f920"
+          ]
+        },
+        {
+          "index": 1,
+          "path": [
+            "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+            "e95b239dcfa3d962f669dab17ba8d5f57616e07eb6acbb98e4d9bb755934f920"
+          ]
+        },
+        {
+          "index": 2,
+          "path": [
+            "bc8bee9bfc9311e0b10562e5924d4bf28ee93033173ceb8c2ef8a2d25c100c61"
+          ]
+        }
+      ]
+    },
+    {
+      "batch_no": 5,
+      "rows": [
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1001,
+          "occurred_at": "2026-10-18T14:01:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0001",
+          "change_set_id": "cs-0001",
+          "before": null,
+          "after": {
+            "content_sha256": "648a2d0e628d48c45f875576483e57ca9f6c18aa37ca626ac7541d63fb2418b5"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1002,
+          "occurred_at": "2026-10-18T14:02:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0002",
+          "change_set_id": "cs-0002",
+          "before": null,
+          "after": {
+            "content_sha256": "05da017bff325c64873aecbfb3efc954188c0642efa1e02b2e493c680a8f3551"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1003,
+          "occurred_at": "2026-10-18T14:03:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0003",
+          "change_set_id": "cs-0003",
+          "before": null,
+          "after": {
+            "content_sha256": "8fa5308588b0e18507527c6e35ba3f9e2eeb2c89f7943b200d3521a5d1ff0ddd"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1004,
+          "occurred_at": "2026-10-18T14:04:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0004",
+          "change_set_id": "cs-0004",
+          "before": null,
+          "after": {
+            "content_sha256": "52d1e422f1bb3352787177bc24e168cd34bb5eeb3a963417e1e0ae7ac2a7eddc"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1005,
+          "occurred_at": "2026-10-18T14:05:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0005",
+          "change_set_id": "cs-0005",
+          "before": null,
+          "after": {
+            "content_sha256": "bec27fed296c8eae3315a8648d96921f86d8b742d63a32d43d97b2cc26212a91"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        }
+      ],
+      "leaf_hashes": [
+        "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+        "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e",
+        "e95b239dcfa3d962f669dab17ba8d5f57616e07eb6acbb98e4d9bb755934f920",
+        "7e9a10c9b3fdbe20b7e505ad9a37011ecdb7a80ba5889ab107beb88b8afa7a9a",
+        "10da1aa2481747d5eaaa9ddb4b4cc92283588025f43ee1a27a0a5f29028f2b38"
+      ],
+      "merkle_root": "9ee7e4b40dbe443c9b68d69b16aeb9144e51e504144ade03dbfbf62158113add",
+      "prev_batch_hash": "81a5c9b54cd36b1ce2707c021e500885458903bcfd6f42e36c5c608af4880b19",
+      "header": {
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "batch_no": 5,
+        "first_audit_id": 1001,
+        "last_audit_id": 1005,
+        "leaf_count": 5,
+        "sealed_at": "2026-10-18T15:00:00.000000Z"
+      },
+      "batch_hash": "6f870bb4df85bb1572f77b96941295b5c5220b6ecdf0531453bc08e1e87fb90b",
+      "proofs": [
+        {
+          "index": 0,
+          "path": [
+            "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e",
+            "f1a04f1c370d5b212c6fe05349d622cfa0e7a5c71b487b02a6650910d26dc909",
+            "10da1aa2481747d5eaaa9ddb4b4cc92283588025f43ee1a27a0a5f29028f2b38"
+          ]
+        },
+        {
+          "index": 1,
+          "path": [
+            "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+            "f1a04f1c370d5b212c6fe05349d622cfa0e7a5c71b487b02a6650910d26dc909",
+            "10da1aa2481747d5eaaa9ddb4b4cc92283588025f43ee1a27a0a5f29028f2b38"
+          ]
+        },
+        {
+          "index": 2,
+          "path": [
+            "7e9a10c9b3fdbe20b7e505ad9a37011ecdb7a80ba5889ab107beb88b8afa7a9a",
+            "bc8bee9bfc9311e0b10562e5924d4bf28ee93033173ceb8c2ef8a2d25c100c61",
+            "10da1aa2481747d5eaaa9ddb4b4cc92283588025f43ee1a27a0a5f29028f2b38"
+          ]
+        },
+        {
+          "index": 3,
+          "path": [
+            "e95b239dcfa3d962f669dab17ba8d5f57616e07eb6acbb98e4d9bb755934f920",
+            "bc8bee9bfc9311e0b10562e5924d4bf28ee93033173ceb8c2ef8a2d25c100c61",
+            "10da1aa2481747d5eaaa9ddb4b4cc92283588025f43ee1a27a0a5f29028f2b38"
+          ]
+        },
+        {
+          "index": 4,
+          "path": [
+            "aa9716806885e9b72754243453a87bbd268f344a53d91e7f5b1706432ec5fa14"
+          ]
+        }
+      ]
+    },
+    {
+      "batch_no": 6,
+      "rows": [
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1001,
+          "occurred_at": "2026-10-18T14:01:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0001",
+          "change_set_id": "cs-0001",
+          "before": null,
+          "after": {
+            "content_sha256": "648a2d0e628d48c45f875576483e57ca9f6c18aa37ca626ac7541d63fb2418b5"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1002,
+          "occurred_at": "2026-10-18T14:02:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0002",
+          "change_set_id": "cs-0002",
+          "before": null,
+          "after": {
+            "content_sha256": "05da017bff325c64873aecbfb3efc954188c0642efa1e02b2e493c680a8f3551"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1003,
+          "occurred_at": "2026-10-18T14:03:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0003",
+          "change_set_id": "cs-0003",
+          "before": null,
+          "after": {
+            "content_sha256": "8fa5308588b0e18507527c6e35ba3f9e2eeb2c89f7943b200d3521a5d1ff0ddd"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1004,
+          "occurred_at": "2026-10-18T14:04:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0004",
+          "change_set_id": "cs-0004",
+          "before": null,
+          "after": {
+            "content_sha256": "52d1e422f1bb3352787177bc24e168cd34bb5eeb3a963417e1e0ae7ac2a7eddc"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1005,
+          "occurred_at": "2026-10-18T14:05:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0005",
+          "change_set_id": "cs-0005",
+          "before": null,
+          "after": {
+            "content_sha256": "bec27fed296c8eae3315a8648d96921f86d8b742d63a32d43d97b2cc26212a91"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1006,
+          "occurred_at": "2026-10-18T14:06:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0006",
+          "change_set_id": "cs-0006",
+          "before": null,
+          "after": {
+            "content_sha256": "d38c54677eb1384e4a539df2218ed01c7c14b723fef55069a883cbefe397cb6b"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1007,
+          "occurred_at": "2026-10-18T14:07:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0007",
+          "change_set_id": "cs-0007",
+          "before": null,
+          "after": {
+            "content_sha256": "08656071ae35f4381b998e362e82a2a7f7f62ecf1ead7c68a4125ea54ee3d566"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1008,
+          "occurred_at": "2026-10-18T14:08:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0008",
+          "change_set_id": "cs-0008",
+          "before": null,
+          "after": {
+            "content_sha256": "c2a22dbfc6aa8d3ab25b1a0b6515cf7307323cc0cf6b8060838a8c12ef593752"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        }
+      ],
+      "leaf_hashes": [
+        "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+        "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e",
+        "e95b239dcfa3d962f669dab17ba8d5f57616e07eb6acbb98e4d9bb755934f920",
+        "7e9a10c9b3fdbe20b7e505ad9a37011ecdb7a80ba5889ab107beb88b8afa7a9a",
+        "10da1aa2481747d5eaaa9ddb4b4cc92283588025f43ee1a27a0a5f29028f2b38",
+        "67364e479ea07571edc1e1e040ecbf37eb50aab1ca7fe36232a275e77add88f3",
+        "03ac462fbf92e4ff6e484cdb512bacea87a41878aa20da3b76df0dee68cf41fa",
+        "73aad4f20cc76ed7cf1d1ce91d1fd300318ece4aba257d0dcdf41ad9445698a0"
+      ],
+      "merkle_root": "881c0a8e7393158c9b9b9b139d05cf09db3907da1603fce10a59daf41c8ff7d6",
+      "prev_batch_hash": "6f870bb4df85bb1572f77b96941295b5c5220b6ecdf0531453bc08e1e87fb90b",
+      "header": {
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "batch_no": 6,
+        "first_audit_id": 1001,
+        "last_audit_id": 1008,
+        "leaf_count": 8,
+        "sealed_at": "2026-10-18T15:00:00.000000Z"
+      },
+      "batch_hash": "b0fcab12a36e2bb42f3215b8745ec7c12189a66da92ae515ca97161f4adc2b2d",
+      "proofs": [
+        {
+          "index": 0,
+          "path": [
+            "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e",
+            "f1a04f1c370d5b212c6fe05349d622cfa0e7a5c71b487b02a6650910d26dc909",
+            "855df9b3d923c38823bf3a4aee9a7ce440677e07e91b178f7f1f06f76560b7f5"
+          ]
+        },
+        {
+          "index": 1,
+          "path": [
+            "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+            "f1a04f1c370d5b212c6fe05349d622cfa0e7a5c71b487b02a6650910d26dc909",
+            "855df9b3d923c38823bf3a4aee9a7ce440677e07e91b178f7f1f06f76560b7f5"
+          ]
+        },
+        {
+          "index": 2,
+          "path": [
+            "7e9a10c9b3fdbe20b7e505ad9a37011ecdb7a80ba5889ab107beb88b8afa7a9a",
+            "bc8bee9bfc9311e0b10562e5924d4bf28ee93033173ceb8c2ef8a2d25c100c61",
+            "855df9b3d923c38823bf3a4aee9a7ce440677e07e91b178f7f1f06f76560b7f5"
+          ]
+        },
+        {
+          "index": 3,
+          "path": [
+            "e95b239dcfa3d962f669dab17ba8d5f57616e07eb6acbb98e4d9bb755934f920",
+            "bc8bee9bfc9311e0b10562e5924d4bf28ee93033173ceb8c2ef8a2d25c100c61",
+            "855df9b3d923c38823bf3a4aee9a7ce440677e07e91b178f7f1f06f76560b7f5"
+          ]
+        },
+        {
+          "index": 4,
+          "path": [
+            "67364e479ea07571edc1e1e040ecbf37eb50aab1ca7fe36232a275e77add88f3",
+            "4488bbc6f7945c3e4da9014eceecf95b6c43b17d89539711e90fe40a07c267b9",
+            "aa9716806885e9b72754243453a87bbd268f344a53d91e7f5b1706432ec5fa14"
+          ]
+        },
+        {
+          "index": 5,
+          "path": [
+            "10da1aa2481747d5eaaa9ddb4b4cc92283588025f43ee1a27a0a5f29028f2b38",
+            "4488bbc6f7945c3e4da9014eceecf95b6c43b17d89539711e90fe40a07c267b9",
+            "aa9716806885e9b72754243453a87bbd268f344a53d91e7f5b1706432ec5fa14"
+          ]
+        },
+        {
+          "index": 6,
+          "path": [
+            "73aad4f20cc76ed7cf1d1ce91d1fd300318ece4aba257d0dcdf41ad9445698a0",
+            "823fff8e4b56d08c8cb74a1f350402f4f946c93dde6d739395dd06c822f894ef",
+            "aa9716806885e9b72754243453a87bbd268f344a53d91e7f5b1706432ec5fa14"
+          ]
+        },
+        {
+          "index": 7,
+          "path": [
+            "03ac462fbf92e4ff6e484cdb512bacea87a41878aa20da3b76df0dee68cf41fa",
+            "823fff8e4b56d08c8cb74a1f350402f4f946c93dde6d739395dd06c822f894ef",
+            "aa9716806885e9b72754243453a87bbd268f344a53d91e7f5b1706432ec5fa14"
+          ]
+        }
+      ]
+    },
+    {
+      "batch_no": 7,
+      "rows": [
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1001,
+          "occurred_at": "2026-10-18T14:01:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0001",
+          "change_set_id": "cs-0001",
+          "before": null,
+          "after": {
+            "content_sha256": "648a2d0e628d48c45f875576483e57ca9f6c18aa37ca626ac7541d63fb2418b5"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1002,
+          "occurred_at": "2026-10-18T14:02:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0002",
+          "change_set_id": "cs-0002",
+          "before": null,
+          "after": {
+            "content_sha256": "05da017bff325c64873aecbfb3efc954188c0642efa1e02b2e493c680a8f3551"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1003,
+          "occurred_at": "2026-10-18T14:03:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0003",
+          "change_set_id": "cs-0003",
+          "before": null,
+          "after": {
+            "content_sha256": "8fa5308588b0e18507527c6e35ba3f9e2eeb2c89f7943b200d3521a5d1ff0ddd"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1004,
+          "occurred_at": "2026-10-18T14:04:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0004",
+          "change_set_id": "cs-0004",
+          "before": null,
+          "after": {
+            "content_sha256": "52d1e422f1bb3352787177bc24e168cd34bb5eeb3a963417e1e0ae7ac2a7eddc"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1005,
+          "occurred_at": "2026-10-18T14:05:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0005",
+          "change_set_id": "cs-0005",
+          "before": null,
+          "after": {
+            "content_sha256": "bec27fed296c8eae3315a8648d96921f86d8b742d63a32d43d97b2cc26212a91"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1006,
+          "occurred_at": "2026-10-18T14:06:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0006",
+          "change_set_id": "cs-0006",
+          "before": null,
+          "after": {
+            "content_sha256": "d38c54677eb1384e4a539df2218ed01c7c14b723fef55069a883cbefe397cb6b"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1007,
+          "occurred_at": "2026-10-18T14:07:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0007",
+          "change_set_id": "cs-0007",
+          "before": null,
+          "after": {
+            "content_sha256": "08656071ae35f4381b998e362e82a2a7f7f62ecf1ead7c68a4125ea54ee3d566"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1008,
+          "occurred_at": "2026-10-18T14:08:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0008",
+          "change_set_id": "cs-0008",
+          "before": null,
+          "after": {
+            "content_sha256": "c2a22dbfc6aa8d3ab25b1a0b6515cf7307323cc0cf6b8060838a8c12ef593752"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1009,
+          "occurred_at": "2026-10-18T14:09:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0009",
+          "change_set_id": "cs-0009",
+          "before": null,
+          "after": {
+            "content_sha256": "d6cb4ed94f324c5c2759f9210ea6bb2d3ff512d93d5a6e7ee7877dfaf0573eba"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1010,
+          "occurred_at": "2026-10-18T14:10:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0010",
+          "change_set_id": "cs-0010",
+          "before": null,
+          "after": {
+            "content_sha256": "ed4ed3cf3b00df82b0207949396a895d212e2a4559b66ff2f55d2f3ab8383984"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1011,
+          "occurred_at": "2026-10-18T14:11:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0011",
+          "change_set_id": "cs-0011",
+          "before": null,
+          "after": {
+            "content_sha256": "917bd5ca0aed1d6f5f8754684833cc0adeb4dcde47afe46cea99f25382e45818"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1012,
+          "occurred_at": "2026-10-18T14:12:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0012",
+          "change_set_id": "cs-0012",
+          "before": null,
+          "after": {
+            "content_sha256": "c65269d04e30573df8b9e2dd341d79efd4f3de161efd16022e2510f10c944c5f"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        },
+        {
+          "tenant_id": "11111111-1111-1111-1111-111111111111",
+          "audit_id": 1013,
+          "occurred_at": "2026-10-18T14:13:00.000000Z",
+          "actor_type": "user",
+          "actor_id": "user:hr-admin",
+          "on_behalf_of": null,
+          "action": "change_set.commit",
+          "subject_type": "change_set",
+          "subject_id": "cs-0013",
+          "change_set_id": "cs-0013",
+          "before": null,
+          "after": {
+            "content_sha256": "083739988432fe3372e02d2d77fde0cce92876bf252509fc9fc3b2867888c955"
+          },
+          "reason": "REORG",
+          "ip": "203.0.113.7"
+        }
+      ],
+      "leaf_hashes": [
+        "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+        "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e",
+        "e95b239dcfa3d962f669dab17ba8d5f57616e07eb6acbb98e4d9bb755934f920",
+        "7e9a10c9b3fdbe20b7e505ad9a37011ecdb7a80ba5889ab107beb88b8afa7a9a",
+        "10da1aa2481747d5eaaa9ddb4b4cc92283588025f43ee1a27a0a5f29028f2b38",
+        "67364e479ea07571edc1e1e040ecbf37eb50aab1ca7fe36232a275e77add88f3",
+        "03ac462fbf92e4ff6e484cdb512bacea87a41878aa20da3b76df0dee68cf41fa",
+        "73aad4f20cc76ed7cf1d1ce91d1fd300318ece4aba257d0dcdf41ad9445698a0",
+        "74184503e17dda5f9f08d986f206610802224aac32b803ba5cda4bc410fd94c5",
+        "cb8a367aa3606cf39936a7ba223f34edd9f1a915f659523b987213815c75c8e9",
+        "d8898924a3dce563b50d737bb00b70e72af6d0aab53aba125c68795241e0fcf6",
+        "482a43fed55eeaa7dadfb2162b0fa85475de19ed6514347b3697de7d3acfa116",
+        "fb2a0b4d72e1218adba6351fab10b32d5e821b699c575ed47f623ccb5d15862b"
+      ],
+      "merkle_root": "fde090e7bda6a0d46d13ccab7e0e496868f2f582ea6907d2c25d996d24964635",
+      "prev_batch_hash": "b0fcab12a36e2bb42f3215b8745ec7c12189a66da92ae515ca97161f4adc2b2d",
+      "header": {
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "batch_no": 7,
+        "first_audit_id": 1001,
+        "last_audit_id": 1013,
+        "leaf_count": 13,
+        "sealed_at": "2026-10-18T15:00:00.000000Z"
+      },
+      "batch_hash": "ec8ece36bd538ae639a335fecdb6b78fa4d889de59f7c4b824dbc115d836f879",
+      "proofs": [
+        {
+          "index": 0,
+          "path": [
+            "17fc67cb8f9686a8a0423f02333b7d96d82f2ca146147c8eef1c41f52976e00e",
+            "f1a04f1c370d5b212c6fe05349d622cfa0e7a5c71b487b02a6650910d26dc909",
+            "855df9b3d923c38823bf3a4aee9a7ce440677e07e91b178f7f1f06f76560b7f5",
+            "d42c51a01c6d03368406f7e721007a7b5f15ebfed8d719ec80e30e0bf91799b3"
+          ]
+        },
+        {
+          "index": 1,
+          "path": [
+            "4c7878b9cf686d56b432e4ef09e94d16f0c988a19795548561a37e03961ae20a",
+            "f1a04f1c370d5b212c6fe05349d622cfa0e7a5c71b487b02a6650910d26dc909",
+            "855df9b3d923c38823bf3a4aee9a7ce440677e07e91b178f7f1f06f76560b7f5",
+            "d42c51a01c6d03368406f7e721007a7b5f15ebfed8d719ec80e30e0bf91799b3"
+          ]
+        },
+        {
+          "index": 2,
+          "path": [
+            "7e9a10c9b3fdbe20b7e505ad9a37011ecdb7a80ba5889ab107beb88b8afa7a9a",
+            "bc8bee9bfc9311e0b10562e5924d4bf28ee93033173ceb8c2ef8a2d25c100c61",
+            "855df9b3d923c38823bf3a4aee9a7ce440677e07e91b178f7f1f06f76560b7f5",
+            "d42c51a01c6d03368406f7e721007a7b5f15ebfed8d719ec80e30e0bf91799b3"
+          ]
+        },
+        {
+          "index": 3,
+          "path": [
+            "e95b239dcfa3d962f669dab17ba8d5f57616e07eb6acbb98e4d9bb755934f920",
+            "bc8bee9bfc9311e0b10562e5924d4bf28ee93033173ceb8c2ef8a2d25c100c61",
+            "855df9b3d923c38823bf3a4aee9a7ce440677e07e91b178f7f1f06f76560b7f5",
+            "d42c51a01c6d03368406f7e721007a7b5f15ebfed8d719ec80e30e0bf91799b3"
+          ]
+        },
+        {
+          "index": 4,
+          "path": [
+            "67364e479ea07571edc1e1e040ecbf37eb50aab1ca7fe36232a275e77add88f3",
+            "4488bbc6f7945c3e4da9014eceecf95b6c43b17d89539711e90fe40a07c267b9",
+            "aa9716806885e9b72754243453a87bbd268f344a53d91e7f5b1706432ec5fa14",
+            "d42c51a01c6d03368406f7e721007a7b5f15ebfed8d719ec80e30e0bf91799b3"
+          ]
+        },
+        {
+          "index": 5,
+          "path": [
+            "10da1aa2481747d5eaaa9ddb4b4cc92283588025f43ee1a27a0a5f29028f2b38",
+            "4488bbc6f7945c3e4da9014eceecf95b6c43b17d89539711e90fe40a07c267b9",
+            "aa9716806885e9b72754243453a87bbd268f344a53d91e7f5b1706432ec5fa14",
+            "d42c51a01c6d03368406f7e721007a7b5f15ebfed8d719ec80e30e0bf91799b3"
+          ]
+        },
+        {
+          "index": 6,
+          "path": [
+            "73aad4f20cc76ed7cf1d1ce91d1fd300318ece4aba257d0dcdf41ad9445698a0",
+            "823fff8e4b56d08c8cb74a1f350402f4f946c93dde6d739395dd06c822f894ef",
+            "aa9716806885e9b72754243453a87bbd268f344a53d91e7f5b1706432ec5fa14",
+            "d42c51a01c6d03368406f7e721007a7b5f15ebfed8d719ec80e30e0bf91799b3"
+          ]
+        },
+        {
+          "index": 7,
+          "path": [
+            "03ac462fbf92e4ff6e484cdb512bacea87a41878aa20da3b76df0dee68cf41fa",
+            "823fff8e4b56d08c8cb74a1f350402f4f946c93dde6d739395dd06c822f894ef",
+            "aa9716806885e9b72754243453a87bbd268f344a53d91e7f5b1706432ec5fa14",
+            "d42c51a01c6d03368406f7e721007a7b5f15ebfed8d719ec80e30e0bf91799b3"
+          ]
+        },
+        {
+          "index": 8,
+          "path": [
+            "cb8a367aa3606cf39936a7ba223f34edd9f1a915f659523b987213815c75c8e9",
+            "5bd4c0c62d683c39964784e1d72afd80cdd560be9c3c53cccd481d950c20633a",
+            "fb2a0b4d72e1218adba6351fab10b32d5e821b699c575ed47f623ccb5d15862b",
+            "881c0a8e7393158c9b9b9b139d05cf09db3907da1603fce10a59daf41c8ff7d6"
+          ]
+        },
+        {
+          "index": 9,
+          "path": [
+            "74184503e17dda5f9f08d986f206610802224aac32b803ba5cda4bc410fd94c5",
+            "5bd4c0c62d683c39964784e1d72afd80cdd560be9c3c53cccd481d950c20633a",
+            "fb2a0b4d72e1218adba6351fab10b32d5e821b699c575ed47f623ccb5d15862b",
+            "881c0a8e7393158c9b9b9b139d05cf09db3907da1603fce10a59daf41c8ff7d6"
+          ]
+        },
+        {
+          "index": 10,
+          "path": [
+            "482a43fed55eeaa7dadfb2162b0fa85475de19ed6514347b3697de7d3acfa116",
+            "07d2ef78a77634d87b45004fa6deca2c2493c34a7527fc60cc855836ce51909f",
+            "fb2a0b4d72e1218adba6351fab10b32d5e821b699c575ed47f623ccb5d15862b",
+            "881c0a8e7393158c9b9b9b139d05cf09db3907da1603fce10a59daf41c8ff7d6"
+          ]
+        },
+        {
+          "index": 11,
+          "path": [
+            "d8898924a3dce563b50d737bb00b70e72af6d0aab53aba125c68795241e0fcf6",
+            "07d2ef78a77634d87b45004fa6deca2c2493c34a7527fc60cc855836ce51909f",
+            "fb2a0b4d72e1218adba6351fab10b32d5e821b699c575ed47f623ccb5d15862b",
+            "881c0a8e7393158c9b9b9b139d05cf09db3907da1603fce10a59daf41c8ff7d6"
+          ]
+        },
+        {
+          "index": 12,
+          "path": [
+            "5c7eceb2cabcd919e554fcada418033cd66d6095458e3dbac76a8d9763e79b18",
+            "881c0a8e7393158c9b9b9b139d05cf09db3907da1603fce10a59daf41c8ff7d6"
+          ]
+        }
+      ]
+    }
+  ],
+  "tamper_check": {
+    "description": "5-row batch with audit_id 1003 deleted; root must differ from batch_no 5",
+    "merkle_root_after_delete": "03b72718c0919b474b67335a9d6119339b9f22bcd3327cdba4eb5c8cbe1aa8ea"
+  }
+}

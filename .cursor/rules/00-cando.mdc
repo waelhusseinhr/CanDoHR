@@ -1,0 +1,33 @@
+---
+description: CanDo HRIS project rules for every task
+globs:
+alwaysApply: true
+---
+
+Before any task, read `AGENTS.md` at the repository root and follow it. It is the single source of rules for every agent and model. If a prompt conflicts with `AGENTS.md`, follow `AGENTS.md` and say so.
+
+Then read the build-plan step you are on in `docs/15-build-plan.md` and the files that step lists.
+
+The rules most often broken, repeated here:
+
+- Every change to business data goes through a change set. No direct row updates, no second write path.
+- Money is `Money` (decimal.js) and `numeric(14,2)`. Never a JavaScript `number`.
+- Statutory values and agreement terms come from `rules/` and the database, never from code.
+- Never edit an expected value in `tests/` or anything in `reference/` to make a test pass. Stop and explain instead.
+- Business data is read and written only through the CanDo API. Never through Supabase's Data API, GraphQL, Realtime or `supabase-js` database calls.
+- The Supabase `service_role` key exists only in `apps/identity`.
+- No personal data in logs, Queue messages, Durable Object storage, KV, R2 or prompts.
+- Every user-facing string in every screen language (`en-CA` and `fr-CA` at launch); each user picks the screen language. The organization's own words show as typed, read through `platform.text_for()` with an EN/FR tag when they differ from the screen; never translate them in code or with AI.
+- No business value in code, a `CHECK`, a `DEFAULT`, an API `default:` or a fixture: settings, the organization's lists, or rules files (`docs/22`).
+- No silent fallback: only the fallbacks in `rules/register/values-and-fallbacks.json`. When a case is not covered or you are unsure how a fallback should work, stop and ask the owner through `docs/16`. `tests/hardcoding/check_values.py` must pass.
+- Approvals come from the organization's routes (`platform.route_for()`, `platform.route_complete()`); never a hard-coded or default route. Going past a caution records an acknowledgement; never skip one (`docs/23` §2).
+- People make every hiring decision; AI suggestions are off until switched on and never decide. The employee record waits for the signed contract (`docs/23` §5.5).
+- Payroll: CanDo prepares files and reminds, the employer pays and files. Pay runs are approved only through the organization's route, never by their creator; vacation pay, banked time and proration come from the organization's rules per group, never from code; recoveries need a written authorization; slips and statements are delivered only as `payroll.delivery_method()` says (`docs/24`).
+- Compensation: structures, philosophies, pay decisions, payouts and disclosure lists are approved only through the organization's routes, never by their submitter; promotion, demotion, acting pay, cycle and transparency rules come from the settings in `docs/25`; pay gap results never show groups under 10 (`docs/25`).
+- Benefits: plan setup, leave rules and coverage on termination are the organization's; HR chooses the governing agreement and which of two plans pays first, with a reason, and CanDo never picks; coverage never ends before the statutory floor, and outside Ontario the decision waits for the caution; carrier invoices go through the route; no claims or medical information in CanDo (`docs/26`).
+- Time and leave: hours worked are always paid and payroll never waits; rest, hours-limit and late schedule changes need their caution; leave plans, recording methods, averaging and exemptions are the organization's records; statutory leave is never declined for staffing; no biometrics, coordinates or proof of leave (`docs/27`).
+- Performance: CanDo suggests, the manager chooses each position's rating with a reason for any difference, and AI never rates; a section is rated only from the minimum days worked and there is no combined rating unless the organization chooses one; no release before calibration, the one-up route and HR on a listed concern; signing means seen; improvement plans need causes ruled out, HR through the route and never start during protected leave (`docs/28`).
+- Learning: no course player, authoring or AI; the law's training is never loosened or waived; credentials count once someone else verifies them; no shift for someone without a licence the law requires, a caution for anything else; training time is paid; requests only through the organization's route; repayment only by its rules, with written authorization to recover (`docs/29`).
+- Succession and workforce planning: no flight risk model or AI ranking; parts work only once switched on; succession data only for the people named and HR, every view logged, age only in totals; plans, pools and the position plan only through the organization's routes; emergency successors for positions the law requires; development-only plans for unionized roles; no secrets in continuity sheets; gap strategies only draft; labour relations before a unionized reduction (`docs/30`).
+- Engagement: survey answers never carry a person or a time of day; no result under 5 (10 for self-identified groups); anonymous surveys only for employers covered by a freedom-of-information law; comments for HR, themes for managers, flags without identity; recognition private until its recipient makes it public through the route; every gift and award through CRA's limits, confirmed by payroll; SMS only for urgent alerts (`docs/31`).
+- Work on a branch and open a pull request. Never push to `main`. Never use production credentials or real personal data.
