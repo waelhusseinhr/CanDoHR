@@ -106,7 +106,6 @@ test("docs/06 section 10 test 15 a tampered result line raises a mismatch and th
         await client.query("DELETE FROM core.payroll_account WHERE payroll_account_id = $1", [account]);
         await client.query("DELETE FROM core.legal_entity_version WHERE legal_entity_id = $1", [legal]);
         await client.query("DELETE FROM core.legal_entity WHERE legal_entity_id = $1", [legal]);
-        await client.query("DELETE FROM platform.tenant WHERE tenant_id = $1", [tenant]);
       }
     } catch (error) {
       cleanupError = error;
@@ -217,7 +216,6 @@ test("a redelivered retro batch message does not calculate the request twice", {
         await client.query("DELETE FROM core.payroll_account WHERE payroll_account_id = $1", [account]);
         await client.query("DELETE FROM core.legal_entity_version WHERE legal_entity_id = $1", [legal]);
         await client.query("DELETE FROM core.legal_entity WHERE legal_entity_id = $1", [legal]);
-        await client.query("DELETE FROM platform.tenant WHERE tenant_id = $1", [tenant]);
       }
     } catch (error) {
       cleanupError = error;
