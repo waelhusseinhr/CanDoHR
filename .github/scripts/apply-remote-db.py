@@ -309,8 +309,13 @@ def report_schema(host: str, user: str, password: str) -> None:
             say(line.strip())
 
 
+def cloudflare_token() -> str:
+    # A pasted token often includes a line break. The token itself has no spaces.
+    return "".join((os.environ.get("CLOUDFLARE_API_TOKEN") or "").split())
+
+
 def cf_api(method: str, path: str, body: dict | None = None, timeout: int = 60) -> tuple[int, dict]:
-    token = os.environ.get("CLOUDFLARE_API_TOKEN") or ""
+    token = cloudflare_token()
     url = f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}{path}"
     data = None if body is None else json.dumps(body).encode()
     req = urllib.request.Request(url, data=data, method=method)
@@ -390,19 +395,37 @@ def create_hyperdrive(label: str, host: str, user: str, password: str) -> tuple[
 
 
 def ensure_hyperdrive(password: str) -> None:
-    if not os.environ.get("CLOUDFLARE_API_TOKEN"):
+    token = cloudflare_token()
+    if not token:
         say(
             "CLOUDFLARE_API_TOKEN is missing from this job, so Hyperdrive was not created. "
             "The database password itself worked."
         )
         say("HYPERDRIVE_RESULT=skipped")
         return
+    raw_token = os.environ.get("CLOUDFLARE_API_TOKEN") or ""
+    if raw_token != token:
+        say("CLOUDFLARE_API_TOKEN had spaces or line breaks; those were removed before the request")
+    say(f"CLOUDFLARE_API_TOKEN length={len(token)}")
     status, payload = cf_api("GET", "/hyperdrive/configs?per_page=100")
     if status >= 400 or not payload.get("success", False):
         say(f"HYPERDRIVE_RESULT=failed list_status={status} {safe_cf_error(payload)}")
+        say("Listing Hyperdrive failed. Trying to create the connection anyway.")
+        created: dict = {}
+        create_status = 0
+        for label, host, user, secret in hyperdrive_origins(password):
+            create_status, created = create_hyperdrive(label, host, user, secret)
+            if create_status < 400 and created.get("success", False):
+                result = created.get("result") if isinstance(created.get("result"), dict) else {}
+                describe_config(result)
+                say("HYPERDRIVE_RESULT=created")
+                say(f"HYPERDRIVE_ID={result.get('id')}")
+                return
+            say(f"HYPERDRIVE_RESULT=failed create_status={create_status} origin={label} {safe_cf_error(created)}")
         say(
-            "Migrations were applied. Hyperdrive was not created because the Cloudflare token "
-            "could not list Hyperdrive configs. Add Hyperdrive edit permission to CLOUDFLARE_API_TOKEN."
+            "Hyperdrive was not created. The Cloudflare token was refused (not the database password). "
+            "Save CLOUDFLARE_API_TOKEN again with no spaces or line breaks, for this same account, "
+            "with permission to edit Hyperdrive and to edit Workers."
         )
         return
     configs = payload.get("result") or []
