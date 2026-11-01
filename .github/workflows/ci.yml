@@ -42,5 +42,25 @@ jobs:
       - name: Rebuild the database from migrations
         run: supabase db reset --local --no-seed
 
+      # The runner logs in as postgres, which is not a superuser on the local
+      # Supabase database. The smoke tests switch to cando_app with SET ROLE,
+      # and that only works when postgres is a member of the role.
+      - name: Let the smoke tests use the app role
+        run: |
+          set -euo pipefail
+          DB_URL="$(supabase status -o json | python3 -c "import json,sys; print(json.load(sys.stdin)['DB_URL'])")"
+          grant_sql="GRANT cando_app TO postgres; GRANT cando_sealer TO postgres;"
+          if ! psql "$DB_URL" -v ON_ERROR_STOP=1 -c "$grant_sql"; then
+            admin_url="$(python3 - "$DB_URL" <<'PY'
+          import sys
+          from urllib.parse import urlsplit, urlunsplit
+          parts = urlsplit(sys.argv[1])
+          netloc = f"supabase_admin:postgres@{parts.hostname}:{parts.port}"
+          print(urlunsplit((parts.scheme, netloc, parts.path, "", "")))
+          PY
+          )"
+            psql "$admin_url" -v ON_ERROR_STOP=1 -c "$grant_sql"
+          fi
+
       - name: Run schema smoke tests
         run: bash tests/schema/run_migrations_ci.sh
