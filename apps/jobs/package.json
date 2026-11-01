@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": { "dev": "wrangler dev", "typecheck": "tsc -p tsconfig.json --noEmit" },
   "dependencies": {
-    "@candohr/audit": "workspace:*"
+    "@candohr/audit": "workspace:*",
+    "@candohr/changesets": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250927.0",
