@@ -37,7 +37,7 @@ R2 is turned on for the Cloudflare account. No bucket was created, and `cloudfla
 
 ## Database connection (Hyperdrive)
 
-Hyperdrive is the fast path from the site to Postgres. The database password works. Hyperdrive itself was not created: the Cloudflare token can publish the site, and it was refused when asked to list Hyperdrive connections (the error is an authentication refusal, not a wrong database password). After that token is allowed to edit Hyperdrive, the connection is created with query caching turned off. The site config does not attach a database until that connection exists. The identity app does not get a database connection.
+Hyperdrive is the fast path from the site to Postgres. The database password works. Hyperdrive itself was not created. A later retry (GitHub Actions run 41338267837) still got HTTP 403, code 10000, when listing Hyperdrive connections. The Cloudflare token can publish the site, and it was refused when asked to list Hyperdrive connections (the error is an authentication refusal, not a wrong database password). After that token is allowed to edit Hyperdrive, the connection is created with query caching turned off. The site config does not attach a database until that connection exists. The identity app does not get a database connection.
 
 The tables were loaded through the session pooler `aws-0-us-east-1.pooler.supabase.com` (port 5432). The direct database host is IPv6 only, and GitHub cannot open it.
 

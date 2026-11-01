@@ -134,4 +134,6 @@ jobs:
           pnpm --filter @candohr/rules typecheck
           pnpm --filter @candohr/payroll-engine test
           pnpm --filter @candohr/payroll-engine typecheck
+          pnpm --filter @candohr/pay-runs test
+          pnpm --filter @candohr/pay-runs typecheck
           pnpm run platform-guards
