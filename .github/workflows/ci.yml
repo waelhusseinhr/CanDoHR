@@ -1,8 +1,10 @@
-# Schema check for pull requests.
+# Pull request checks.
 # Starts Postgres on the GitHub runner, rebuilds it from supabase/migrations
 # with `supabase db reset`, then runs tests/schema/run_migrations_ci.sh.
+# After that, runs the Step 2 package tests (money, dates, effective dating,
+# and the tenant transaction) against that same local database.
 # This does not connect to the CanDo cloud database.
-# See docs/BUILD_STATUS.md (Step 1).
+# See docs/BUILD_STATUS.md.
 
 name: CI
 
@@ -64,3 +66,26 @@ jobs:
 
       - name: Run schema smoke tests
         run: bash tests/schema/run_migrations_ci.sh
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test shared foundations and tenant transactions
+        run: |
+          set -euo pipefail
+          export DATABASE_URL="$(supabase status -o json | python3 -c "import json,sys; print(json.load(sys.stdin)['DB_URL'])")"
+          pnpm --filter @candohr/shared test
+          pnpm --filter @candohr/shared typecheck
+          pnpm --filter @candohr/db test
+          pnpm --filter @candohr/db typecheck

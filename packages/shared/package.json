@@ -7,10 +7,15 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "node --test tests/smoke.test.mjs",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "dependencies": {
+    "decimal.js": "^10.5.0"
+  },
   "devDependencies": {
+    "@types/node": "^22.15.30",
+    "fast-check": "^4.2.0",
     "typescript": "^5.8.3"
   }
 }
