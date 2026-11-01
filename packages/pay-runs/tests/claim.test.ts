@@ -15,6 +15,8 @@ test("a redelivered bucket message writes nothing twice", { skip: !databaseUrl }
   const other = new pg.Client({ connectionString: databaseUrl });
   await client.connect();
   await other.connect();
+  await client.query("SET statement_timeout = '5s'");
+  await other.query("SET statement_timeout = '5s'");
   const tenant = crypto.randomUUID();
   const legal = crypto.randomUUID();
   const account = crypto.randomUUID();

@@ -10,7 +10,7 @@ export type ClaimOutcome =
   | { outcome: "claimed"; bucket: number; attempts: number };
 
 const CLAIM = `
-WITH next AS (
+WITH next AS MATERIALIZED (
   SELECT pay_run_id, bucket
   FROM payroll.pay_run_partition
   WHERE tenant_id = $1::uuid
