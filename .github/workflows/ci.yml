@@ -126,4 +126,6 @@ jobs:
           pnpm --filter @candohr/identity typecheck
           pnpm --filter @candohr/jobs typecheck
           pnpm --filter @candohr/realtime typecheck
+          pnpm --filter @candohr/core test
+          pnpm --filter @candohr/core typecheck
           pnpm run platform-guards
