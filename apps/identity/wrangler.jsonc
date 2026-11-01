@@ -5,4 +5,5 @@
   "compatibility_date": "2026-10-30",
   "compatibility_flags": ["nodejs_compat"],
   "placement": { "mode": "smart", "region": "aws:ca-central-1" }
+  // This Worker only calls Supabase Auth admin. It has no database connection.
 }

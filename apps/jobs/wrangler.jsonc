@@ -4,5 +4,8 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-10-30",
   "compatibility_flags": ["nodejs_compat"],
-  "placement": { "mode": "smart", "region": "aws:ca-central-1" }
+  "placement": { "mode": "smart", "region": "aws:ca-central-1" },
+  "triggers": { "crons": ["0 * * * *"] }
+  // The sealer database is a separate Hyperdrive configuration, created with caching disabled.
+  // Do not add the binding until that configuration exists.
 }
