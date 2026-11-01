@@ -54,12 +54,12 @@ test("docs/06 section 10 test 15 a tampered result line raises a mismatch and th
       `INSERT INTO payroll.pay_result (
          tenant_id, pay_result_id, pay_run_id, employment_id, person_id, payroll_account_id, bucket, pay_date, tax_year,
          province, periods_per_year, tax_method, gross, taxable_periodic, taxable_non_periodic, pensionable, insurable,
-         cpp, cpp2, ei, income_tax_federal, income_tax_provincial, net, employer_cpp, employer_cpp2, employer_ei,
+         cpp, cpp2, ei, income_tax_federal, income_tax_provincial, territorial_payroll_tax, net, employer_cpp, employer_cpp2, employer_ei,
          input_snapshot_sha256, result_sha256, trace, status
        ) VALUES (
          $1, $2, $3, $4, $5, $6, 0, '2026-04-24', 2026,
          'ON', 26, 'periodic', 100, 100, 0, 100, 100,
-         0, 0, 0, 0, 0, 100, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 100, 0, 0, 0,
          'inputs', $7, '[]', 'finalized'
        )`,
       [tenant, result, run, employment, person, account, storedSha],
@@ -163,12 +163,12 @@ test("a redelivered retro batch message does not calculate the request twice", {
       `INSERT INTO payroll.pay_result (
          tenant_id, pay_result_id, pay_run_id, employment_id, person_id, payroll_account_id, bucket, pay_date, tax_year,
          province, periods_per_year, tax_method, gross, taxable_periodic, taxable_non_periodic, pensionable, insurable,
-         cpp, cpp2, ei, income_tax_federal, income_tax_provincial, net, employer_cpp, employer_cpp2, employer_ei,
+         cpp, cpp2, ei, income_tax_federal, income_tax_provincial, territorial_payroll_tax, net, employer_cpp, employer_cpp2, employer_ei,
          input_snapshot_sha256, result_sha256, trace, status
        ) VALUES (
          $1, $2, $3, $4, $5, $6, 0, '2026-04-24', 2026,
          'ON', 26, 'periodic', 100, 100, 0, 100, 100,
-         0, 0, 0, 0, 0, 100, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 100, 0, 0, 0,
          'inputs', 'sha', '[]', 'finalized'
        )`,
       [tenant, result, run, employment, person, account],
