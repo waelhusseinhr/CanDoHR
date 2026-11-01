@@ -10,7 +10,7 @@ async function payrollReady(client: pg.Client): Promise<boolean> {
   return found.rows[0]?.ready === "payroll.pay_run_partition";
 }
 
-test("a redelivered bucket message writes nothing twice", { skip: !databaseUrl }, async () => {
+test("a redelivered bucket message writes nothing twice", { skip: !databaseUrl, timeout: 20_000 }, async () => {
   const client = new pg.Client({ connectionString: databaseUrl });
   const other = new pg.Client({ connectionString: databaseUrl });
   await client.connect();
@@ -88,16 +88,22 @@ test("a redelivered bucket message writes nothing twice", { skip: !databaseUrl }
     await other.query("ROLLBACK");
     await client.query("ROLLBACK");
   } finally {
-    if (inserted) {
-      await client.query("DELETE FROM payroll.pay_run_partition WHERE pay_run_id = $1", [run]);
-      await client.query("DELETE FROM payroll.pay_run WHERE pay_run_id = $1", [run]);
-      await client.query("DELETE FROM core.person WHERE person_id = $1", [person]);
-      await client.query("DELETE FROM core.payroll_account WHERE payroll_account_id = $1", [account]);
-      await client.query("DELETE FROM core.legal_entity_version WHERE legal_entity_id = $1", [legal]);
-      await client.query("DELETE FROM core.legal_entity WHERE legal_entity_id = $1", [legal]);
-      await client.query("DELETE FROM platform.tenant WHERE tenant_id = $1", [tenant]);
+    let cleanupError: unknown;
+    try {
+      await client.query("ROLLBACK").catch(() => undefined);
+      if (inserted) {
+        await client.query("DELETE FROM payroll.pay_run_partition WHERE pay_run_id = $1", [run]);
+        await client.query("DELETE FROM payroll.pay_run WHERE pay_run_id = $1", [run]);
+        await client.query("DELETE FROM core.person WHERE person_id = $1", [person]);
+        await client.query("DELETE FROM core.payroll_account WHERE payroll_account_id = $1", [account]);
+        await client.query("DELETE FROM core.legal_entity_version WHERE legal_entity_id = $1", [legal]);
+        await client.query("DELETE FROM core.legal_entity WHERE legal_entity_id = $1", [legal]);
+      }
+    } catch (error) {
+      cleanupError = error;
     }
-    await client.end();
-    await other.end();
+    await client.end().catch(() => undefined);
+    await other.end().catch(() => undefined);
+    if (cleanupError) throw cleanupError;
   }
 });
