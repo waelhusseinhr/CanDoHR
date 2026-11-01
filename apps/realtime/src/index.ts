@@ -1,7 +1,15 @@
+import { OutboxRelay, SessionHub } from "@candohr/changesets";
+
+export { OutboxRelay, SessionHub };
+
 export default {
   async fetch(): Promise<Response> {
-    return new Response(JSON.stringify({ ok: true, service: "candohr-realtime", step: 0 }), {
-      headers: { "content-type": "application/json" },
+    return Response.json({
+      ok: true,
+      service: "candohr-realtime",
+      step: 4,
+      outbox: "waiting-for-hyperdrive",
+      live: "identifiers-only",
     });
   },
 };

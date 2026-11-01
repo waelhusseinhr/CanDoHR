@@ -5,4 +5,6 @@
   "compatibility_date": "2026-10-30",
   "compatibility_flags": ["nodejs_compat"],
   "placement": { "mode": "smart", "region": "aws:ca-central-1" }
+  // OutboxRelay reads unpublished events through Hyperdrive with caching disabled.
+  // SessionHub pushes identifiers only. Do not add either binding until that configuration exists.
 }

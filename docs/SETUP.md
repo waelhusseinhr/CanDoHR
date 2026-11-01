@@ -33,7 +33,7 @@ Values stay in GitHub. Settings, then Secrets and variables, then Actions. Do no
 
 ## Files (R2)
 
-Pay documents do not go in R2. The spec keeps those in Supabase Storage. R2 is still off on the Cloudflare account until someone opens the Cloudflare dashboard, chooses R2, and selects Enable. That switch cannot be flipped from this checkout (Cloudflare error 10042). After that, a bucket named `candohr` can be created. Do not attach it in `cloudflare.config.ts` before the bucket exists.
+R2 is turned on for the Cloudflare account. No bucket was created, and `cloudflare.config.ts` does not attach one. Pay documents stay in Supabase Storage. Audit seals stay in the write-once anchor, not in R2. A bucket named `candohr` can be added later if a step actually needs it. Do not attach a binding before that bucket exists.
 
 ## Database connection (Hyperdrive)
 
@@ -41,6 +41,6 @@ Hyperdrive is the fast path from the site to Postgres. Creating it needs `SUPABA
 
 ## What is already in the database
 
-The schema files are in `supabase/migrations`. The CanDo project does not have those tables yet. This checkout has no database password, so the files were not pushed to the cloud database. GitHub tests rebuild a throwaway database on the runner. They do not use the CanDo password.
+The schema files are in `supabase/migrations`. The CanDo project does not have those tables yet. This checkout has no database password, so the files were not pushed to the cloud database. GitHub tests rebuild a throwaway database on the runner. They do not use the CanDo password. Change sets, the event sender, and the daily seal copy are tested in memory for the same reason. They will use Hyperdrive, with query caching off, once `SUPABASE_DB_PASSWORD` is stored.
 
 Email sign-in and the return addresses above are also not switched on from here. The switch is in the Supabase dashboard: Authentication, then Providers, then Email, and Authentication, then URL Configuration. The addresses to allow are listed under Sign-in.
