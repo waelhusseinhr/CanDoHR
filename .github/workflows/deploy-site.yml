@@ -1,6 +1,6 @@
 # Deploys the public site (the vinext app at the repo root) to candohr.ca.
-# Runs on a push to the site branch, and only after the CI workflow for that
-# same commit has succeeded. Uses the GitHub Actions secret CLOUDFLARE_API_TOKEN.
+# Runs on a push to main, and only after the CI workflow for that same commit
+# has succeeded. Uses the GitHub Actions secret CLOUDFLARE_API_TOKEN.
 # The account id is the one already in cloudflare.config.ts.
 
 name: Deploy site
@@ -8,7 +8,7 @@ name: Deploy site
 on:
   push:
     branches:
-      - cursor/step-0-repository-4cf6
+      - main
 
 permissions:
   contents: read
