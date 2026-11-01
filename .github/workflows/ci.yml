@@ -128,4 +128,6 @@ jobs:
           pnpm --filter @candohr/realtime typecheck
           pnpm --filter @candohr/core test
           pnpm --filter @candohr/core typecheck
+          pnpm --filter @candohr/org-chart test
+          pnpm --filter @candohr/org-chart typecheck
           pnpm run platform-guards

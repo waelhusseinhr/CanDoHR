@@ -7,6 +7,7 @@ export function HrChrome(props: { locale: Locale; path: string; tab?: string; ch
   const home = locale === "fr-CA" ? "/?lang=fr-CA" : "/";
   const people = locale === "fr-CA" ? "/people?lang=fr-CA" : "/people";
   const positions = locale === "fr-CA" ? "/positions?lang=fr-CA" : "/positions";
+  const chart = locale === "fr-CA" ? "/org-chart?lang=fr-CA" : "/org-chart";
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
       <header className="border-b border-slate-200 bg-white">
@@ -17,6 +18,7 @@ export function HrChrome(props: { locale: Locale; path: string; tab?: string; ch
             </a>
             <a href={people}>{ct(locale, "people.title")}</a>
             <a href={positions}>{ct(locale, "positions.title")}</a>
+            <a href={chart}>{locale === "fr-CA" ? "Organigramme" : "Org chart"}</a>
           </nav>
           <a className="text-sm text-orange-700" href={langHref(path, other, tab)}>
             {ct(locale, "lang.switch")}

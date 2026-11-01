@@ -30,6 +30,9 @@ export default async function Home({
         <a className="text-orange-700" href={people}>
           {copy.link}
         </a>
+        <a className="text-orange-700" href={locale === "fr-CA" ? "/org-chart?lang=fr-CA" : "/org-chart"}>
+          {locale === "fr-CA" ? "Organigramme" : "Org chart"}
+        </a>
       </main>
     </HrChrome>
   );
