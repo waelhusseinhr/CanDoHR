@@ -12,6 +12,8 @@ GRANT SELECT ON ALL TABLES IN SCHEMA ref TO cando_app;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA platform, core, payroll, timeleave, recruit, comp, benefits, talent, offboard, compliance TO cando_app;
 
 GRANT INSERT, SELECT ON platform.audit_entry TO cando_app;
+-- The grant on every table above includes DELETE. The audit log is insert-only for the application (docs/10).
+REVOKE DELETE ON platform.audit_entry FROM cando_app;
 GRANT SELECT ON platform.audit_batch TO cando_app;
 GRANT SELECT, UPDATE (batch_id) ON platform.audit_entry TO cando_sealer;
 GRANT INSERT, SELECT ON platform.audit_batch TO cando_sealer;

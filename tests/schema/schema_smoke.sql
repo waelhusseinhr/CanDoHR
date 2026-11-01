@@ -17,8 +17,9 @@ SELECT set_config('app.tenant_id', '11111111-1111-1111-1111-111111111111', false
 
 -- Reference objects
 INSERT INTO core.legal_entity (tenant_id, legal_entity_id) VALUES (current_setting('app.tenant_id')::uuid, 'aaaaaaaa-0000-0000-0000-000000000001');
-INSERT INTO core.legal_entity_version (tenant_id, legal_entity_id, valid_period, change_set_id, legal_name, business_number, regulatory_jurisdiction)
-VALUES (current_setting('app.tenant_id')::uuid, 'aaaaaaaa-0000-0000-0000-000000000001', '[2020-01-01,)', gen_random_uuid(), 'Example Municipality', '123456789', 'provincial');
+-- Whether the employer is a First Nation government has to be stated. Neither answer is a default (docs/22 §3.2).
+INSERT INTO core.legal_entity_version (tenant_id, legal_entity_id, valid_period, change_set_id, legal_name, business_number, regulatory_jurisdiction, first_nation_government)
+VALUES (current_setting('app.tenant_id')::uuid, 'aaaaaaaa-0000-0000-0000-000000000001', '[2020-01-01,)', gen_random_uuid(), 'Example Municipality', '123456789', 'provincial', false);
 INSERT INTO core.location (tenant_id, location_id) VALUES (current_setting('app.tenant_id')::uuid, 'bbbbbbbb-0000-0000-0000-000000000001');
 INSERT INTO core.location_version (tenant_id, location_id, valid_period, change_set_id, name, address_line1, city, province, postal_code, time_zone, holiday_jurisdiction)
 VALUES (current_setting('app.tenant_id')::uuid, 'bbbbbbbb-0000-0000-0000-000000000001', '[2020-01-01,)', gen_random_uuid(), 'City Hall', '1 Main St', 'Example', 'ON', 'K1A 0B1', 'America/Toronto', 'ON');
@@ -171,8 +172,8 @@ END $$;
 
 \echo '--- Agreement versions: frozen once verified'
 SELECT set_config('app.tenant_id', '11111111-1111-1111-1111-111111111111', false);
-INSERT INTO core.agreement (tenant_id, agreement_id, name, union_name, jurisdiction, status)
-VALUES ('11111111-1111-1111-1111-111111111111', 'TEST-AGR', 'Test agreement', 'Test union', 'ON', 'in_force');
+INSERT INTO core.agreement (tenant_id, agreement_id, name, union_name, jurisdiction, status, bargaining_employer_entity_id)
+VALUES ('11111111-1111-1111-1111-111111111111', 'TEST-AGR', 'Test agreement', 'Test union', 'ON', 'in_force', 'aaaaaaaa-0000-0000-0000-000000000001');
 INSERT INTO core.agreement_version (tenant_id, agreement_id, version, effective_from, rules, content_sha256, status)
 VALUES ('11111111-1111-1111-1111-111111111111', 'TEST-AGR', 1, '2026-01-01', '{"premiums":[]}', 'h1', 'verified');
 DO $$ BEGIN
