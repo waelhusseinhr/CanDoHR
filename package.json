@@ -14,6 +14,7 @@
     "platform-guards": "node --experimental-strip-types scripts/platform-guards.ts"
   },
   "dependencies": {
+    "@candohr/core": "workspace:*",
     "@vinext/cloudflare": "^1.3.0",
     "react": "latest",
     "react-dom": "latest",

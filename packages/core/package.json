@@ -1,0 +1,28 @@
+{
+  "name": "@candohr/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./screens": "./src/screens.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@candohr/access": "workspace:*",
+    "@candohr/keys": "workspace:*",
+    "@candohr/shared": "workspace:*",
+    "hono": "^4.9.6",
+    "react": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "react-dom": "latest",
+    "typescript": "^5.8.3"
+  }
+}

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "CanDoHR",
-  description: "CanDoHR starting page. The public site is not online yet.",
+  description: "CanDoHR. People and positions on this site are sample records until the database is connected.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
