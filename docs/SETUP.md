@@ -25,10 +25,10 @@ Values stay in GitHub. Settings, then Secrets and variables, then Actions. Do no
 
 | Name | What it is |
 | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Already used to publish the site. |
+| `CLOUDFLARE_API_TOKEN` | Already used to publish the site. It cannot create Hyperdrive yet. In the Cloudflare token settings, add permission to edit Hyperdrive, then save the token again under this same name. |
 | `SUPABASE_URL` | `https://lasowjpgxlxijpaeezxe.supabase.co` |
 | `SUPABASE_PUBLISHABLE_KEY` | The publishable (anon) key from Supabase, Project Settings, API. Safe for the browser. The tests do not need it; the site will. |
-| `SUPABASE_DB_PASSWORD` | The database password for the CanDo project. Needed only to create the Hyperdrive connection. Not set from here. |
+| `SUPABASE_DB_PASSWORD` | The database password for the CanDo project. It is saved, and GitHub Actions used it to load the tables. |
 | `SUPABASE_SERVICE_ROLE_KEY` | The secret key that creates and disables sign-in accounts. Only the identity app may hold it, and only as a Cloudflare secret, not in GitHub Actions. The tests do not need it. Do not put it in the website. |
 
 ## Files (R2)
@@ -37,10 +37,14 @@ R2 is turned on for the Cloudflare account. No bucket was created, and `cloudfla
 
 ## Database connection (Hyperdrive)
 
-Hyperdrive is the fast path from the site to Postgres. Creating it needs `SUPABASE_DB_PASSWORD`. That password is not in this checkout, so Hyperdrive was not created. When the password is stored under the secret name above, the connection is created with query caching turned off. The identity app does not get a database connection.
+Hyperdrive is the fast path from the site to Postgres. The database password works. Hyperdrive itself was not created: the Cloudflare token can publish the site, and it was refused when asked to list Hyperdrive connections (the error is an authentication refusal, not a wrong database password). After that token is allowed to edit Hyperdrive, the connection is created with query caching turned off. The site config does not attach a database until that connection exists. The identity app does not get a database connection.
+
+The tables were loaded through the session pooler `aws-0-us-east-1.pooler.supabase.com` (port 5432). The direct database host is IPv6 only, and GitHub cannot open it.
 
 ## What is already in the database
 
-The schema files are in `supabase/migrations`. The CanDo project does not have those tables yet. This checkout has no database password, so the files were not pushed to the cloud database. GitHub tests rebuild a throwaway database on the runner. They do not use the CanDo password. Change sets, the event sender, and the daily seal copy are tested in memory for the same reason. They will use Hyperdrive, with query caching off, once `SUPABASE_DB_PASSWORD` is stored. Core HR (hire, jobs, positions, and the people screens) is tested the same way. The people list on the site is sample data until that connection exists. The org chart is tested in memory too. Choosing Move to… writes a change set in that memory copy. The chart on the site is a list of sample boxes until the database is connected. A drag canvas is not in this slice. The rules engine reads the rule files in this repo and keeps agreement versions in memory. Those rows are not in the CanDo database yet. Payroll calculation checks one pay against the statutory files. It does not write a pay run.
+The 17 migration files in `supabase/migrations` are loaded on the CanDo project. GitHub confirmed 17 rows in the migration history. The CanDo schemas and their table counts are: `ref` 29, `platform` 25, `core` 69, `payroll` 35, `timeleave` 23, `recruit` 19, `comp` 31, `benefits` 13, `talent` 92, `offboard` 1, `compliance` 4, `finance` 9. That is 350 tables. `public` has no application tables. GitHub tests still rebuild a throwaway database on the runner for the schema checks.
 
-Email sign-in and the return addresses above are also not switched on from here. The switch is in the Supabase dashboard: Authentication, then Providers, then Email, and Authentication, then URL Configuration. The addresses to allow are listed under Sign-in.
+The site does not read those tables yet. Change sets, the event sender, and the daily seal copy are still tested in memory. Core HR screens and the org chart still show sample rows. The rules engine still reads the rule files in this repo. Payroll calculation still checks one pay in memory and does not write a pay run. Those features use the tables after Hyperdrive exists, with query caching off.
+
+Email sign-in and the return addresses above are also not switched on from here. There is no Supabase management token in GitHub Actions. The switch is in the Supabase dashboard: Authentication, then Providers, then Email, and Authentication, then URL Configuration. The addresses to allow are listed under Sign-in.

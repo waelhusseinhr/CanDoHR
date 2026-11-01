@@ -1,0 +1,45 @@
+# One-off job: apply supabase/migrations to the CanDo Supabase project and
+# create the Hyperdrive connection with query caching off.
+# It runs when this branch is pushed, or when someone starts it by hand.
+# It does not run on every push to main.
+# Logs print secret names and counts only. They do not print secret values.
+
+name: Apply database migrations
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cursor/apply-db-migrations-5a46
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apply-cando-db
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Push migrations to CanDo
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install the Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+
+      - name: Install the Postgres client
+        run: sudo apt-get update && sudo apt-get install --yes postgresql-client
+
+      - name: Apply migrations and create Hyperdrive
+        run: python3 .github/scripts/apply-remote-db.py
