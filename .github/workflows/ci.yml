@@ -140,4 +140,6 @@ jobs:
           pnpm --filter @candohr/retro typecheck
           pnpm --filter @candohr/time test
           pnpm --filter @candohr/time typecheck
+          pnpm --filter @candohr/disbursement test
+          pnpm --filter @candohr/disbursement typecheck
           pnpm run platform-guards
