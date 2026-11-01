@@ -114,3 +114,13 @@ jobs:
           pnpm --filter @candohr/shared typecheck
           pnpm --filter @candohr/db test
           pnpm --filter @candohr/db typecheck
+          pnpm --filter @candohr/audit test
+          pnpm --filter @candohr/audit typecheck
+          pnpm --filter @candohr/keys test
+          pnpm --filter @candohr/keys typecheck
+          pnpm --filter @candohr/access test
+          pnpm --filter @candohr/access typecheck
+          pnpm --filter @candohr/api typecheck
+          pnpm --filter @candohr/identity typecheck
+          pnpm --filter @candohr/jobs typecheck
+          pnpm run platform-guards
