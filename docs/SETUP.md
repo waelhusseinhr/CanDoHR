@@ -41,4 +41,6 @@ Hyperdrive is the fast path from the site to Postgres. Creating it needs `SUPABA
 
 ## What is already in the database
 
-The schema files in `supabase/migrations` are the database. Applying them to the CanDo project is a separate step from the GitHub tests. The tests rebuild a throwaway database on the GitHub runner. They do not use the CanDo password.
+The schema files are in `supabase/migrations`. The CanDo project does not have those tables yet. This checkout has no database password, so the files were not pushed to the cloud database. GitHub tests rebuild a throwaway database on the runner. They do not use the CanDo password.
+
+Email sign-in and the return addresses above are also not switched on from here. The switch is in the Supabase dashboard: Authentication, then Providers, then Email, and Authentication, then URL Configuration. The addresses to allow are listed under Sign-in.
