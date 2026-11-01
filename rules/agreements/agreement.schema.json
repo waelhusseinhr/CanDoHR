@@ -189,6 +189,43 @@
         }
       }
     },
+    "applies_to": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Selectors from docs/17 section 11.2. The most specific matching scope wins.",
+      "properties": {
+        "classifications": { "type": "array", "items": { "type": "string" } },
+        "position_groups": { "type": "array", "items": { "type": "string" } },
+        "org_nodes": { "type": "array", "items": { "type": "string" } },
+        "org_subtrees": { "type": "array", "items": { "type": "string" } },
+        "locations": { "type": "array", "items": { "type": "string" } },
+        "schedule_types": { "type": "array", "items": { "type": "string" } },
+        "employment_types": { "type": "array", "items": { "type": "string" } },
+        "statuses": { "type": "array", "items": { "type": "string" } },
+        "hour_bands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" }
+            }
+          }
+        },
+        "age_bands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
     "money": {
       "type": "number",
       "minimum": 0
@@ -441,6 +478,40 @@
             "carryover_max_days": {
               "type": "number"
             },
+            "pay_method": {
+              "enum": [
+                "time",
+                "percent_of_gross_each_period"
+              ]
+            },
+            "week_hours": { "type": "number" },
+            "banking": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "per_year": { "type": "number" },
+                "cap": { "type": "number" }
+              }
+            },
+            "termination_percent": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "service_years": { "type": "number" },
+                  "percent": { "type": "number" }
+                }
+              }
+            },
+            "applies_to": {
+              "$ref": "#/$defs/applies_to"
+            },
+            "precedence": {
+              "enum": [
+                "prevails"
+              ]
+            },
             "cite": {
               "$ref": "#/$defs/citation"
             },
@@ -528,8 +599,31 @@
               "enum": [
                 "calendar_date",
                 "hours_paid",
-                "hours_worked"
+                "hours_worked",
+                "points"
               ]
+            },
+            "points_per_hours": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["points", "hours"],
+              "properties": {
+                "points": { "type": "number" },
+                "hours": { "type": "number" }
+              }
+            },
+            "annual_cap": { "type": "number" },
+            "break_in_service_months": { "type": "number" },
+            "unpaid_leave_adjustment_days": { "type": "number" },
+            "retain_after_transfer_out_months": { "type": "number" },
+            "reciprocal": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "other_unit": { "type": "string" },
+                "transfer_on": { "type": "string" },
+                "conditions": { "type": "string" }
+              }
             },
             "tie_breakers": {
               "type": "array",
@@ -559,6 +653,14 @@
                   "type": "integer"
                 }
               }
+            },
+            "applies_to": {
+              "$ref": "#/$defs/applies_to"
+            },
+            "precedence": {
+              "enum": [
+                "prevails"
+              ]
             },
             "cite": {
               "$ref": "#/$defs/citation"
@@ -608,6 +710,26 @@
             "severance_formula": {
               "type": "string"
             },
+            "grouping": { "type": "string" },
+            "bumping_path": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "grouping": { "type": "string" },
+                  "equal_or_lower": { "type": "boolean" }
+                }
+              }
+            },
+            "applies_to": {
+              "$ref": "#/$defs/applies_to"
+            },
+            "precedence": {
+              "enum": [
+                "prevails"
+              ]
+            },
             "cite": {
               "$ref": "#/$defs/citation"
             },
@@ -648,6 +770,15 @@
             "remit_to": {
               "type": "string"
             },
+            "continues_after_transfer_out_months": { "type": "number" },
+            "applies_to": {
+              "$ref": "#/$defs/applies_to"
+            },
+            "precedence": {
+              "enum": [
+                "prevails"
+              ]
+            },
             "cite": {
               "$ref": "#/$defs/citation"
             },
@@ -669,18 +800,287 @@
               "enum": [
                 "active_on_ratification",
                 "active_on_ratification_and_terminated_after_retro_from",
-                "all_employed_in_retro_period"
+                "all_employed_in_retro_period",
+                "terminated_on_application",
+                "retirees"
               ]
             },
+            "application_days": { "type": "number" },
             "interest": {
               "type": "boolean"
             },
+            "applies_to": {
+              "$ref": "#/$defs/applies_to"
+            },
+            "precedence": {
+              "enum": [
+                "prevails"
+              ]
+            },
+
             "cite": {
               "$ref": "#/$defs/citation"
             },
             "provenance": {
               "$ref": "#/$defs/provenance"
             }
+          }
+        },
+        "acting_pay": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["trigger", "rate_method", "cite", "provenance"],
+            "properties": {
+              "trigger": { "enum": ["full_day", "majority_of_duties", "hours_min", "consecutive_days_min"] },
+              "rate_method": { "enum": ["step_at_least_percent_above", "rate_of_position_incl_premiums", "fixed_premium", "percent_premium"] },
+              "percent": { "type": "number" },
+              "paid_from": { "enum": ["trigger_met", "first_day"] },
+              "credit": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "counter": { "type": "string" },
+                  "amount": { "type": "number" }
+                }
+              },
+              "applies_to": { "$ref": "#/$defs/applies_to" },
+              "precedence": { "enum": ["prevails"] },
+              "cite": { "$ref": "#/$defs/citation" },
+              "provenance": { "$ref": "#/$defs/provenance" }
+            }
+          }
+        },
+        "status_conversion": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from_types", "to_type", "cite", "provenance"],
+            "properties": {
+              "from_types": { "type": "array", "items": { "type": "string" } },
+              "to_type": { "type": "string" },
+              "window": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "months": { "type": "number" },
+                  "hours": { "type": "number" }
+                }
+              },
+              "measured_over": { "type": "number", "description": "Rolling weeks." },
+              "average_hours_min": { "type": "number" },
+              "same_grouping": { "type": "boolean" },
+              "counts_leaves": { "type": "array", "items": { "type": "string" } },
+              "creates_position": { "type": "boolean" },
+              "applies_to": { "$ref": "#/$defs/applies_to" },
+              "precedence": { "enum": ["prevails"] },
+              "cite": { "$ref": "#/$defs/citation" },
+              "provenance": { "$ref": "#/$defs/provenance" }
+            }
+          }
+        },
+        "rate_protection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "red_circle": { "enum": ["freeze", "general_increases_for_months", "lump_sum"] },
+            "out_of_schedule": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "notice_months_before_reduction": { "type": "number" }
+              }
+            },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "cash_in_lieu": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "percent": { "type": "number" },
+            "replaces": { "type": "array", "items": { "enum": ["benefits", "holiday_pay"] } },
+            "after": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "probation": { "type": "boolean" },
+                "months": { "type": "number" }
+              }
+            },
+            "age_bands": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "min": { "type": "number" },
+                  "max": { "type": "number" }
+                }
+              }
+            },
+            "grandfathered": { "type": "boolean" },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "lieu_time": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "election_at_time_of_work": { "type": "boolean" },
+            "payout": { "type": "string" },
+            "carryover_months": { "type": "number" },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "averaging_cycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "length_days": { "type": "number" },
+            "anchor": { "type": "string" },
+            "target_hours": { "type": "number" },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "work_offering": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "tiers": { "type": "array", "items": { "type": "string" } },
+            "returning_staff_first_refusal": { "type": "boolean" },
+            "distribution": { "type": "string" },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "unit_hours_cap": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "average_weekly_max": { "type": "number" },
+            "exceptions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": { "type": "string" },
+                  "max": { "type": "number" }
+                }
+              }
+            },
+            "report": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "frequency": { "type": "string" },
+                "threshold": { "type": "number" }
+              }
+            },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "discipline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "sunset_months": { "type": "number" },
+            "extended_by_absence_days_over": { "type": "number" },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "holiday_pay": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "average_daily_wage_weeks": { "type": "number" },
+            "lieu_day_during": { "type": "array", "items": { "type": "string" } },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "plans": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "pension_plan": { "type": "string" },
+            "benefit_association": { "type": "string" },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "service_pay": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cite", "provenance"],
+          "properties": {
+            "tiers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "years": { "type": "number" },
+                  "amount_per_month": { "type": "number" }
+                }
+              }
+            },
+            "paid": { "type": "string" },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
+          }
+        },
+        "grid_floor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["minimum_wage_jurisdiction", "margin", "cite", "provenance"],
+          "properties": {
+            "minimum_wage_jurisdiction": {
+              "enum": ["FED", "NL", "PE", "NS", "NB", "QC", "ON", "MB", "SK", "AB", "BC", "YT", "NT", "NU"]
+            },
+            "margin": { "type": "number" },
+            "applies_to": { "$ref": "#/$defs/applies_to" },
+            "precedence": { "enum": ["prevails"] },
+            "cite": { "$ref": "#/$defs/citation" },
+            "provenance": { "$ref": "#/$defs/provenance" }
           }
         }
       },
@@ -771,6 +1171,42 @@
             },
             "requires_satisfactory_review": {
               "type": "boolean"
+            },
+            "hour_equivalents": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "hours": { "type": "number" },
+                "months": { "type": "number" }
+              }
+            },
+            "absence_extension_days": { "type": "number" },
+            "performance_hold": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "notice_days_min": { "type": "number" },
+                "max": { "type": "number" }
+              }
+            },
+            "new_hire_rates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string" },
+                  "rate": { "$ref": "#/$defs/money" }
+                }
+              }
+            },
+            "relief_credit": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "counter": { "type": "string" },
+                "amount": { "type": "number" }
+              }
             }
           }
         },
