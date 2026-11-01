@@ -372,10 +372,8 @@ def describe_config(item: dict) -> None:
 
 
 def hyperdrive_origins(password: str) -> list[tuple[str, str, str, str]]:
-    # Hyperdrive pools on its own, so the direct database host is the one to use.
-    # GitHub cannot open that IPv6 host; Cloudflare can. The session pooler is only a fallback.
+    # Use the session pooler. The direct host is IPv6-only, and this connection is the pooler.
     return [
-        ("direct", DIRECT_HOST, "postgres", password),
         ("session-pooler", "aws-0-us-east-1.pooler.supabase.com", f"postgres.{PROJECT_REF}", password),
     ]
 
