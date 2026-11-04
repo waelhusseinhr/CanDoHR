@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install the Postgres client
-        run: sudo apt-get update && sudo apt-get install --yes postgresql-client
+        run: sudo apt-get update && sudo apt-get install --yes postgresql-client libxml2-utils
 
       - name: Install the Supabase CLI
         uses: supabase/setup-cli@v1
@@ -142,4 +142,6 @@ jobs:
           pnpm --filter @candohr/time typecheck
           pnpm --filter @candohr/disbursement test
           pnpm --filter @candohr/disbursement typecheck
+          pnpm --filter @candohr/year-end test
+          pnpm --filter @candohr/year-end typecheck
           pnpm run platform-guards
