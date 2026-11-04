@@ -25,6 +25,7 @@ tags:
   - name: Assistant
   - name: Audit
   - name: Webhooks
+  - name: Recruitment
 
 paths:
   /change-sets:
@@ -745,6 +746,225 @@ paths:
                 properties:
                   subscriptionId: { type: string, format: uuid }
                   secret: { type: string }
+  /workflow-routes:
+    get:
+      tags: [Recruitment]
+      operationId: listWorkflowRoutes
+      parameters:
+        - $ref: '#/components/parameters/AsOf'
+      responses:
+        '200': { description: Routes the organization has copied and edited }
+    post:
+      tags: [Recruitment]
+      operationId: createWorkflowRoute
+      responses:
+        '201': { description: Route created through a change set }
+  /workflow-routes/{routeId}/steps:
+    post:
+      tags: [Recruitment]
+      operationId: addWorkflowRouteStep
+      parameters:
+        - name: routeId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '201': { description: Step added }
+  /cautions/acknowledgements:
+    post:
+      tags: [Recruitment]
+      operationId: acknowledgeCaution
+      responses:
+        '201': { description: The text shown and the person who went past the caution }
+  /requisitions:
+    post:
+      tags: [Recruitment]
+      operationId: createRequisition
+      responses:
+        '201': { description: Requisition drafted from the position, with funding lines }
+  /requisitions/{requisitionId}/submit:
+    post:
+      tags: [Recruitment]
+      operationId: submitRequisition
+      parameters:
+        - { name: requisitionId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Submitted on the organization's route }
+  /requisitions/{requisitionId}/approve:
+    post:
+      tags: [Recruitment]
+      operationId: approveRequisition
+      parameters:
+        - { name: requisitionId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Approval recorded }
+  /posting-exemption-rules:
+    get:
+      tags: [Recruitment]
+      operationId: listPostingExemptionRules
+      responses:
+        '200': { description: The organization's posting exemptions }
+  /postings:
+    post:
+      tags: [Recruitment]
+      operationId: createPosting
+      responses:
+        '201': { description: Posting checked against the location's pay-transparency rule }
+  /postings/{postingId}/publish:
+    post:
+      tags: [Recruitment]
+      operationId: publishPosting
+      parameters:
+        - { name: postingId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Published on an approved requisition }
+  /candidates:
+    post:
+      tags: [Recruitment]
+      operationId: createCandidate
+      responses:
+        '201': { description: Candidate record }
+  /apply:
+    post:
+      tags: [Recruitment]
+      operationId: applyWithoutAccount
+      security: []
+      responses:
+        '201': { description: Application without a sign-in account }
+  /applications/{applicationId}/decide:
+    post:
+      tags: [Recruitment]
+      operationId: decideApplication
+      parameters:
+        - { name: applicationId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: A person records the decision }
+  /interviews/{interviewId}/scores:
+    post:
+      tags: [Recruitment]
+      operationId: submitInterviewScore
+      parameters:
+        - { name: interviewId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Score locked once submitted }
+  /message-templates:
+    get:
+      tags: [Recruitment]
+      operationId: listMessageTemplates
+      responses:
+        '200': { description: The organization's message templates }
+  /message-batches:
+    post:
+      tags: [Recruitment]
+      operationId: sendMessageBatch
+      responses:
+        '201': { description: Batch sent with a reason }
+  /offers:
+    post:
+      tags: [Recruitment]
+      operationId: createOffer
+      responses:
+        '201': { description: Offer drafted inside or outside the range }
+  /offers/{offerId}/submit:
+    post:
+      tags: [Recruitment]
+      operationId: submitOffer
+      parameters:
+        - { name: offerId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Submitted on the organization's route }
+  /offers/{offerId}/approve:
+    post:
+      tags: [Recruitment]
+      operationId: approveOffer
+      parameters:
+        - { name: offerId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Approval recorded }
+  /offers/{offerId}/send:
+    post:
+      tags: [Recruitment]
+      operationId: sendOffer
+      parameters:
+        - { name: offerId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Sent once approved }
+  /offers/{offerId}/accept:
+    post:
+      tags: [Recruitment]
+      operationId: acceptOffer
+      parameters:
+        - { name: offerId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Candidate accepted }
+  /offers/{offerId}/sign-contract:
+    post:
+      tags: [Recruitment]
+      operationId: signOfferContract
+      parameters:
+        - { name: offerId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Contract signed on an accepted offer }
+  /offers/{offerId}/conditions:
+    post:
+      tags: [Recruitment]
+      operationId: startOfferCondition
+      parameters:
+        - { name: offerId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Conditional check after the offer is sent, with consent }
+  /onboarding-plans:
+    get:
+      tags: [Recruitment]
+      operationId: listOnboardingPlans
+      responses:
+        '200': { description: Plans the organization edited from the starters }
+  /employments/{employmentId}/onboarding/generate:
+    post:
+      tags: [Recruitment]
+      operationId: generateOnboardingTasks
+      parameters:
+        - { name: employmentId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Tasks from every plan that applies }
+  /onboarding-tasks/{taskId}/complete:
+    post:
+      tags: [Recruitment]
+      operationId: completeOnboardingTask
+      parameters:
+        - { name: taskId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Task completed by a named person }
+  /employments/{employmentId}/supporters:
+    post:
+      tags: [Recruitment]
+      operationId: addOnboardingSupporter
+      parameters:
+        - { name: employmentId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '201': { description: Buddy, mentor, or trainer }
+  /employments/{employmentId}/probation/extensions:
+    post:
+      tags: [Recruitment]
+      operationId: proposeProbationExtension
+      parameters:
+        - { name: employmentId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '201': { description: Extension proposed with a reason }
+  /employments/{employmentId}/open-matters:
+    get:
+      tags: [Recruitment]
+      operationId: listOpenMatters
+      parameters:
+        - { name: employmentId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: HR sees the matters; a respondent sees only that HR must review }
+  /status-conversions:
+    post:
+      tags: [Recruitment]
+      operationId: requestStatusConversion
+      responses:
+        '201': { description: Conversion requested by a manager, a threshold, or an agreement }
 
 components:
   securitySchemes:

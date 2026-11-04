@@ -30,6 +30,22 @@ channels:
       paymentReleased: { $ref: '#/components/messages/paymentReleased' }
       retroRequested: { $ref: '#/components/messages/retroRequested' }
       ruleEditionLoaded: { $ref: '#/components/messages/ruleEditionLoaded' }
+      cautionAcknowledged: { $ref: '#/components/messages/cautionAcknowledged' }
+      requisitionApproved: { $ref: '#/components/messages/requisitionApproved' }
+      postingPublished: { $ref: '#/components/messages/postingPublished' }
+      applicationDecided: { $ref: '#/components/messages/applicationDecided' }
+      offerApproved: { $ref: '#/components/messages/offerApproved' }
+      offerSent: { $ref: '#/components/messages/offerSent' }
+      offerAccepted: { $ref: '#/components/messages/offerAccepted' }
+      offerContractSigned: { $ref: '#/components/messages/offerContractSigned' }
+      offerExpired: { $ref: '#/components/messages/offerExpired' }
+      onboardingTaskOverdue: { $ref: '#/components/messages/onboardingTaskOverdue' }
+      onboardingLegalDueSoon: { $ref: '#/components/messages/onboardingLegalDueSoon' }
+      probationReminderDue: { $ref: '#/components/messages/probationReminderDue' }
+      probationExtended: { $ref: '#/components/messages/probationExtended' }
+      probationLapsedPassed: { $ref: '#/components/messages/probationLapsedPassed' }
+      probationLeaveCautionShown: { $ref: '#/components/messages/probationLeaveCautionShown' }
+      statusConversionFlagged: { $ref: '#/components/messages/statusConversionFlagged' }
 operations:
   publishDomainEvents:
     action: send
@@ -93,3 +109,19 @@ components:
     paymentReleased: { name: payment.released, payload: { $ref: '#/components/schemas/Envelope' } }
     retroRequested: { name: retro.requested, payload: { $ref: '#/components/schemas/Envelope' } }
     ruleEditionLoaded: { name: rule_edition.loaded, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Compliance dashboard; payroll pre-run checks' }
+    cautionAcknowledged: { name: caution.acknowledged, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    requisitionApproved: { name: requisition.approved, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    postingPublished: { name: posting.published, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    applicationDecided: { name: application.decided, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    offerApproved: { name: offer.approved, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    offerSent: { name: offer.sent, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    offerAccepted: { name: offer.accepted, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    offerContractSigned: { name: offer.contract_signed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    offerExpired: { name: offer.expired, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    onboardingTaskOverdue: { name: onboarding.task_overdue, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    onboardingLegalDueSoon: { name: onboarding.legal_due_soon, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    probationReminderDue: { name: probation.reminder_due, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    probationExtended: { name: probation.extended, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    probationLapsedPassed: { name: probation.lapsed_passed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    probationLeaveCautionShown: { name: probation.leave_caution_shown, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    statusConversionFlagged: { name: status_conversion.flagged, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
