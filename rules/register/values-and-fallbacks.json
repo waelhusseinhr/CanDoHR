@@ -5194,6 +5194,38 @@
    "class": "neutral_choice",
    "note": "The organization does not submit data unless it says so"
   },
+  "openapi.yaml#deleteOnExpiry=false": {
+   "class": "neutral_choice",
+   "note": "Licence term recorded from the licence"
+  },
+  "openapi.yaml#dryRun=true": {
+   "class": "safety",
+   "note": "An import validates without loading unless the caller says to load"
+  },
+  "openapi.yaml#employeesMaySee=false": {
+   "class": "safety",
+   "note": "Survey data is hidden from employees unless the licence allows it"
+  },
+  "openapi.yaml#final=false": {
+   "class": "initial_state",
+   "note": "An assessment starts as a draft"
+  },
+  "openapi.yaml#format=xlsx": {
+   "class": "technical",
+   "note": "File format of an export"
+  },
+  "openapi.yaml#includeSelf=false": {
+   "class": "neutral_choice",
+   "note": "Self-assessments are shown beside a gap and counted only when asked (docs/20 §5.4)"
+  },
+  "openapi.yaml#includeVacant=false": {
+   "class": "neutral_choice",
+   "note": "Vacant positions are left out of a submission unless included"
+  },
+  "openapi.yaml#participates=false": {
+   "class": "neutral_choice",
+   "note": "The organization does not submit data unless it says so"
+  },
   "openapi.yaml#approvedTime=true": {
    "class": "technical",
    "note": "A pay run includes every input unless the caller leaves one out"

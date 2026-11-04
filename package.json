@@ -10,6 +10,7 @@
     "start": "vite preview",
     "deploy": "vinext-cloudflare deploy",
     "test": "pnpm -r --if-present run test",
+    "test:market-pricing": "pnpm --filter @candohr/compensation exec node --experimental-strip-types --test --test-concurrency=1 tests/market-pricing.test.ts",
     "typecheck": "pnpm -r --if-present run typecheck",
     "platform-guards": "node --experimental-strip-types scripts/platform-guards.ts"
   },
