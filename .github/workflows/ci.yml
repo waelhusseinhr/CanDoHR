@@ -152,4 +152,6 @@ jobs:
           pnpm --filter @candohr/offboarding typecheck
           pnpm --filter @candohr/talent test
           pnpm --filter @candohr/talent typecheck
+          pnpm --filter @candohr/analytics test
+          pnpm --filter @candohr/analytics typecheck
           pnpm run platform-guards
