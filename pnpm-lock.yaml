@@ -343,6 +343,19 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
+  packages/recruiting:
+    dependencies:
+      '@candohr/disbursement':
+        specifier: workspace:*
+        version: link:../disbursement
+    devDependencies:
+      '@types/node':
+        specifier: ^22.15.30
+        version: 22.20.5
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+
   packages/retro:
     dependencies:
       decimal.js:
