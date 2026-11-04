@@ -150,4 +150,6 @@ jobs:
           pnpm --filter @candohr/compensation typecheck
           pnpm --filter @candohr/offboarding test
           pnpm --filter @candohr/offboarding typecheck
+          pnpm --filter @candohr/talent test
+          pnpm --filter @candohr/talent typecheck
           pnpm run platform-guards
