@@ -1,0 +1,59 @@
+{
+  "$comment": "Applicability for the statutory report catalogue (docs/25 §8.3, stories/12 ANA-005, stories/13 COMPL-001). Counts and due dates are the owner decisions cited on each entry. form_status verify_at_load means a draft may be listed and filing is refused. This file is not a government form. A due date that is absent here is not invented. requirements/13 mentions 100 employees for federal employment equity; docs/25 §8.3 does not use that count as a gate.",
+  "version": "2026-11-04",
+  "source_decisions": "docs/25 §8.3; stories/12 ANA-005; stories/13 COMPL-001",
+  "reports": {
+    "BC_PAY_TRANSPARENCY": {
+      "who": "British Columbia employers with at least the employee count on this entry",
+      "min_employees": 50,
+      "due": { "month": 11, "day": 1 },
+      "first_year": 2026,
+      "form_status": "verify_at_load",
+      "source_data": "headcount and pay on the report date",
+      "cite": "docs/25 §8.3; BC Ministry of Finance, Pay Transparency Report (1 June 2026): https://news.gov.bc.ca/releases/2026FIN0022-000633"
+    },
+    "FED_PAY_EQUITY": {
+      "who": "federally regulated employers",
+      "form_status": "verify_at_load",
+      "source_data": "pay and hours for the federally regulated payroll",
+      "cite": "docs/25 §8.3"
+    },
+    "FED_EMPLOYMENT_EQUITY": {
+      "who": "federally regulated employers",
+      "form_status": "verify_at_load",
+      "source_data": "workforce representation for the federally regulated payroll",
+      "cite": "docs/25 §8.3"
+    },
+    "EHT": {
+      "who": "employers the jurisdiction's employer health tax covers",
+      "form_status": "verify_at_load",
+      "source_data": "payroll subject to the employer health tax",
+      "cite": "stories/12 ANA-005. No due date is in a verified rule edition."
+    },
+    "WCB_ANNUAL": {
+      "who": "employers with a workers' compensation account",
+      "form_status": "verify_at_load",
+      "source_data": "assessable payroll for the board account",
+      "cite": "stories/12 ANA-005. No due date is in a verified rule edition."
+    },
+    "UNION_DUES_REMITTANCE": {
+      "who": "employers that remit union dues",
+      "form_status": "verify_at_load",
+      "source_data": "dues withheld for the bargaining unit",
+      "cite": "stories/12 ANA-005. No due date is in a verified rule edition."
+    },
+    "T4": {
+      "who": "employers who file a T4",
+      "due": { "month": 2, "day": "last" },
+      "form_status": "verify_at_load",
+      "source_data": "year-end slips",
+      "cite": "stories/13 COMPL-001. The T4 is due at the end of February. The slip schema is the publisher file already stored under vendor/. This entry does not reconstruct a submission."
+    },
+    "CRA_REMITTANCE": {
+      "who": "employers who remit source deductions",
+      "form_status": "verify_at_load",
+      "source_data": "payroll source deductions",
+      "cite": "stories/13 COMPL-001. The due date depends on the remitter type and is not a single date in this file."
+    }
+  }
+}
