@@ -46,6 +46,15 @@ channels:
       probationLapsedPassed: { $ref: '#/components/messages/probationLapsedPassed' }
       probationLeaveCautionShown: { $ref: '#/components/messages/probationLeaveCautionShown' }
       statusConversionFlagged: { $ref: '#/components/messages/statusConversionFlagged' }
+      competencyFrameworkPublished: { $ref: '#/components/messages/competencyFrameworkPublished' }
+      competencyTargetChanged: { $ref: '#/components/messages/competencyTargetChanged' }
+      competencyAssessmentFinalized: { $ref: '#/components/messages/competencyAssessmentFinalized' }
+      jobEvaluationApproved: { $ref: '#/components/messages/jobEvaluationApproved' }
+      surveyEditionPublished: { $ref: '#/components/messages/surveyEditionPublished' }
+      marketPricingRunApproved: { $ref: '#/components/messages/marketPricingRunApproved' }
+      payStructureVersionApproved: { $ref: '#/components/messages/payStructureVersionApproved' }
+      surveySubmissionExported: { $ref: '#/components/messages/surveySubmissionExported' }
+      rewardPracticeValuesChanged: { $ref: '#/components/messages/rewardPracticeValuesChanged' }
 operations:
   publishDomainEvents:
     action: send
@@ -125,3 +134,12 @@ components:
     probationLapsedPassed: { name: probation.lapsed_passed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
     probationLeaveCautionShown: { name: probation.leave_caution_shown, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
     statusConversionFlagged: { name: status_conversion.flagged, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    competencyFrameworkPublished: { name: competency.framework.published, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Proposals to move targets to the new version. Identifiers only' }
+    competencyTargetChanged: { name: competency.target.changed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Gap refresh. Identifiers only' }
+    competencyAssessmentFinalized: { name: competency.assessment.finalized, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Gap refresh. Identifiers only' }
+    jobEvaluationApproved: { name: job_evaluation.approved, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Grade proposal. Identifiers only' }
+    surveyEditionPublished: { name: survey.edition.published, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Pricing runs on the prior edition marked stale. Identifiers only' }
+    marketPricingRunApproved: { name: market_pricing.run.approved, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }
+    payStructureVersionApproved: { name: pay_structure.version.approved, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only. Amounts stay off the event' }
+    surveySubmissionExported: { name: survey_submission.exported, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Audit only. Identifiers only' }
+    rewardPracticeValuesChanged: { name: reward_practice.values.changed, payload: { $ref: '#/components/schemas/Envelope' }, summary: 'Identifiers only' }

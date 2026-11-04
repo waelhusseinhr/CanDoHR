@@ -146,4 +146,6 @@ jobs:
           pnpm --filter @candohr/year-end typecheck
           pnpm --filter @candohr/recruiting test
           pnpm --filter @candohr/recruiting typecheck
+          pnpm --filter @candohr/compensation test
+          pnpm --filter @candohr/compensation typecheck
           pnpm run platform-guards
