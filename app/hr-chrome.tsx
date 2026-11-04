@@ -9,7 +9,13 @@ export function HrChrome(props: { locale: Locale; path: string; tab?: string; ch
   const positions = locale === "fr-CA" ? "/positions?lang=fr-CA" : "/positions";
   const chart = locale === "fr-CA" ? "/org-chart?lang=fr-CA" : "/org-chart";
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950">
+    <div lang={locale} className="min-h-screen bg-slate-50 text-slate-950">
+      <a
+        href="#content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-10 focus:bg-white focus:px-3 focus:py-2 focus:text-slate-950"
+      >
+        {ct(locale, "nav.skip")}
+      </a>
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-4">
           <nav className="flex items-center gap-4 text-sm">
@@ -25,7 +31,7 @@ export function HrChrome(props: { locale: Locale; path: string; tab?: string; ch
           </a>
         </div>
       </header>
-      {children}
+      <div id="content">{children}</div>
     </div>
   );
 }

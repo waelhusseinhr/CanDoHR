@@ -1,0 +1,10 @@
+{
+  "loadedIntoDatabase": false,
+  "builder": "@candohr/hardening",
+  "note": "People are generated in memory by the hardening package. They are not inserted into the CanDo project. Light org mode is not used.",
+  "tenants": [
+    { "code": "northern-lights", "name": "Northern Lights Non-Profit", "employees": 60 },
+    { "code": "example-municipality", "name": "Example Municipality", "employees": 2400 },
+    { "code": "example-first-nation", "name": "Example First Nation", "employees": 180 }
+  ]
+}

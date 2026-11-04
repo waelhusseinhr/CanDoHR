@@ -156,4 +156,6 @@ jobs:
           pnpm --filter @candohr/analytics typecheck
           pnpm --filter @candohr/assistant test
           pnpm --filter @candohr/assistant typecheck
+          pnpm --filter @candohr/hardening test
+          pnpm --filter @candohr/hardening typecheck
           pnpm run platform-guards
