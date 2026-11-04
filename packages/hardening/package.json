@@ -1,0 +1,24 @@
+{
+  "name": "@candohr/hardening",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test --test-concurrency=1 tests/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@candohr/access": "workspace:*",
+    "@candohr/audit": "workspace:*",
+    "@candohr/core": "workspace:*",
+    "@candohr/org-chart": "workspace:*",
+    "@candohr/pay-runs": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "typescript": "^5.8.3"
+  }
+}

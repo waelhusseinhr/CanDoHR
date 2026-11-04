@@ -34,6 +34,7 @@ const MESSAGES = {
     "positions.title": "Positions",
     "positions.empty": "No positions to show.",
     "lang.switch": "Français",
+    "nav.skip": "Skip to content",
   },
   "fr-CA": {
     "people.title": "Personnes",
@@ -65,6 +66,7 @@ const MESSAGES = {
     "positions.title": "Postes",
     "positions.empty": "Aucun poste à afficher.",
     "lang.switch": "English",
+    "nav.skip": "Aller au contenu",
   },
 } as const;
 
