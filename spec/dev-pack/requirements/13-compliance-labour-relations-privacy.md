@@ -2,6 +2,8 @@
 
 Oct 17, 2026 · @Wael
 
+> **Reviewed 3 Nov 2026.** Decisions in `docs/34-compliance-labour-relations-privacy-decisions.md`, applied in migration `schema/0020_compliance_labour_relations_privacy_decisions.sql`. This is the last of the thirteen module reviews. Inline notes below point to the relevant docs/34 section; the five open questions this module could close are closed at the bottom, and the sixth (Indigenous data governance / OCAP) stays open.
+
 ## Overview and scope
 
 > **Draft status:** new specification. Brings together the compliance content spread through the recruitment files (human rights, privacy, accessibility, Indigenous hiring, collective agreement hiring rules) and the payroll files (statutory compliance, audit, records), and adds the programs that had no source.
@@ -10,7 +12,7 @@ Compliance, Labour Relations & Privacy is where an organization manages its lega
 
 **In scope:** regulatory rules repository and change monitoring; compliance calendar; human rights accommodation and return to work; occupational health and safety; workplace harassment and violence programs and investigations; confidential speak-up channel; labour relations (agreements, grievances, bargaining support, arbitration); employment equity, pay equity program administration and accessibility; privacy program; immigration and hiring compliance support.
 
-**Not legal advice:** the module tracks and applies rules and records decisions. Customers remain responsible for legal interpretation, and content is reviewed by Canadian employment counsel before release.
+**Not legal advice:** the module tracks and applies rules and records decisions. Customers remain responsible for legal interpretation, and content is reviewed by Canadian employment counsel before release. *(docs/34 §1: this is why `compliance.rule_ai_interpretation_enabled` is locked off forever — no AI feature interprets, summarizes or drafts an opinion on what a law requires.)*
 
 ## Regulatory framework and rules repository
 
@@ -32,54 +34,60 @@ Compliance, Labour Relations & Privacy is where an organization manages its lega
 
 **Rules repository:** every rule stored as structured, effective-dated configuration with its legal citation, jurisdiction, applicability conditions, owner and review date; rule changes go through drafting, legal review, testing against sample employees and approval; modules read rules at run time so a change takes effect without code releases.
 
-**Change monitoring:** legislative and regulatory changes tracked from government sources; each change logged with impact assessment (which rules, modules and customers), target date and status; customers notified in plain language before effective dates.
+> **Decided (docs/34 §3):** CanDo seeds a starter/reference copy by jurisdiction (`ref.rule_starter`, CanDo-verified before loading); **the organization owns keeping its own copy current** from there (`compliance.rule`). A seeded rule starts as a draft and can go active only once the organization records an owner and its own review — CanDo never silently re-syncs a live tenant's rules. This is distinct from the statutory-tables precedent (payroll tax tables, employment standards), which CanDo does own and maintain centrally; the rules repository here covers far more fact-specific, jurisdiction-specific ground than a single verifiable number.
+
+**Change monitoring:** legislative and regulatory changes tracked from government sources; each change logged with impact assessment (which rules, modules and customers), target date and status; customers notified in plain language before effective dates. *(`compliance.legislative_change`, docs/34 §3.)*
 
 ## Compliance calendar and obligations tracking
 
-**Obligations register:** every recurring obligation for the customer, generated from their entities, jurisdictions, size thresholds and agreements: filings, remittances, postings (for example employment standards posters, pay equity results), policy reviews (for example annual workplace violence and harassment policy review in Ontario), training renewals, committee meetings and inspections, privacy reviews, agreement expiry and bargaining notice windows.
+**Obligations register:** every recurring obligation for the customer, generated from their entities, jurisdictions, size thresholds and agreements: filings, remittances, postings (for example employment standards posters, pay equity results), policy reviews (for example annual workplace violence and harassment policy review in Ontario), training renewals, committee meetings and inspections, privacy reviews, agreement expiry and bargaining notice windows. *(`compliance.obligation`, docs/34 §4; COMPL-001.)*
 
-**Calendar:** due dates with owners; reminders ahead of deadlines; evidence upload when done; overdue escalation; view by month, by entity and by law area.
+**Calendar:** due dates with owners; reminders ahead of deadlines (`compliance.obligation_reminder_days`, default 30); evidence upload when done; overdue escalation; view by month, by entity and by law area.
 
-**Policy library:** required policies per jurisdiction with templates, versions, approval, distribution and employee acknowledgement tracked (shared document service); policies due for review flagged.
+**Policy library:** required policies per jurisdiction with templates, versions, approval, distribution and employee acknowledgement tracked (shared document service); policies due for review flagged. *(`compliance.policy` / `compliance.policy_acknowledgement`, docs/34 §5.)*
 
-**Self-assessments:** periodic checklists by law area (for example an employment standards self-audit) with findings and remediation actions.
+**Self-assessments:** periodic checklists by law area (for example an employment standards self-audit) with findings and remediation actions. *(Scope cut: not built — no story AC covers a self-assessment checklist; a future addition on top of the obligations register.)*
 
-**Inspections and audits:** visits from labour inspectors, health and safety officers, CRA payroll audits or privacy regulators logged with requests, documents provided, orders received, compliance dates and closure.
+**Inspections and audits:** visits from labour inspectors, health and safety officers, CRA payroll audits or privacy regulators logged with requests, documents provided, orders received, compliance dates and closure. *(`compliance.inspection`, docs/34 §6.)*
 
 ## Human rights, accommodation and return to work
 
-**Accommodation cases:** request from the employee, a manager, a candidate (from Module 02) or a disability claim (Module 05); grounds category (disability, religion, family status, sex including pregnancy, and other protected grounds) recorded without diagnosis; functional limitations and restrictions from medical providers (not medical details); options considered with reasons; agreed accommodations (modified duties, schedules, equipment, leave, alternate role); undue hardship assessment documented where accommodation is refused; review dates; outcome.
+**Accommodation cases:** request from the employee, a manager, a candidate (from Module 02) or a disability claim (Module 05); grounds category (disability, religion, family status, sex including pregnancy, and other protected grounds) recorded without diagnosis; functional limitations and restrictions from medical providers (not medical details); options considered with reasons; agreed accommodations (modified duties, schedules, equipment, leave, alternate role); undue hardship assessment documented where accommodation is refused; review dates; outcome. *(`compliance.accommodation_case`, docs/34 §7; EQ-002. The outcome goes through the new `accommodation_outcome` route; neither the case owner nor the employee can approve it.)*
 
-**Return to work:** graduated return plans with hours and duties by week; coordination with STD or LTD carriers and workers' compensation boards; check-ins; adjustments; schedule and pay changes pushed to Modules 06 and 03.
+**Return to work:** graduated return plans with hours and duties by week; coordination with STD or LTD carriers and workers' compensation boards; check-ins; adjustments; schedule and pay changes pushed to Modules 06 and 03. *(`compliance.rtw_plan`, docs/34 §7 — deliberately linked to either an accommodation case or a WCB claim, since the law requires RTW planning for a workplace injury either way.)*
 
 **Duty to accommodate safeguards:** prompts when the system sees signals that may trigger the duty (repeated absences, performance concerns after a leave, requests mentioning a protected ground) so managers involve HR; attendance and performance processes in Modules 06 and 07 pause or exclude protected absences.
 
-**Confidentiality:** case files restricted to the accommodation coordinator and HR; managers see only the agreed accommodations they must implement; medical documents, if received, stored in a sealed section with separate access logging and retention.
+**Confidentiality:** case files restricted to the accommodation coordinator and HR; managers see only the agreed accommodations they must implement; medical documents, if received, stored in a sealed section with separate access logging and retention. *(Every view is logged — `compliance.case_view_log`, docs/34 §13.)*
 
-**Human rights complaints:** complaints to a tribunal or commission tracked with deadlines, representatives, documents and outcomes.
+**Human rights complaints:** complaints to a tribunal or commission tracked with deadlines, representatives, documents and outcomes. *(Scope cut: not a separate table — tracked as an `compliance.investigation` of category `discrimination` or as `compliance.legal_hold`/document attachments against the accommodation case; no story AC calls for a dedicated tribunal-complaint entity.)*
 
 ## Occupational health and safety
 
+> **Decided (docs/34 §8):** full in-house case management, not integration with a separate EHS product — CanDo's stated differentiator (see "How CanDo compares" below).
+
 | Capability | Detail |
 | --- | --- |
-| Incident reporting | Mobile reporting of injuries, illnesses, near misses and hazards, with photos and witnesses; anonymous hazard reports allowed |
-| Regulator notifications | Critical or serious injury and fatality notifications flagged as immediate; jurisdiction deadlines tracked |
-| Workers' compensation claims | Employer reports to the provincial board (for example the employer's report of injury within the board's deadline, often three days); claim number, status, lost time, modified work, costs; experience rating impact |
-| Investigation | Root cause analysis; corrective actions with owners and due dates; verification of completion |
-| Hazard and risk assessment | Hazard register by site and job; controls; review dates; link to training requirements in Module 08 |
-| Committees and representatives | Joint health and safety committees or representatives where thresholds require; members, certification, meeting minutes, recommendations and employer responses with legislated response times |
-| Inspections | Workplace inspection schedules, checklists, findings and actions |
-| WHMIS | Safety data sheet library by site; worker education records |
-| Work refusals | Right-to-refuse process with each stage recorded, as legislated |
-| Psychological safety | Optional program aligned with the CSA Z1003 standard |
+| Incident reporting | Mobile reporting of injuries, illnesses, near misses and hazards, with photos and witnesses; anonymous hazard reports allowed *(`compliance.incident`, `kind` distinguishes a hazard observation from an injury)* |
+| Regulator notifications | Critical or serious injury and fatality notifications flagged as immediate; jurisdiction deadlines tracked *(`compliance.incident.is_critical_injury`, `regulator_notified_at`)* |
+| Workers' compensation claims | Employer reports to the provincial board (for example the employer's report of injury within the board's deadline, often three days); claim number, status, lost time, modified work, costs; experience rating impact *(`compliance.wcb_claim`)* |
+| Investigation | Root cause analysis; corrective actions with owners and due dates; verification of completion *(`compliance.incident.corrective_actions`)* |
+| Hazard and risk assessment | Hazard register by site and job; controls; review dates; link to training requirements in Module 08 *(folded into `compliance.incident` with `kind = 'hazard_observation'` rather than a separate table)* |
+| Committees and representatives | Joint health and safety committees or representatives where thresholds require; members, certification, meeting minutes, recommendations and employer responses with legislated response times *(`compliance.ohs_committee`, meetings kept inline)* |
+| Inspections | Workplace inspection schedules, checklists, findings and actions *(`compliance.inspection`)* |
+| WHMIS | Safety data sheet library by site; worker education records *(`compliance.sds_document`; worker education tracked as training in Module 08, not duplicated here)* |
+| Work refusals | Right-to-refuse process with each stage recorded, as legislated *(`compliance.work_refusal`)* |
+| Psychological safety | Optional program aligned with the CSA Z1003 standard *(scope cut: not built — no story AC covers a dedicated psychological-safety program beyond the harassment/violence policy and incident tracking already built)* |
 
-**Metrics:** lost time injury frequency and severity, total recordable incident rate, days lost, claim costs, overdue corrective actions, committee recommendation response times.
+**Metrics:** lost time injury frequency and severity, total recordable incident rate, days lost, claim costs, overdue corrective actions, committee recommendation response times. *(Fed by `compliance.incident`/`compliance.wcb_claim` into Module 12's reporting layer.)*
 
 ## Harassment, violence, investigations and speak-up
 
-**Prevention program:** policies and programs required by jurisdiction (for example Ontario's workplace violence and harassment policies and program with annual review; federal workplace harassment and violence prevention regulations with workplace assessment, prevention policy, designated recipient and training); risk assessments for workplace violence; training assignments through Module 08.
+**Prevention program:** policies and programs required by jurisdiction (for example Ontario's workplace violence and harassment policies and program with annual review; federal workplace harassment and violence prevention regulations with workplace assessment, prevention policy, designated recipient and training); risk assessments for workplace violence; training assignments through Module 08. *(`compliance.policy`, category `harassment_violence`.)*
 
 **Speak-up channel:** confidential intake by web, mobile and phone (third-party hotline option); anonymous reporting with two-way anonymous messaging; categories (harassment, discrimination, violence, safety, fraud, ethics, privacy); acknowledgment within a set time; protection against reprisal stated and monitored.
+
+> **Decided (docs/34 §9):** built in-house — `compliance.speakup_report` / `compliance.speakup_message` — not a third-party hotline partner, so case management stays in one system. A named report must name a reporter (`speakup_identity_consistent`); an anonymous reporter checks back in with a rotating case token. `compliance.speakup_ack_hours` (default 48) is the first-acknowledgement SLA.
 
 **Investigation case management:**
 
@@ -92,13 +100,15 @@ Compliance, Labour Relations & Privacy is where an organization manages its lega
 | Outcome | Corrective actions, discipline (through Core HR transactions with HR approval), communication of results to the parties as required (for example Ontario requires written results to the complainant and the alleged harasser) |
 | Follow-up | Reprisal monitoring, climate actions, policy changes |
 
-**Discipline records:** conduct-related discipline (as distinct from performance in Module 07) with progressive steps, union representation, and sunset clause enforcement from collective agreements.
+*(`compliance.investigation`, docs/34 §9. "Evidence" and "chain of custody" detail live as `platform.document` attachments rather than a separate evidence-pack table — scope cut, no story AC calls for a dedicated chain-of-custody ledger.)*
+
+**Discipline records:** conduct-related discipline (as distinct from performance in Module 07) with progressive steps, union representation, and sunset clause enforcement from collective agreements. *(`compliance.discipline_record`, docs/34 §9 — never shared with a performance review, the same separation `docs/28` already keeps.)*
 
 **Access:** investigation files are visible only to assigned investigators and designated HR; parties never see each other's identities through the system beyond what the process requires.
 
 ## Labour relations
 
-**Agreement administration:** agreement records and terms live in Core HR (Module 01); this module adds the full agreement text with article-level search, letters of understanding, memoranda of settlement, side agreements and interpretation notes, so managers can find the article that applies.
+**Agreement administration:** agreement records and terms live in Core HR (Module 01); this module adds the full agreement text with article-level search, letters of understanding, memoranda of settlement, side agreements and interpretation notes, so managers can find the article that applies. *(Already built — `core.agreement`/`core.agreement_version`, migration 0003, `docs/08`.)*
 
 **Grievances:**
 
@@ -111,21 +121,23 @@ Compliance, Labour Relations & Privacy is where an organization manages its lega
 | Resolution | Settled, withdrawn, denied, referred to arbitration; settlement terms and any pay or record changes routed to the right module |
 | Arbitration | Arbitrator, hearing dates, counsel, costs, award and implementation tracking |
 
-**Bargaining support:** costing of union proposals using real payroll, benefits and schedule data (for example the cost of a 2% increase, an extra holiday or a premium change over the agreement term); proposal tracking by article and status; comparisons with other agreements; scenarios shared with Module 09 and Module 04.
+*(`compliance.grievance`, docs/34 §10; LR-010. Steps and arbitration detail kept as structured fields on the one row, read as a case file, not joined across a steps table. A settlement goes through the new `grievance_settlement` route; the officer who proposed it cannot approve it herself.)*
 
-**Union relations:** union contacts and stewards; joint committees; labour-management meeting minutes; information requests from the union with response dates; union leave tracking (Module 06); dues remittances (Module 03).
+**Bargaining support:** costing of union proposals using real payroll, benefits and schedule data (for example the cost of a 2% increase, an extra holiday or a premium change over the agreement term); proposal tracking by article and status; comparisons with other agreements; scenarios shared with Module 09 and Module 04. *(`compliance.bargaining_proposal`, docs/34 §10 — tracking and a non-binding cost estimate only; like `comp.bargaining_scenario`, a proposal never changes pay or terms by itself.)*
 
-**Certification proceedings:** the system records only official proceedings (board applications, hearing dates, certificates issued) for legal follow-up. It never records or infers any individual employee's union support or activity, since that information is protected and collecting it could amount to interference.
+**Union relations:** union contacts and stewards; joint committees; labour-management meeting minutes; information requests from the union with response dates; union leave tracking (Module 06); dues remittances (Module 03). *(Scope cut: contacts, joint-committee minutes beyond OHS, and labour-management meeting minutes are not built — no story AC covers them; union leave and dues remittance are already handled in Modules 06 and 03.)*
+
+**Certification proceedings:** the system records only official proceedings (board applications, hearing dates, certificates issued) for legal follow-up. It never records or infers any individual employee's union support or activity, since that information is protected and collecting it could amount to interference. *(Scope cut: not built as a dedicated table — no story AC calls for it; the non-negotiable privacy constraint stated here still applies to anything built later.)*
 
 ## Employment equity, pay equity and accessibility
 
-**Employment equity (federally regulated employers with 100 or more employees, and federal contractors):** workforce survey with voluntary self-identification; workforce analysis comparing representation of designated groups with labour market availability by occupational group; employment systems review; employment equity plan with goals and measures; annual report data including salary information; small-group suppression in every output. Provincially regulated employers can use the same tools voluntarily.
+**Employment equity (federally regulated employers with 100 or more employees, and federal contractors):** workforce survey with voluntary self-identification; workforce analysis comparing representation of designated groups with labour market availability by occupational group; employment systems review; employment equity plan with goals and measures; annual report data including salary information; small-group suppression in every output. Provincially regulated employers can use the same tools voluntarily. *(`compliance.employment_equity_report`, docs/34 §11; EQ-001. Suppression reuses `privacy.min_group_size_self_id` (10) directly — no third suppression mechanism alongside `analytics.min_group_size` and engagement's own floor.)*
 
-**Pay equity program administration:** committees, job class determination, gender predominance, evaluation, comparisons, required adjustments, postings and maintenance reviews, for the federal Pay Equity Act, Ontario and Quebec regimes and public-sector statutes; analytics come from Module 04.
+**Pay equity program administration:** committees, job class determination, gender predominance, evaluation, comparisons, required adjustments, postings and maintenance reviews, for the federal Pay Equity Act, Ontario and Quebec regimes and public-sector statutes; analytics come from Module 04. *(Scope cut: committee/job-class/posting detail not built — tracked only at the filing level via `compliance.employment_equity_report.program = 'pay_equity'`; no story AC covers the committee workflow itself.)*
 
-**Accessibility:** organizational accessibility plans and progress reports where legislation requires them (for example federal entities under the Accessible Canada Act, Ontario AODA compliance reports); feedback process for accessibility barriers; accessible formats for employee documents on request; accommodation in recruitment (Module 02) and employment (accommodation cases above).
+**Accessibility:** organizational accessibility plans and progress reports where legislation requires them (for example federal entities under the Accessible Canada Act, Ontario AODA compliance reports); feedback process for accessibility barriers; accessible formats for employee documents on request; accommodation in recruitment (Module 02) and employment (accommodation cases above). *(Scope cut: the plan/report is tracked at the filing level via `compliance.employment_equity_report.program = 'accessibility_plan'`; the feedback process itself is not built — no story AC covers it.)*
 
-**Indigenous employment:** Indigenous hiring commitments, impact benefit agreement employment obligations, and reporting to communities or funders; s.87 tax exemption documentation (with Module 03); support for Indigenous organizations' own governance of HR data.
+**Indigenous employment:** Indigenous hiring commitments, impact benefit agreement employment obligations, and reporting to communities or funders; s.87 tax exemption documentation (with Module 03); support for Indigenous organizations' own governance of HR data. *(See the open question below — OCAP stays open.)*
 
 ## Privacy and data protection program
 
@@ -133,15 +145,15 @@ The platform's technical controls are specified in Module 00 and each module; th
 
 | Component | Capability |
 | --- | --- |
-| Accountability | Privacy officer designation (required in Quebec, with the title and contact published); privacy policies and notices by purpose; governance records |
-| Inventory | Register of personal information held: categories, purposes, legal basis, retention, location, recipients |
-| Privacy impact assessments | Templates and workflow for new systems, monitoring, AI features and cross-border transfers (Quebec Law 25 requires assessments before transferring personal information outside Quebec) |
-| Consent and notices | Recorded consents for optional data (self-identification, biometrics, location, marketing to alumni), withdrawal handled |
-| Access and correction requests | Request intake, identity verification, statutory response deadlines (for example 30 days), redaction support, response tracking |
-| Retention and destruction | Retention schedules per data class and jurisdiction with legal holds; automated destruction or anonymisation with logs |
-| Breach management | Incident intake, risk-of-significant-harm assessment, notification to regulators and individuals where required, breach register kept for the legislated period |
-| Vendors | Service provider register, data processing agreements, sub-processor list, transfer assessments |
-| Automated decisions | Notices and review requests where decisions rely on automated processing (Law 25), supported by the AI guardrails |
+| Accountability | Privacy officer designation (required in Quebec, with the title and contact published); privacy policies and notices by purpose; governance records *(`compliance.privacy_officer`)* |
+| Inventory | Register of personal information held: categories, purposes, legal basis, retention, location, recipients *(`compliance.retention_schedule` covers the retention side; the fuller inventory register is a scope cut — no story AC covers it)* |
+| Privacy impact assessments | Templates and workflow for new systems, monitoring, AI features and cross-border transfers (Quebec Law 25 requires assessments before transferring personal information outside Quebec) *(`compliance.pia`; a cross-border feature cannot go live without an approved PIA — `cross_border_needs_approved_pia`)* |
+| Consent and notices | Recorded consents for optional data (self-identification, biometrics, location, marketing to alumni), withdrawal handled *(already handled where the consenting data lives — e.g. self-identification consent in Core HR)* |
+| Access and correction requests | Request intake, identity verification, statutory response deadlines (for example 30 days), redaction support, response tracking *(`compliance.access_request`, docs/34 §12; PRIV-001. The deadline is law content read from `compliance.rule`, never a hard-coded default.)* |
+| Retention and destruction | Retention schedules per data class and jurisdiction with legal holds; automated destruction or anonymisation with logs *(`compliance.retention_schedule` / `compliance.legal_hold` / `compliance.destruction_log`, docs/34 §12; PRIV-002)* |
+| Breach management | Incident intake, risk-of-significant-harm assessment, notification to regulators and individuals where required, breach register kept for the legislated period *(`compliance.breach`, docs/34 §12 — covers both the Law 25 confidentiality-incident register and the general PIPEDA breach flow)* |
+| Vendors | Service provider register, data processing agreements, sub-processor list, transfer assessments *(scope cut: not built as a dedicated register — no story AC covers it; a cross-border vendor still needs `compliance.cross_border_feature` and its PIA gate)* |
+| Automated decisions | Notices and review requests where decisions rely on automated processing (Law 25), supported by the AI guardrails *(no automated HR decision is built anywhere in the pack — rule 14 — so this has no live case yet)* |
 
 **CanDo as processor:** Canadian data residency; data processing agreement with every customer; sub-processor transparency; SOC 2 Type II and ISO 27001 targets; customer data export and deletion at contract end.
 
@@ -160,32 +172,36 @@ Module 02 enforces these controls in the hiring workflow; this module holds the 
 | Immigration | Work permit type, conditions and expiry tracked; LMIA and employer-specific permit obligations (wages, duties, location) monitored so job changes that would breach permit conditions are flagged; compliance records kept for the period IRCC and ESDC can request them; permit renewal reminders |
 | Unionized hiring | Posting periods, internal candidate rights and seniority-based selection rules enforced from agreement terms |
 
-**Evidence pack:** for any hire, the system can assemble the posting, candidate communications, assessments, approvals and consents for an audit or complaint.
+*(All rows above are already enforced in Module 02's recruitment workflow, per `docs/23`; this module is their rules/evidence home, not a new schema. A dedicated immigration-case record and evidence-pack assembly are scope cuts — no story AC covers either.)*
+
+**Evidence pack:** for any hire, the system can assemble the posting, candidate communications, assessments, approvals and consents for an audit or complaint. *(Scope cut: not built as a one-click assembly — the underlying records all exist and are retrievable individually.)*
 
 ## Data model, integrations and security
 
-| Entity | Key fields |
-| --- | --- |
-| Rule | Jurisdiction, law area, citation, conditions, parameters, effective dates, status, owner |
-| Legislative Change | Source, summary, affected rules and customers, effective date, status |
-| Obligation | Customer entity, type, frequency, due dates, owner, evidence |
-| Policy | Jurisdiction, version, approval, distribution, acknowledgements |
-| Accommodation Case | Employee or candidate, ground category, limitations, options, accommodations, reviews, outcome |
-| RTW Plan | Case, weekly hours and duties, check-ins |
-| Incident | Type, date, site, people, description, severity, notifications, actions |
-| WCB Claim | Board, claim number, status, lost time, costs |
-| Investigation | Category, parties (restricted), investigator, evidence, findings, outcome |
-| Speak-up Report | Channel, category, anonymity, messages, status |
-| Grievance | Agreement, articles, grievors, steps, deadlines, outcome, arbitration |
-| Bargaining Proposal | Article, party, costing, status |
-| Privacy Request / Breach | Type, dates, deadlines, actions, notifications |
-| Inspection | Regulator, dates, orders, compliance dates |
+| Entity | Key fields | Built as |
+| --- | --- | --- |
+| Rule | Jurisdiction, law area, citation, conditions, parameters, effective dates, status, owner | `ref.rule_starter` + `compliance.rule` |
+| Legislative Change | Source, summary, affected rules and customers, effective date, status | `compliance.legislative_change` |
+| Obligation | Customer entity, type, frequency, due dates, owner, evidence | `compliance.obligation` |
+| Policy | Jurisdiction, version, approval, distribution, acknowledgements | `compliance.policy` / `compliance.policy_acknowledgement` |
+| Accommodation Case | Employee or candidate, ground category, limitations, options, accommodations, reviews, outcome | `compliance.accommodation_case` |
+| RTW Plan | Case, weekly hours and duties, check-ins | `compliance.rtw_plan` |
+| Incident | Type, date, site, people, description, severity, notifications, actions | `compliance.incident` |
+| WCB Claim | Board, claim number, status, lost time, costs | `compliance.wcb_claim` |
+| Investigation | Category, parties (restricted), investigator, evidence, findings, outcome | `compliance.investigation` |
+| Speak-up Report | Channel, category, anonymity, messages, status | `compliance.speakup_report` / `compliance.speakup_message` |
+| Grievance | Agreement, articles, grievors, steps, deadlines, outcome, arbitration | `compliance.grievance` |
+| Bargaining Proposal | Article, party, costing, status | `compliance.bargaining_proposal` |
+| Privacy Request / Breach | Type, dates, deadlines, actions, notifications | `compliance.access_request` / `compliance.breach` |
+| Inspection | Regulator, dates, orders, compliance dates | `compliance.inspection` |
 
-**Integrations:** every module reads rules from the repository and writes compliance events (for example a missed final pay deadline or an overdue training) to the obligations register; external integrations with workers' compensation board portals, hotline providers, and legal research or legislative update services where available.
+**Integrations:** every module reads rules from the repository and writes compliance events (for example a missed final pay deadline or an overdue training) to the obligations register; external integrations with workers' compensation board portals, hotline providers, and legal research or legislative update services where available. *(No third-party hotline — docs/34 §9.)*
 
-**Security:** separate access roles for accommodation coordinators, OHS staff, investigators, labour relations and privacy office; strictest default access in the platform; every view logged; legal privilege marking on documents prepared with counsel, with restricted sharing.
+**Security:** separate access roles for accommodation coordinators, OHS staff, investigators, labour relations and privacy office; strictest default access in the platform; every view logged (`compliance.case_view_log`); legal privilege marking on documents prepared with counsel, with restricted sharing.
 
 ## Collective agreement library
+
+> **Already built** (migration 0003, `docs/08`) before any module review began. The paragraphs below describe design intent that is already satisfied; nothing in this section needed new schema in migration 0020.
 
 Union terms come from the agreements themselves. The library imports agreements from government registries and the employer's signed copy, turns their terms into rules a specialist has checked, and keeps every generation.
 
@@ -215,9 +231,13 @@ A renewal, memorandum of settlement or arbitration award re-enters at import, an
 | Accessibility | Accessible Canada Act for federal bodies; provincial accessibility laws; plans and progress reports |
 | First Nations jurisdiction | Labour jurisdiction of each First Nations employer recorded per activity: band governance is usually federal, while some services can be provincial; the determination is documented with counsel |
 
+*(Essential-services designation is built — `compliance.essential_position`, LR-011. Interest arbitration timelines/awards, central bargaining and the FOI request flow itself are scope cuts beyond salary disclosure, which is already built in Module 04.)*
+
 ## How CanDo compares
 
 None of the HRIS platforms reviewed markets accommodation, health and safety, investigations, grievances and an agreement library in the same system; employers typically use spreadsheets or separate EHS and case management tools. UKG, Dayforce and ADP reach unionized and public-sector employers through time, pay and workforce management depth, which CanDo must match in Modules 03 and 06. The library and case management in this module are where CanDo can lead. Detail: [Competitive Analysis](https://claude.ai/code/artifact/8431bba2-ae2a-4b20-b7d2-6f89d632c2c0).
+
+> **This is why OHS and the speak-up channel are built in-house rather than integrated with a third-party product (docs/34 §8, §9) — it is the stated differentiator, not an incidental choice.**
 
 ## Reporting, implementation and open questions
 
@@ -238,10 +258,10 @@ None of the HRIS platforms reviewed markets accommodation, health and safety, in
 
 **Open questions:**
 
-- [ ] Who owns the rules repository and legislative monitoring (in-house legal team, a legal content partner, or both) — linked to the statutory table ownership decision in Module 00
-- [ ] Jurisdictions supported at launch
-- [ ] Third-party hotline partner for the speak-up channel
-- [ ] Scope of OHS features at launch versus integrating with dedicated EHS software
-- [ ] Indigenous data governance commitments (OCAP®) and advisory process
+- [x] Who owns the rules repository and legislative monitoring (in-house legal team, a legal content partner, or both) — linked to the statutory table ownership decision in Module 00. **Resolved (docs/34 §3, §16):** CanDo seeds a starter/reference copy by jurisdiction; the organization owns keeping it current from there.
+- [x] Jurisdictions supported at launch. **Resolved (docs/34 §16):** the same federal/provincial/territorial set CanDo already supports for payroll and employment standards; no new jurisdiction added for this module alone.
+- [x] Third-party hotline partner for the speak-up channel. **Resolved (docs/34 §9, §16):** built in-house, never a third-party hotline.
+- [x] Scope of OHS features at launch versus integrating with dedicated EHS software. **Resolved (docs/34 §8, §16):** full in-house case management.
+- [ ] Indigenous data governance commitments (OCAP®) and advisory process. **Still open (docs/34 §16):** pending the owner's advisers; CanDo's existing OCAP-aligned data residency option in Core HR (migration 0008, PRIV-004) is unaffected and is not extended in this module.
 
 **October 2026 review:** added the collective agreement library (Negotech and provincial registries), public-sector obligations, First Nations jurisdiction and competitor comparison; scope widened to all employer sizes and public-sector employers.

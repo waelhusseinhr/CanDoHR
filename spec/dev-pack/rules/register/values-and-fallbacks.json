@@ -1,6 +1,6 @@
 {
  "$comment": "Register of every fixed value, default and fallback in CanDo (AGENTS rules 43 and 44, docs/22). tests/hardcoding/check_values.py fails when the code or the database holds one that is not here, or when this file names one that no longer exists. Change a list, a default or a fallback only in the same pull request as the code, with its class and source.",
- "version": "2026-10-30",
+ "version": "2026-11-03",
  "classes": {
   "system_status": "A state CanDo's own workflow moves a record through. Code depends on every value; screens show each organization's wording through translations, never new values.",
   "engine_method": "A way CanDo calculates, routes, matches or stores an entry. Each value has code behind it; the organization chooses among them (through a setting, a list category or the record itself) and a new value needs new code.",
@@ -913,6 +913,67 @@
    ],
    "class": "engine_method"
   },
+  "compliance.access_request.kind": {
+   "values": [
+    "access",
+    "correction",
+    "deletion"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.access_request.status": {
+   "values": [
+    "declined",
+    "in_progress",
+    "received",
+    "responded"
+   ],
+   "class": "system_status"
+  },
+  "compliance.accommodation_case.ground": {
+   "values": [
+    "disability",
+    "family_status",
+    "other_protected_ground",
+    "religion",
+    "sex_pregnancy"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.accommodation_case.status": {
+   "values": [
+    "accommodated",
+    "closed",
+    "declined",
+    "open",
+    "undue_hardship_assessed"
+   ],
+   "class": "system_status"
+  },
+  "compliance.bargaining_proposal.side": {
+   "values": [
+    "employer",
+    "union"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.bargaining_proposal.status": {
+   "values": [
+    "accepted",
+    "countered",
+    "tabled",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "compliance.breach.status": {
+   "values": [
+    "assessing",
+    "closed",
+    "notifying"
+   ],
+   "class": "system_status"
+  },
   "compliance.case_party.role": {
    "values": [
     "complainant",
@@ -924,12 +985,412 @@
    "class": "taxonomy",
    "note": "R7.4: a respondent sees only that HR must review."
   },
+  "compliance.case_view_log.subject_type": {
+   "values": [
+    "accommodation_case",
+    "discipline_record",
+    "grievance",
+    "investigation",
+    "rtw_plan",
+    "speakup_report",
+    "wcb_claim"
+   ],
+   "class": "technical",
+   "note": "Every view of these case types is logged, the same pattern talent.succession_view_log already applies to succession data (rule 35; COMPL-018)."
+  },
+  "compliance.cross_border_feature.status": {
+   "values": [
+    "live",
+    "proposed",
+    "retired"
+   ],
+   "class": "system_status",
+   "note": "Going live needs a pia_id present (cross_border_needs_approved_pia); the API, not this constraint, blocks going live until that PIA's own status is approved (PRIV-005)."
+  },
+  "compliance.destruction_log.method": {
+   "values": [
+    "anonymized",
+    "deleted",
+    "shredded_physical"
+   ],
+   "class": "technical"
+  },
+  "compliance.discipline_record.level": {
+   "values": [
+    "final_warning",
+    "suspension",
+    "termination",
+    "verbal_warning",
+    "written_warning"
+   ],
+   "class": "taxonomy",
+   "note": "Written independently of any talent performance table (rule 35; COMPL-016)."
+  },
+  "compliance.employment_equity_report.program": {
+   "values": [
+    "accessibility_plan",
+    "federal_employment_equity",
+    "other",
+    "pay_equity"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.employment_equity_report.status": {
+   "values": [
+    "draft",
+    "filed"
+   ],
+   "class": "system_status"
+  },
+  "compliance.essential_position.status": {
+   "values": [
+    "active",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "compliance.grievance.filed_by": {
+   "values": [
+    "employee",
+    "employer",
+    "union"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.grievance.outcome": {
+   "values": [
+    "arbitration_award",
+    "denied",
+    "settled",
+    "upheld",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "compliance.grievance.status": {
+   "values": [
+    "arbitration",
+    "closed",
+    "filed",
+    "in_progress"
+   ],
+   "class": "system_status"
+  },
+  "compliance.incident.kind": {
+   "values": [
+    "hazard_observation",
+    "injury",
+    "near_miss",
+    "property_damage",
+    "violence_incident"
+   ],
+   "class": "taxonomy",
+   "note": "A hazard_observation names no employment (COMPL-002/HS-002)."
+  },
+  "compliance.incident.severity": {
+   "values": [
+    "critical",
+    "first_aid",
+    "lost_time",
+    "medical_aid",
+    "none"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.incident.status": {
+   "values": [
+    "closed",
+    "corrective_action",
+    "investigating",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "compliance.inspection.category": {
+   "values": [
+    "employment_standards",
+    "human_rights",
+    "immigration",
+    "ohs",
+    "other",
+    "privacy"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.inspection.status": {
+   "values": [
+    "awaiting_response",
+    "closed",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "compliance.investigation.category": {
+   "values": [
+    "discrimination",
+    "harassment",
+    "misconduct",
+    "policy_breach",
+    "violence"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.investigation.outcome": {
+   "values": [
+    "inconclusive",
+    "partially_substantiated",
+    "substantiated",
+    "unsubstantiated"
+   ],
+   "class": "system_status"
+  },
+  "compliance.investigation.status": {
+   "values": [
+    "closed",
+    "in_progress",
+    "open"
+   ],
+   "class": "system_status"
+  },
+  "compliance.legal_hold.status": {
+   "values": [
+    "active",
+    "released"
+   ],
+   "class": "system_status"
+  },
+  "compliance.legal_hold.subject_type": {
+   "values": [
+    "document",
+    "employment",
+    "grievance",
+    "investigation",
+    "person"
+   ],
+   "class": "technical"
+  },
+  "compliance.legislative_change.stage": {
+   "values": [
+    "in_force",
+    "passed",
+    "proposed",
+    "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "compliance.obligation.category": {
+   "values": [
+    "audit",
+    "filing",
+    "inspection_response",
+    "other",
+    "posting",
+    "renewal",
+    "report",
+    "training"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.obligation.recurrence": {
+   "values": [
+    "annual",
+    "custom",
+    "monthly",
+    "one_time",
+    "quarterly"
+   ],
+   "class": "engine_method"
+  },
+  "compliance.obligation.status": {
+   "values": [
+    "completed",
+    "in_progress",
+    "open",
+    "overdue",
+    "waived"
+   ],
+   "class": "system_status"
+  },
+  "compliance.ohs_committee.status": {
+   "values": [
+    "active",
+    "inactive"
+   ],
+   "class": "system_status"
+  },
+  "compliance.pia.risk_level": {
+   "values": [
+    "high",
+    "low",
+    "medium"
+   ],
+   "class": "engine_method"
+  },
+  "compliance.pia.status": {
+   "values": [
+    "approved",
+    "in_progress",
+    "rejected"
+   ],
+   "class": "system_status"
+  },
+  "compliance.pia.triggered_by": {
+   "values": [
+    "cross_border_transfer",
+    "new_system",
+    "quebec_law25",
+    "voluntary"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.policy.category": {
+   "values": [
+    "accommodation",
+    "code_of_conduct",
+    "harassment_violence",
+    "ohs",
+    "other",
+    "privacy"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.policy.status": {
+   "values": [
+    "active",
+    "draft",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "compliance.retention_schedule.status": {
+   "values": [
+    "active",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "compliance.rtw_plan.source_type": {
+   "values": [
+    "accommodation_case",
+    "wcb_claim"
+   ],
+   "class": "engine_method",
+   "note": "Names exactly one source, never both and never neither (requirements/13)."
+  },
+  "compliance.rtw_plan.status": {
+   "values": [
+    "active",
+    "completed",
+    "suspended"
+   ],
+   "class": "system_status"
+  },
+  "compliance.rule.category": {
+   "values": [
+    "accessibility",
+    "employment_equity",
+    "human_rights",
+    "immigration",
+    "labour_relations",
+    "ohs",
+    "pay_equity",
+    "privacy"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.rule.source": {
+   "values": [
+    "cando_starter",
+    "organization_authored"
+   ],
+   "class": "technical"
+  },
+  "compliance.rule.status": {
+   "values": [
+    "active",
+    "draft",
+    "retired",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "compliance.rule.verification": {
+   "values": [
+    "organization_verified",
+    "verify_at_load"
+   ],
+   "class": "technical",
+   "note": "The organization's own review state; a seeded rule always starts verify_at_load regardless of the starter's own cando_verified state (docs/34 §3; rule_active_needs_owner_and_review)."
+  },
   "compliance.salary_disclosure.status": {
    "values": [
     "approved",
     "draft",
     "published",
     "withdrawn"
+   ],
+   "class": "system_status"
+  },
+  "compliance.sds_document.status": {
+   "values": [
+    "current",
+    "superseded"
+   ],
+   "class": "system_status"
+  },
+  "compliance.speakup_message.from_side": {
+   "values": [
+    "organization",
+    "reporter"
+   ],
+   "class": "technical",
+   "note": "Messages are addressed by side, never by identity, on an anonymous report (COMPL-017 AC4)."
+  },
+  "compliance.speakup_report.category": {
+   "values": [
+    "ethics",
+    "fraud",
+    "harassment",
+    "other",
+    "retaliation",
+    "safety"
+   ],
+   "class": "taxonomy"
+  },
+  "compliance.speakup_report.status": {
+   "values": [
+    "acknowledged",
+    "closed",
+    "investigating",
+    "received"
+   ],
+   "class": "system_status"
+  },
+  "compliance.wcb_claim.status": {
+   "values": [
+    "accepted",
+    "closed",
+    "denied",
+    "filed",
+    "in_appeal"
+   ],
+   "class": "system_status"
+  },
+  "compliance.work_refusal.outcome": {
+   "values": [
+    "refusal_upheld",
+    "regulator_ruled_safe",
+    "regulator_ruled_unsafe",
+    "resolved_safe",
+    "work_modified"
+   ],
+   "class": "system_status"
+  },
+  "compliance.work_refusal.status": {
+   "values": [
+    "investigating",
+    "open",
+    "resolved"
    ],
    "class": "system_status"
   },
@@ -2547,12 +3008,17 @@
   },
   "platform.workflow_route.subject_type": {
    "values": [
+    "accommodation_outcome",
     "banked_time_payout",
     "carrier_invoice",
     "caution",
     "comp_decision",
     "comp_philosophy",
+    "custom_metric",
     "direct_hire",
+    "early_retirement_program",
+    "entitlement_calculation",
+    "grievance_settlement",
     "incentive_payout",
     "offer",
     "pay_run",
@@ -2563,8 +3029,10 @@
     "probation_extension",
     "recognition_award",
     "recognition_publication",
+    "reduction_batch",
     "requisition",
     "salary_disclosure",
+    "separation_case",
     "status_conversion",
     "succession_plan",
     "talent_pool_membership",
@@ -2573,7 +3041,7 @@
     "voluntary_deduction"
    ],
    "class": "engine_method",
-   "note": "What a route approves; each subject has code that checks its route (docs/23 §2.2)."
+   "note": "What a route approves; each subject has code that checks its route (docs/23 §2.2). Backfilled 3 Nov 2026 (migration 0020): separation_case, entitlement_calculation, reduction_batch and early_retirement_program were live in the database since migration 0018, and custom_metric since migration 0019, but missing from this register until now; accommodation_outcome and grievance_settlement are new in migration 0020 itself."
   },
   "platform.workflow_route_step.approver_kind": {
    "values": [
@@ -3130,6 +3598,28 @@
     "tested"
    ],
    "class": "system_status"
+  },
+  "ref.rule_starter.category": {
+   "values": [
+    "accessibility",
+    "employment_equity",
+    "human_rights",
+    "immigration",
+    "labour_relations",
+    "ohs",
+    "pay_equity",
+    "privacy"
+   ],
+   "class": "taxonomy",
+   "note": "Same list as compliance.rule.category; a starter's category carries over to the tenant's own copy."
+  },
+  "ref.rule_starter.verification": {
+   "values": [
+    "cando_verified",
+    "verify_at_load"
+   ],
+   "class": "technical",
+   "note": "CanDo's own legal-review state for the starter catalogue; distinct from compliance.rule.verification, which tracks the organization's own review of its live copy (docs/34 §3)."
   },
   "ref.training_requirement.status": {
    "values": [
@@ -4690,9 +5180,136 @@
    "default": "true",
    "class": "neutral_choice"
   },
+  "compliance.access_request.status": {
+   "default": "'received'::text",
+   "class": "initial_state"
+  },
+  "compliance.accommodation_case.status": {
+   "default": "'open'::text",
+   "class": "initial_state"
+  },
+  "compliance.bargaining_proposal.status": {
+   "default": "'tabled'::text",
+   "class": "initial_state"
+  },
+  "compliance.breach.status": {
+   "default": "'assessing'::text",
+   "class": "initial_state"
+  },
   "compliance.case_file.restricted": {
    "default": "true",
    "class": "safety"
+  },
+  "compliance.cross_border_feature.status": {
+   "default": "'proposed'::text",
+   "class": "initial_state"
+  },
+  "compliance.employment_equity_report.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "compliance.essential_position.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "compliance.grievance.status": {
+   "default": "'filed'::text",
+   "class": "initial_state"
+  },
+  "compliance.incident.is_critical_injury": {
+   "default": "false",
+   "class": "neutral_choice",
+   "note": "Set only when the facts trigger the jurisdiction's immediate-notification duty (HS-002)."
+  },
+  "compliance.incident.status": {
+   "default": "'open'::text",
+   "class": "initial_state"
+  },
+  "compliance.inspection.orders_outstanding": {
+   "default": "false",
+   "class": "initial_state"
+  },
+  "compliance.inspection.status": {
+   "default": "'open'::text",
+   "class": "initial_state"
+  },
+  "compliance.investigation.status": {
+   "default": "'open'::text",
+   "class": "initial_state"
+  },
+  "compliance.legal_hold.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "compliance.obligation.recurrence": {
+   "default": "'one_time'::text",
+   "class": "neutral_choice"
+  },
+  "compliance.obligation.status": {
+   "default": "'open'::text",
+   "class": "initial_state"
+  },
+  "compliance.ohs_committee.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "compliance.pia.status": {
+   "default": "'in_progress'::text",
+   "class": "initial_state"
+  },
+  "compliance.policy.requires_acknowledgement": {
+   "default": "true",
+   "class": "safety"
+  },
+  "compliance.policy.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "compliance.retention_schedule.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "compliance.rtw_plan.status": {
+   "default": "'active'::text",
+   "class": "initial_state"
+  },
+  "compliance.rule.source": {
+   "default": "'cando_starter'::text",
+   "class": "technical"
+  },
+  "compliance.rule.status": {
+   "default": "'draft'::text",
+   "class": "initial_state"
+  },
+  "compliance.rule.verification": {
+   "default": "'verify_at_load'::text",
+   "class": "safety",
+   "note": "A seeded rule always starts unreviewed by the organization, whatever the starter's own state (rule_active_needs_owner_and_review)."
+  },
+  "compliance.sds_document.status": {
+   "default": "'current'::text",
+   "class": "initial_state"
+  },
+  "compliance.speakup_report.is_anonymous": {
+   "default": "true",
+   "class": "safety",
+   "note": "A report defaults to anonymous; identifying the reporter is an explicit choice (COMPL-017)."
+  },
+  "compliance.speakup_report.status": {
+   "default": "'received'::text",
+   "class": "initial_state"
+  },
+  "compliance.wcb_claim.status": {
+   "default": "'filed'::text",
+   "class": "initial_state"
+  },
+  "compliance.work_refusal.regulator_called": {
+   "default": "false",
+   "class": "neutral_choice"
+  },
+  "compliance.work_refusal.status": {
+   "default": "'open'::text",
+   "class": "initial_state"
   },
   "core.approval_part.status": {
    "default": "'pending'::text",
@@ -5048,6 +5665,11 @@
    "default": "100",
    "class": "display_order"
   },
+  "ref.rule_starter.verification": {
+   "default": "'verify_at_load'::text",
+   "class": "safety",
+   "note": "A starter edition is never copied into a live tenant's rule set until CanDo's own review marks it cando_verified (docs/34 §3; mirrors rule 22)."
+  },
   "talent.competency.display_order": {
    "default": "100",
    "class": "display_order"
@@ -5202,9 +5824,37 @@
    "class": "technical",
    "note": "A pay run includes every input unless the caller leaves one out"
   },
+  "openapi.yaml#deleteOnExpiry=false": {
+   "class": "neutral_choice",
+   "note": "Licence term recorded from the licence"
+  },
   "openapi.yaml#depth=3": {
    "class": "technical",
    "note": "Org chart levels shown"
+  },
+  "openapi.yaml#dryRun=true": {
+   "class": "safety",
+   "note": "An import validates without loading unless the caller says to load"
+  },
+  "openapi.yaml#employeesMaySee=false": {
+   "class": "safety",
+   "note": "Survey data is hidden from employees unless the licence allows it"
+  },
+  "openapi.yaml#final=false": {
+   "class": "initial_state",
+   "note": "An assessment starts as a draft"
+  },
+  "openapi.yaml#format=xlsx": {
+   "class": "technical",
+   "note": "File format of an export"
+  },
+  "openapi.yaml#includeSelf=false": {
+   "class": "neutral_choice",
+   "note": "Self-assessments are shown beside a gap and counted only when asked (docs/20 §5.4)"
+  },
+  "openapi.yaml#includeVacant=false": {
+   "class": "neutral_choice",
+   "note": "Vacant positions are left out of a submission unless included"
   },
   "openapi.yaml#isCorrection=false": {
    "class": "initial_state",
@@ -5221,6 +5871,10 @@
   "openapi.yaml#mode=position": {
    "class": "technical",
    "note": "Org chart drawn by position"
+  },
+  "openapi.yaml#participates=false": {
+   "class": "neutral_choice",
+   "note": "The organization does not submit data unless it says so"
   },
   "openapi.yaml#recurringDeductions=true": {
    "class": "technical",

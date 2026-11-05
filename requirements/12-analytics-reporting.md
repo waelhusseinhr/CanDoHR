@@ -2,6 +2,8 @@
 
 Oct 17, 2026 · @Wael
 
+> **November 2026 review:** the owner's decisions on build approach, individual predictive scores, the suppression floor, natural-language reporting, benchmarking and the external BI connector are in `docs/33-analytics-reporting-decisions.md`, applied as migration `schema/0019_analytics_reporting_decisions.sql`. Where this document and `docs/33` differ, `docs/33` wins. The five open questions below are closed.
+
 ## Overview and scope
 
 > **Draft status:** new specification. Brings together the reporting sections of Modules 01–11 and the recruitment analytics and payroll reporting in the source files, and adds the cross-module layer they all point to.
@@ -20,9 +22,9 @@ Analytics & Reporting turns data from every module into consistent numbers peopl
 
 ## Data architecture and metric definitions
 
-**Analytics store:** module events and nightly snapshots flow into a reporting store separate from the transactional database, so heavy queries never slow down payroll or self-service; data refresh is near real time for operational metrics and daily for trend metrics; history is kept as effective-dated facts so trends are reproducible.
+**Analytics store:** built in-house on the Supabase read replica, not an embedded BI product (`docs/33` §3.1, R1.1); module events and nightly snapshots flow into a reporting store separate from the transactional database, so heavy queries never slow down payroll or self-service; data refresh is near real time for operational metrics and daily for trend metrics; history is kept as effective-dated facts so trends are reproducible.
 
-**Semantic layer:** a governed catalogue of dimensions (employee, position, job, org unit, location, province, entity, bargaining unit, time) and measures with plain-language definitions in English and French, the formula, the source fields, filters, and an owner. Reports and dashboards use the semantic layer rather than raw tables.
+**Semantic layer:** a governed catalogue of dimensions (employee, position, job, org unit, location, province, entity, bargaining unit, time) and measures with plain-language definitions in English and French, the formula, the source fields, filters, and an owner (`ref.metric_definition`, `docs/33` §3.2). Reports and dashboards use the semantic layer rather than raw tables.
 
 **Example definitions:**
 
@@ -38,7 +40,7 @@ Analytics & Reporting turns data from every module into consistent numbers peopl
 | Compa-ratio | Pay ÷ range midpoint |
 | Labour cost | Gross pay plus employer statutory and benefits costs |
 
-Customers can add their own metrics through the semantic layer with an owner and approval, so local definitions do not drift.
+Customers can add their own metrics through the semantic layer with an owner and approval, so local definitions do not drift (`analytics.custom_metric`, through the organization's `custom_metric` route; the submitter never approves it — `docs/33` §3.3).
 
 ## Standard metric library
 
@@ -75,33 +77,33 @@ Customers can add their own metrics through the semantic layer with an owner and
 
 ## Self-service reporting and exports
 
-**Report builder:** pick a subject area (employees, positions, requisitions, pay results, leave, reviews, training and so on) and drag fields from the semantic layer; filters, grouping, totals, calculated fields; as-of date or date range; charts; save, share with roles or people, and schedule.
+**Report builder:** pick a subject area (employees, positions, requisitions, pay results, leave, reviews, training and so on) and drag fields from the semantic layer; filters, grouping, totals, calculated fields; as-of date or date range; charts; save, share with roles or people, and schedule (`analytics.report`, `docs/33` §4.1).
 
-**Natural-language questions:** users can ask questions in plain English or French ("how many hires in BC last quarter by department?"); the assistant builds the query on the semantic layer, shows the report definition it used so the user can check it, and applies the same permissions and suppression rules.
+**Natural-language questions:** not built at launch (`docs/33` §4.3, R1.4). When built: users can ask questions in plain English or French (“how many hires in BC last quarter by department?”); the assistant builds the query on the semantic layer, shows the report definition it used so the user can check it, and applies the same permissions and suppression rules.
 
-**Exports:** Excel, CSV and PDF; large exports run in the background with a notification; exports of sensitive fields require a permission and are logged; watermarking optional for restricted reports.
+**Exports:** Excel, CSV and PDF; large exports run in the background with a notification; exports of sensitive fields require a permission and are logged (`analytics.export_log`, `docs/33` §4.2); watermarking optional for restricted reports.
 
-**External BI:** governed data feeds or a read-only connector to Power BI, Tableau and similar tools, carrying row-level security; customers own their data and can extract it in full.
+**External BI:** ships after launch, not at launch (`docs/33` §4.4, R2.2). When built: governed data feeds or a read-only connector to Power BI, Tableau and similar tools, carrying row-level security; customers own their data and can already extract it in full through the ordinary export path before the connector exists.
 
 ## Predictive analytics and AI
 
 | Use | Output | Guardrails |
 | --- | --- | --- |
-| Turnover risk (group level) | Segments with rising risk and the drivers behind it | Shown for groups by default; individual scores only if the customer enables them after a privacy impact assessment, never visible to the employee's manager alone, never used as the sole basis for any decision |
+| Turnover risk (group level) | Segments with rising risk and the drivers behind it | Group level only, forever; CanDo will not build an individual score, and the switch for one is locked off, enforced by the schema (`docs/33` §5.1, R1.2); never used as the sole basis for any decision |
 | Hiring forecast | Expected requisitions by month from turnover and growth plans | Assumptions visible and editable |
 | Time-to-fill prediction | Expected days for a new requisition | Comparable past requisitions shown |
 | Overtime and absence forecast | Expected hours by unit and week | Seasonality explained |
 | Labour cost forecast | Cost to year-end | Linked to Module 09 scenarios |
-| Anomaly detection | Unusual payroll, overtime, leave or access patterns | Human review queue; feedback improves thresholds |
+| Anomaly detection | Unusual payroll, overtime, leave or access patterns | Human review queue (`analytics.anomaly_flag`); feedback improves thresholds |
 | Narrative insights | Plain-language summaries of dashboard changes | Each sentence links to the numbers behind it |
 
-**Model governance:** each model documented (purpose, data used, excluded fields, performance, fairness tests across groups, owner, review date); protected characteristics are never model inputs, and proxies are tested; customers can switch any model off; Quebec Law 25 requirements to inform people about automated decisions and let them ask for review are met by design, since no model makes a decision on its own.
+**Model governance:** each model documented (purpose, data used, excluded fields, performance, fairness tests across groups, owner, review date — `ref.predictive_model`); protected characteristics are never model inputs, and proxies are tested; customers can switch any model off (`analytics.model_enablement`, `docs/33` §5.2); fairness is tested quarterly (`analytics.model_fairness_test`); Quebec Law 25 requirements to inform people about automated decisions and let them ask for review are met by design, since no model makes a decision on its own and none scores a named individual.
 
 **Performance claims:** any accuracy figures are measured on the customer's own data after deployment and shown in the model card; no vendor-sourced benchmark claims are reused (consistent with the source reconciliation in Module 02).
 
 ## Statutory and regulatory reporting catalogue
 
-The catalogue lists every government or regulator report the platform produces, its owning module, frequency and due date, so the compliance calendar in Module 13 can track them.
+The catalogue (`ref.statutory_report`, `docs/33` §7.2) lists every government or regulator report the platform produces, its owning module, frequency and due date, so the compliance calendar in Module 13 can track them.
 
 | Report | Owner module | Frequency |
 | --- | --- | --- |
@@ -124,13 +126,13 @@ Each report shows the data lineage (which fields and rules produced each number)
 
 **Access:** row-level security by org scope and field-level security by data class are inherited from Module 01 and applied to every report, dashboard, export, natural-language answer and BI connector.
 
-**Small-group suppression:** results for self-identification, engagement, inclusion and pay gap analyses are hidden when the group is below the configured minimum (default 5); complementary suppression stops people working out a hidden cell from totals; drill-through blocked where it would reveal individuals.
+**Small-group suppression:** hidden below `analytics.min_group_size` (default 5, and an organization can never set it below 5 — `docs/33` §6.1, R1.3), which applies to every breakdown this module produces outside two breakdowns that keep their own, higher floors: self-identification breakdowns in any module (`privacy.min_group_size_self_id`, 10, never lower) and engagement-survey results (`engagement.min_group_size`, default 5, floor 3). Complementary suppression stops people working out a hidden cell from totals; drill-through blocked where it would reveal individuals (`docs/33` §6.2).
 
 **De-identification:** analytics datasets for advanced work can be de-identified (pseudonymous keys, generalised dates and ages) with re-identification restricted.
 
 **Audit:** report runs, exports and natural-language queries logged with user, time and fields.
 
-**Data quality:** quality scores per domain (completeness, validity, timeliness) shown on dashboards; known issues annotated on affected metrics; stewards assigned per domain to fix problems at the source.
+**Data quality:** quality scores per domain (completeness, validity, timeliness) shown on dashboards (`analytics.data_quality_score`); known issues annotated on affected metrics; stewards assigned per domain to fix problems at the source.
 
 ## Public-sector and large-employer reporting
 
@@ -166,16 +168,16 @@ Detail: [Competitive Analysis](https://claude.ai/code/artifact/8431bba2-ae2a-4b2
 | With Core HR and Payroll | Semantic layer for workforce and cost; standard dashboards for executives, HR, managers and finance; statutory catalogue for payroll filings |
 | With each later module | That module's metrics added to the semantic layer and dashboards |
 | After six months of data | Trend dashboards, forecasting and group-level turnover insights |
-| On request | BI connector, natural-language questions, individual-level models (after privacy impact assessment) |
+| On request, after launch | BI connector; natural-language questions; cross-customer benchmarking, if ever built |
 
 **Sources:** recruitment analytics and dashboards in Recruitment 1.docx, DD Recruitment Module.docx and the Bubble build guide (Module 02); payroll reporting in the April 16 payroll file (Module 03); reporting sections drafted in Modules 01 and 04–11. Vendor performance claims from the DD Recruitment Module were excluded.
 
-**Open questions:**
+**Open questions — closed by the November 2026 review (`docs/33`):**
 
-- [ ] Build the analytics store and dashboards in-house or embed a BI product
-- [ ] Whether natural-language reporting ships at launch
-- [ ] Default suppression threshold (5 recommended) and whether customers may lower it to 3
-- [ ] Policy on individual-level predictive scores
-- [ ] Benchmarking across customers (anonymised industry benchmarks) and the consent model it would need
+- [x] Build the analytics store and dashboards in-house or embed a BI product — **in-house, on the Supabase read replica** (`docs/33` §3.1, R1.1)
+- [x] Whether natural-language reporting ships at launch — **not at launch** (`docs/33` §4.3, R1.4)
+- [x] Default suppression threshold (5 recommended) and whether customers may lower it to 3 — **5, and never lower** (`docs/33` §6.1, R1.3)
+- [x] Policy on individual-level predictive scores — **never; group level only, enforced by the schema** (`docs/33` §5.1, R1.2)
+- [x] Benchmarking across customers (anonymised industry benchmarks) and the consent model it would need — **not at launch; the consent model is a separate future decision** (`docs/33` §8.1, R2.1)
 
 **October 2026 review:** added public-sector reporting (salary disclosure, council, Statistics Canada, audit, funders), scale target and competitor comparison.

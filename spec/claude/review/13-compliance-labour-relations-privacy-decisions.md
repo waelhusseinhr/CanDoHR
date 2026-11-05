@@ -1,0 +1,28 @@
+# 13 Compliance, Labour Relations & Privacy · Review decisions
+
+Review started and finished 3 Nov 2026 with Wael. This is the last of the thirteen module reviews.
+
+**Status: applied 3 Nov 2026.** The decisions are in `dev-pack/docs/34-compliance-labour-relations-privacy-decisions.md`, migration `dev-pack/schema/0020_compliance_labour_relations_privacy_decisions.sql` and its smoke test, and the updates listed in docs/34 §16. Five of the module's open questions are closed; the sixth (Indigenous data governance / OCAP) stays open pending the owner's advisers. Decided: the organization, not CanDo, owns keeping the rules repository current once CanDo seeds a starter copy by jurisdiction; no new jurisdiction is added beyond what CanDo already supports; the speak-up channel is built in-house, never a third-party hotline; occupational health and safety is full in-house case management, never a bolted-on EHS product; OCAP stays open.
+
+Already decided elsewhere and not asked again: the statutory-tables ownership precedent (`docs/16` Q7 / `docs/22` Module 00 review) — distinguished in docs/34 §2 from this module's "organization owns" decision, since the rules repository covers far more fact-specific ground than a single verifiable statutory number; the collective agreement library itself (import, extraction, verification, activation, retro, sandbox testing, pay composition — LR-001 to LR-007), built in the original base spec (migration 0003, `docs/08`) before any module review began; `privacy.min_group_size_self_id` (10, never lower, migration 0011), reused directly for this module's employment equity reporting rather than a third suppression mechanism; discipline kept apart from performance review (`docs/28`'s existing separation, carried into this module's `compliance.discipline_record`); the respondent-visibility boundary in an open case (rule 47, extended here to investigations).
+
+Planned rounds: 1 rules repository ownership, jurisdictions at launch, speak-up partner, OHS scope · 2 clarification of what "the organization" owning the repository means mechanically (the owner's Round 1 answer to question 1 was free text, not one of the offered options, and the distinction materially changes the schema).
+
+The principle from Modules 01 to 12 applies: every decision is a default each organization can change at setup or later, except legal floors, safety rules and the handful of product-scope decisions that are not organization choices; CanDo pre-fills its suggested numbers at setup and the organization can change them (Q46). This module adds one more such product-scope decision: `compliance.rule_ai_interpretation_enabled`, locked off forever, consistent with requirements/13's own "not legal advice" framing.
+
+## Round 1 · Rules repository ownership, jurisdictions, speak-up partner, OHS scope
+
+| # | Decision |
+| --- | --- |
+| 1 | Who owns the rules repository's currency? Offered: (a) CanDo centrally owns and maintains it, like the payroll statutory tables; (b) a hybrid, CanDo owns the content but the organization must explicitly re-verify before each use; (c) a third-party legal-content vendor feed. **The owner answered free text: "The organization."** None of the three offered options matched this answer cleanly — all three assumed CanDo would retain primary ownership in some form — so this question was not closed in Round 1; see Round 2. |
+| 2 | Which jurisdictions at launch? **CanDo's recommended handling applied**: every jurisdiction CanDo already supports for payroll and employment standards (the same federal/provincial/territorial set), no new jurisdiction added solely for this module. Closes the module's second open question. |
+| 3 | A third-party speak-up/hotline partner, or built in-house? **CanDo's recommended handling applied**: built in-house, in the same case-management system as the rest of this module, over the alternative of integrating a named third-party hotline vendor. Closes the module's third open question. |
+| 4 | OHS scope: full in-house case management, or integrate with a separate EHS product? **CanDo's recommended handling applied**: full in-house case management (incidents, WCB claims, the joint committee, the SDS register, work refusals), over the alternative of integrating with a dedicated EHS product and keeping OHS data there. Closes the module's fourth open question. |
+
+## Round 2 · Clarifying what "the organization" owning the rules repository means
+
+| # | Decision |
+| --- | --- |
+| 1 | Given CanDo still seeds *some* verified starting content (it cannot ship an empty repository), what does "the organization owns it" mean mechanically? Offered: (a) **CanDo seeds a starter/reference copy by jurisdiction; the organization owns keeping it current from there** (recommended); (b) CanDo seeds nothing — the organization starts from a blank repository and builds its own from day one; (c) CanDo seeds a starter copy, but a rule can never go active until the organization explicitly re-verifies it against its own counsel, with no CanDo-verified shortcut at all. **The owner chose (a), CanDo's recommended option.** This closes the module's first open question and fixes the mechanical design: a seeded rule starts as a tenant `draft` needing both an owner and the organization's own review before it can go `active` (docs/34 §3). |
+
+Indigenous data governance / OCAP (the module's fifth open question) was not put to a Round 1 or Round 2 question: it depends on advisers the owner has not yet engaged, and CanDo's existing OCAP-aligned data residency option in Core HR (migration 0008) already covers what can responsibly be built without that input. It stays open in docs/34 §16 and `docs/16`.
