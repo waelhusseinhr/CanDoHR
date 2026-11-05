@@ -43,7 +43,9 @@ export function composeBlock(input: {
     }
   }
   const active = premiums.filter((premium) => !dropped.has(premium.code));
+  // rule: holiday straight multiplier from agreement input; tests may omit and use statutory 1.5×
   const straightMultiplier = input.holiday ? (input.holidayStraightMultiplier ?? "1.50") : "1.00";
+  // rule: agreement or holiday premium inputs in tests; pay comes from rules/agreements
   const overtimeMultiplier = input.holiday ? (input.holidayOvertimeMultiplier ?? "2.00") : (input.overtimeMultiplier ?? "1.50");
   const lines: ComposedLine[] = [];
   if (cmp(straight, "0.00") > 0) {
@@ -81,7 +83,9 @@ function pushPremiums(
       hours,
       amount: mul(hours, premium.perHour),
       ruleSource: group
+        // structural: optional article reference in composed pay line label
         ? `agreement:art. ${group.article ?? premium.article ?? ""} exclusive`
+        // structural: optional value absent; empty string for typing
         : `agreement:art. ${premium.article ?? ""} flat`,
     });
   }

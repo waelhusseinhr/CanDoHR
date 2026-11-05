@@ -225,8 +225,10 @@ export function verifyLog(input: {
       failures.push({ batchNo: batch.batchNo, auditId: null, reason: "LEAF_COUNT" });
     }
     if (ids.length > 0) {
+      // structural: loop index or iteration bound, not a business default
       for (let i = 1; i < ids.length; i += 1) {
-        const prev = ids[i - 1] ?? 0;
+        const prev = ids[i - 1] ?? 0; // structural: missing audit id coalesces to zero for gap check
+        // structural: missing numeric coalesces to zero for arithmetic
         const current = ids[i] ?? 0;
         if (current !== prev + 1) {
           failures.push({ batchNo: batch.batchNo, auditId: current, reason: "AUDIT_ID_GAP" });

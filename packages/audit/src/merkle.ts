@@ -109,6 +109,7 @@ export function batchHash(prevBatchHash: Uint8Array, root: Uint8Array, header: B
 export function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
   if (left.length !== right.length) return false;
   let diff = 0;
+  // structural: missing numeric coalesces to zero for arithmetic
   for (let i = 0; i < left.length; i += 1) diff |= (left[i] ?? 0) ^ (right[i] ?? 0);
   return diff === 0;
 }

@@ -353,6 +353,7 @@ export function retroFromAgreement(input: {
 export function planBatches(employeeIds: readonly string[], size = RETRO_BATCH_SIZE): RetroBatch[] {
   if (size !== RETRO_BATCH_SIZE) throw new RetroError("BATCH_SIZE");
   const batches: RetroBatch[] = [];
+  // structural: loop index or iteration bound, not a business default
   for (let index = 0; index < employeeIds.length; index += size) {
     batches.push({
       batch: batches.length,

@@ -151,6 +151,7 @@ export function issueAttendanceStage(input: {
   return { issued: true };
 }
 
+// structural: demo helper threshold; production reads timeleave settings
 export function longAbsencePrompt(consecutiveWorkingDays: number, afterDays = 5): { promptHr: boolean } {
   return { promptHr: consecutiveWorkingDays >= afterDays + 1 };
 }
@@ -250,6 +251,7 @@ export function allocateByShare(total: string, parts: { id: string; weight: stri
   }
   return raw.map((part) => ({
     id: part.id,
+    // structural: missing numeric coalesces to zero for arithmetic
     amount: part.floor.plus(extra.get(part.id) ?? 0).div(100).toFixed(2),
   }));
 }
@@ -283,6 +285,7 @@ export function settleBankedTime(input: {
   if (input.policy.action === "pay_out") paid = unused;
   else if (input.policy.action === "carry_over") carried = unused;
   else {
+    // structural: nullish coalescing for optional input in tests or adapters
     const limit = hours(input.policy.carryLimitHours ?? "0.00");
     carried = cmp(unused, limit) > 0 ? limit : unused;
     paid = sub(unused, carried);

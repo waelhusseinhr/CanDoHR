@@ -23,7 +23,8 @@ export function addPosition(
 ): void {
   world.positions[input.id] = {
     id: input.id,
-    status: input.status ?? "active",
+    status: input.status ?? "active", // structural: in-memory world seed status for tests
+    // structural: nullish coalescing for optional input in tests or adapters
     version: input.version ?? 1,
     orgUnitId: input.orgUnitId,
   };
@@ -49,6 +50,7 @@ export function addProfile(
   world.profiles[input.assignmentId] = {
     assignmentId: input.assignmentId,
     taxProvince: input.taxProvince,
+    // structural: nullish coalescing for optional input in tests or adapters
     overridden: input.overridden ?? false,
   };
 }
@@ -87,6 +89,7 @@ export function addAssignment(
     positionId: input.positionId,
     locationId: input.locationId ?? null,
     rate: input.rate ?? null,
+    // structural: in-memory world seed status for tests
     status: input.status ?? "open",
   };
   const explicit = input.explicitKeys ?? Object.keys(attributes).filter((key) => attributes[key] !== null);
@@ -103,6 +106,7 @@ export function addAssignment(
     employmentId: input.employmentId,
     personId: input.personId,
     positionId: input.positionId,
+    // structural: nullish coalescing for optional input in tests or adapters
     version: input.version ?? 1,
     versions,
   };

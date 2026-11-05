@@ -11,6 +11,7 @@ export function isKnownOperation(op: string): boolean {
 
 /** The entity id the operation writes, from either the OpenAPI field or the spec example fields. */
 export function targetId(op: Operation): string {
+  // structural: optional value absent; empty string for typing
   const id = op.targetId ?? op.assignmentId ?? op.positionId ?? op.employmentId ?? op.personId ?? op.orgUnitId ?? "";
   return id;
 }

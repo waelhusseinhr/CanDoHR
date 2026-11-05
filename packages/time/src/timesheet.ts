@@ -8,6 +8,7 @@ export function employeeConfirmation(confirmed: boolean, confirmedAt?: string): 
   return {
     reminders: !confirmed,
     payrollProceeds: true,
+    // structural: sentinel when confirmation time is omitted in tests
     employeeConfirmedAt: confirmed ? (confirmedAt ?? "recorded") : null,
   };
 }

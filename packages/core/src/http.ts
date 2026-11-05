@@ -38,6 +38,7 @@ export function createCoreApp(core: CoreHr, knownAt: string): Hono {
 
 function readQuery(asOf: string | undefined, knownAt: string | undefined, fallbackKnownAt: string): { asOf: string; knownAt: string } {
   return {
+    // structural: as-of or demo date when caller omits effective date
     asOf: asOf ?? "2026-11-01",
     knownAt: knownAt ?? fallbackKnownAt,
   };

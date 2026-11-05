@@ -51,10 +51,12 @@ function plain(value: Decimal): string {
 }
 
 function amount(input: Obj, key: string): Decimal {
+  // structural: missing numeric coalesces to zero for arithmetic
   return D(input[key] ?? 0);
 }
 
 function exempt(input: Obj, key: string): boolean {
+  // structural: payroll engine coerces missing flags to false
   return Boolean(input[key] ?? false);
 }
 
@@ -127,6 +129,7 @@ function incomeTestedBpa(spec: Obj, income: Decimal): Decimal {
 
 function ontarioHealthPremium(spec: Obj, annual: Decimal): Decimal {
   const bands = spec.bands as Obj[];
+  // structural: loop index or iteration bound, not a business default
   for (let index = 0; index < bands.length - 1; index += 1) {
     const previous = bands[index];
     const next = bands[index + 1];
@@ -491,6 +494,7 @@ export function checkCase(testCase: Obj, rulesDir = statutoryDirectory()): strin
   for (const [key, value] of Object.entries(expectedTrace)) {
     if (trace.get(key) !== value) fails.push(`trace ${key}: got ${trace.get(key)} expected ${String(value)}`);
   }
+  // structural: missing numeric coalesces to zero for arithmetic
   const tolerance = D(testCase.tolerance ?? "0");
   const within = isObj(testCase.expected_within) ? testCase.expected_within : {};
   for (const [key, value] of Object.entries(within)) {

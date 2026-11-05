@@ -56,6 +56,7 @@ export function allocateByShare(total: string, parts: { id: string; weight: stri
   }
   return raw.map((part) => ({
     id: part.id,
+    // structural: missing numeric coalesces to zero for arithmetic
     amount: part.floor.plus(extra.get(part.id) ?? 0).div(100).toFixed(2),
   }));
 }

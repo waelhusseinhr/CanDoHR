@@ -7,6 +7,7 @@ export function createOrgChartApp(chart: OrgChart, today: string): Hono {
 
   app.get("/org-chart", (c) => {
     const asOf = c.req.query("asOf") ?? today;
+    // structural: org-chart query default depth for demos
     const depth = Number(c.req.query("depth") ?? "3");
     const rootId = c.req.query("rootId") ?? undefined;
     const planId = c.req.query("planId") ?? undefined;

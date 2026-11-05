@@ -128,6 +128,7 @@ function splitSlice(
     ...tiers.map((tier) => norm(tier.after)).filter((after) => cmp(after, "0.00") > 0 && cmp(after, total) < 0),
   ]);
   const pieces: Piece[] = [];
+  // structural: loop index or iteration bound, not a business default
   for (let index = 0; index < cuts.length - 1; index += 1) {
     const from = cuts[index];
     const to = cuts[index + 1];
@@ -143,6 +144,7 @@ function splitSlice(
       assignmentId: slice.assignmentId,
       rate: norm(slice.rate),
       hours: span,
+      // rule: agreement or holiday premium inputs in tests; pay comes from rules/agreements
       multiplier: tier?.multiplier ?? "1.00",
       kind: overtime ? "daily_ot" : "regular",
       rateBasis: overtime && kind === "statute" ? jurisdiction.rateBasis : "regular",
@@ -164,6 +166,7 @@ function chooseDaily(slice: DaySlice, jurisdiction: Jurisdiction, agreements?: A
   if (!agreement?.dailyAfter) return statute;
   const alternate = splitSlice(
     slice,
+    // rule: agreement or holiday premium inputs in tests; pay comes from rules/agreements
     [{ after: agreement.dailyAfter, multiplier: agreement.dailyMultiplier ?? "1.50" }],
     "agreement",
     jurisdiction,

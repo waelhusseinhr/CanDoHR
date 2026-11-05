@@ -37,6 +37,7 @@ export function addDays(isoDate: string, days: number): string {
   }
   const parsed = parseIsoDate(isoDate);
   const [year, month, day] = parsed.split("-").map(Number);
+  // structural: missing numeric coalesces to zero for arithmetic
   const utc = new Date(Date.UTC(year ?? 0, (month ?? 1) - 1, (day ?? 1) + days));
   const y = utc.getUTCFullYear().toString().padStart(4, "0");
   const m = (utc.getUTCMonth() + 1).toString().padStart(2, "0");

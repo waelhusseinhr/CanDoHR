@@ -64,6 +64,7 @@ export function fiscalPeriod(date: string, yearEndMonth: number, closedPeriods: 
 export function postingPeriod(work: FiscalPeriod, yearEndMonth: number, closedPeriods: readonly string[]): FiscalPeriod {
   if (work.status === "open") return work;
   let cursor = addDays(work.end, 1);
+  // structural: loop index or iteration bound, not a business default
   for (let step = 0; step < 36; step += 1) {
     const period = fiscalPeriod(cursor, yearEndMonth, closedPeriods);
     if (period.status === "open") return period;
@@ -130,6 +131,7 @@ export function journalForRun(input: {
   const groups = new Map<string, { first: string; amounts: string[]; sample: string }>();
   for (const share of shares) {
     const period = fiscalPeriod(share.id, input.yearEndMonth, input.closed ?? []);
+    // structural: nullish coalescing for optional input in tests or adapters
     const group = groups.get(period.id) ?? { first: share.id, amounts: [], sample: share.id };
     group.amounts.push(share.amount);
     groups.set(period.id, group);

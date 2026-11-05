@@ -5,6 +5,7 @@ export function isValidSin(value: string): boolean {
   const digits = value.replace(/\D/g, "");
   if (!/^\d{9}$/.test(digits)) return false;
   let sum = 0;
+  // structural: loop index or iteration bound, not a business default
   for (let index = 0; index < 9; index += 1) {
     let digit = Number(digits[8 - index]);
     if (index % 2 === 1) {

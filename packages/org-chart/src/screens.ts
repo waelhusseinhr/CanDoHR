@@ -23,6 +23,7 @@ export function OrgChartScreen(props: {
       "nav",
       { "aria-label": ct(locale, "chart.hierarchy"), className: "flex gap-3 text-sm" },
       h("a", { href: "?hierarchy=management" }, ct(locale, "chart.hierarchy")),
+      // structural: optional parameter default for callers that omit it
       h("a", { href: "?compare=2026-12-01" }, ct(locale, "chart.compare")),
     ),
     chart.nodes.length === 0

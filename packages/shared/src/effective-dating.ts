@@ -107,6 +107,7 @@ export function writeVersion(versions: readonly VersionRow[], input: WriteVersio
       throw new CanDoError("EXPLICIT_KEY_NOT_IN_PATCH");
     }
   }
+  // structural: in-memory merge strategy for tests, not platform.setting()
   const resolution = input.conflictResolution ?? "keep";
   if (resolution !== "keep" && resolution !== "replace" && resolution !== "merge") {
     throw new CanDoError("CONFLICT_RESOLUTION");

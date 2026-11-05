@@ -56,6 +56,7 @@ export class EditionStore {
       const bytes = readFileSync(path);
       const body = JSON.parse(bytes.toString("utf8")) as unknown;
       const hash = sha256(bytes);
+      // structural: path parsing for rules files
       const family = relative(root, path).split(/[/\\]/)[0] ?? "rules";
       const status = markedVerifyAtLoad(body) ? "verify_at_load" : "loaded";
       this.byHash.set(hash, { bytes, body, family, path });
@@ -74,6 +75,7 @@ export class EditionStore {
   }
 
   /** Test hook: store bytes under a hash that may not match them. */
+  // structural: rules file family label for test fixtures
   remember(claimedHash: string, bytes: Buffer, family = "test"): void {
     this.byHash.set(claimedHash, {
       bytes,

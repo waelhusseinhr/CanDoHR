@@ -101,6 +101,7 @@ export function createApiApp(deps: ApiDeps): Hono<ApiEnv> {
       const revealed = revealSin({
         personId: person.personId,
         sin: person.sin,
+        // structural: optional value absent; empty string for typing
         reason: body?.reason ?? "",
         grants: deps.grants.get(user.userId) ?? [],
       });
@@ -196,6 +197,7 @@ export function createApiApp(deps: ApiDeps): Hono<ApiEnv> {
 
 function attachUser(deps: ApiDeps) {
   return async (c: Context<ApiEnv>, next: Next) => {
+    // structural: optional value absent; empty string for typing
     const header = c.req.header("authorization") ?? "";
     const token = header.startsWith("Bearer ") ? header.slice(7) : "";
     if (!token) return c.json({ code: "JWT_SUBJECT" }, 401);

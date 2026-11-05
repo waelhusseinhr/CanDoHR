@@ -67,6 +67,9 @@ jobs:
       - name: Run schema smoke tests
         run: bash tests/schema/run_migrations_ci.sh
 
+      - name: Check values register (code and API, no database)
+        run: python3 tests/hardcoding/check_values.py
+
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:

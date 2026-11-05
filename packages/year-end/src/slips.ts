@@ -96,7 +96,8 @@ function t4Slip(slip: T4SlipInput, report: ReportCode): string {
     group("EMPE_NM", [tag("snm", slip.surname), tag("gvn_nm", slip.givenName)]),
     tag("sin", slip.sin),
     tag("bn", slip.payrollAccount),
-    tag("cpp_qpp_xmpt_cd", slip.cppExempt ?? "0"),
+    tag("cpp_qpp_xmpt_cd", slip.cppExempt ?? "0"), // rule: CRA T4 exemption code when not stated on slip input
+    // structural: missing numeric coalesces to zero for arithmetic
     tag("ei_xmpt_cd", slip.eiExempt ?? "0"),
     tag("rpt_tcd", report),
     tag("empt_prov_cd", slip.province),

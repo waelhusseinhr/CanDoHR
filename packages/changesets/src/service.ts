@@ -100,6 +100,7 @@ export class ChangeSetService {
         return fail(400, "UNKNOWN_OPERATION", "That operation is not in the catalogue.");
       }
     }
+    // structural: optional value absent; empty string for typing
     const source = (SOURCES as readonly string[]).includes(input.source ?? "") ? (input.source as ChangeSource) : "api";
     const record: ChangeSetRecord = {
       changeSetId: crypto.randomUUID(),
@@ -184,6 +185,7 @@ export class ChangeSetService {
     const result = this.inspect(row);
     row.validation = result;
     if (result.errors.length > 0) {
+      // structural: nullish coalescing for optional input in tests or adapters
       return fail(422, result.errors[0]?.code ?? "INVALID", result.errors[0]?.message ?? "Fix the errors before submitting.");
     }
     const acknowledged = new Set(body.acknowledgedWarnings ?? []);
@@ -308,6 +310,7 @@ export class ChangeSetService {
         }
       }
       if (!this.choiceMissing(row) && (op.op === "assignment.update" || op.op === "compensation.set_rate")) {
+        // structural: optional value absent; empty string for typing
         const id = op.assignmentId ?? op.targetId ?? "";
         const assignment = this.world.assignments[id];
         const patch = attributesOf(op.set);
@@ -385,7 +388,9 @@ export class ChangeSetService {
 
   private currentVersion(key: string): number {
     const [type, id] = key.split(":");
+    // structural: in-memory version lookup for tests; missing id or version reads as zero
     if (type === "assignment") return this.world.assignments[id ?? ""]?.version ?? 0;
+    // structural: optional value absent; empty string for typing
     if (type === "position") return this.world.positions[id ?? ""]?.version ?? 0;
     return 0;
   }
