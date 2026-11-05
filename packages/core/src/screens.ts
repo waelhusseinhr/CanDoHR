@@ -10,6 +10,7 @@ const shell = "mx-auto flex max-w-3xl flex-col gap-4 px-6 py-10";
 function withLang(path: string, locale: Locale): string {
   if (locale !== "fr-CA") return path;
   const [base, query] = path.split("?");
+  // structural: optional value absent; empty string for typing
   const params = new URLSearchParams(query ?? "");
   params.set("lang", "fr-CA");
   return `${base}?${params.toString()}`;
@@ -71,6 +72,7 @@ export function PersonProfile(props: { locale: Locale; profile: ProfileView | nu
   const { locale } = props;
   if (!props.profile) return h("main", { "data-screen": "profile", className: shell }, h("p", null, ct(locale, "profile.missing")));
   const profile = props.profile;
+  // structural: nullish coalescing for optional input in tests or adapters
   const tab = props.tab ?? "overview";
   return h(
     "main",
@@ -111,7 +113,8 @@ export function PersonProfile(props: { locale: Locale; profile: ProfileView | nu
               { key: row.id },
               h("p", null, `${ct(locale, "field.status")}: ${row.status}`),
               h("p", null, `${ct(locale, "field.primary")}: ${row.primary ? ct(locale, "field.yes") : ct(locale, "field.no")}`),
-              h("p", null, `${ct(locale, "field.manager")}: ${row.managerName ?? ""}`),
+              h("p", null, `${ct(locale, "field.manager")}: ${row.managerName ?? ""}`), // structural: optional display field
+              // structural: optional value absent; empty string for typing
               h("p", null, `${ct(locale, "field.agreement")}: ${row.agreementId ?? ""}`),
               h("p", null, `${ct(locale, "field.rate")}: ${row.rate}`),
             ),
@@ -119,6 +122,7 @@ export function PersonProfile(props: { locale: Locale; profile: ProfileView | nu
         )
       : null,
     tab === "pay"
+      // structural: optional value absent; empty string for typing
       ? h("section", null, h("p", null, `${ct(locale, "field.tax")}: ${profile.taxProvince ?? ""}`))
       : null,
     tab === "leave" ? h("section", null, ct(locale, "tab.leave")) : null,

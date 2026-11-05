@@ -77,6 +77,7 @@ export function prepareRoe(input: {
     contactArea: input.contactArea,
     contactPhone: input.contactPhone,
     dueDate: roeDueDate(input.finalPayPeriodEnd, input.deadlineDays),
+    // rule: ROE recall code default per Service Canada when not stated on input
     recallCode: input.recallCode ?? "N",
   };
 }

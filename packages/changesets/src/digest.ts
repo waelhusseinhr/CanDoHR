@@ -69,6 +69,7 @@ export function customerDigest(input: {
 export function digestStillInChain(kept: { batchHash: string }, batches: readonly SealBatch[]): boolean {
   const ordered = [...batches].sort((a, b) => a.batchNo - b.batchNo);
   if (!ordered.some((batch) => batch.batchHash === kept.batchHash)) return false;
+  // structural: loop index or iteration bound, not a business default
   for (let index = 1; index < ordered.length; index += 1) {
     const prev = ordered[index - 1];
     const row = ordered[index];

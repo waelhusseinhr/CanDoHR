@@ -7,6 +7,7 @@ export class RulesError extends Error {
   readonly detail: string;
   readonly problems: RuleProblem[];
 
+  // structural: HTTP status for validation errors
   constructor(code: string, detail: string, status = 422, problems: RuleProblem[] = []) {
     super(`${code}: ${detail}`);
     this.name = "RulesError";

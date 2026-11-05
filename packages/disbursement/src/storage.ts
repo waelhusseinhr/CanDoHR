@@ -56,6 +56,7 @@ export function putChunked(store: ChunkStore, key: string, bytes: Uint8Array, ch
   if (chunkSize < 1) throw new DisbursementError("UPLOAD");
   const upload = store.createMultipartUpload(key);
   let parts = 0;
+  // structural: loop index or iteration bound, not a business default
   for (let offset = 0; offset < bytes.length; offset += chunkSize) {
     parts += 1;
     store.uploadPart(upload.uploadId, parts, bytes.slice(offset, offset + chunkSize));

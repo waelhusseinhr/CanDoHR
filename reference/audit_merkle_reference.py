@@ -41,6 +41,7 @@ def canonical(obj: dict) -> bytes:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
 
 
+# structural: audit leaf field names are fixed by docs/10 §5
 AUDIT_FIELDS = ("tenant_id", "audit_id", "occurred_at", "actor_type", "actor_id", "on_behalf_of", "action",
                 "subject_type", "subject_id", "change_set_id", "before", "after", "reason")
 

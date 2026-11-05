@@ -132,6 +132,7 @@ function hourlyRate(premium: Obj, base: Decimal): Decimal {
 
 function isHourly(premium: Obj): boolean {
   const amount = asObj(premium.amount);
+  // structural: premium amount shape discriminator
   return "per_hour" in amount || "percent_of_rate" in amount;
 }
 
@@ -160,6 +161,7 @@ function resolveMethod(method: string, multipliers: Map<string, Decimal>, order:
 
 function findConflictRule(comp: Obj, bases: Set<string>): { index: number; rule: Obj } | null {
   const rules = asArray(asObj(comp.multiplier_conflicts).rules);
+  // structural: loop index or iteration bound, not a business default
   for (let index = 0; index < rules.length; index += 1) {
     const rule = rules[index];
     if (!isObj(rule) || !Array.isArray(rule.when)) continue;
@@ -386,6 +388,7 @@ function possibleCombinations(rules: Obj): string[][] {
   const sources = definedSources(rules);
   const exclusive = exclusivePairs(rules);
   const out: string[][] = [];
+  // structural: loop index or iteration bound, not a business default
   for (let size = 2; size <= sources.length; size += 1) {
     for (const combo of combinations(sources, size)) {
       const blocked = combinations(combo, 2).some((pair) => exclusive.has(pairKey(pair[0], pair[1])));
@@ -440,6 +443,7 @@ export function validate(rules: Obj): Problem[] {
   const seen = new Set<string>();
   const order = Array.isArray(composition.evaluation_order) ? composition.evaluation_order.map(String) : [];
   const conflictRules = asArray(conflicts.rules);
+  // structural: loop index or iteration bound, not a business default
   for (let index = 0; index < conflictRules.length; index += 1) {
     const rule = conflictRules[index];
     if (!isObj(rule) || !Array.isArray(rule.when)) continue;

@@ -25,6 +25,7 @@ export class AgreementLibrary {
 
   save(version: Record<string, unknown>): { id: string; contentSha256: string } {
     const rules = isRecord(version.rules) ? version.rules : version;
+    // structural: nullish coalescing for optional input in tests or adapters
     const id = String(version.id ?? `${String(version.agreementId ?? "agreement")}:${String(version.version ?? "1")}`);
     const existing = this.byId.get(id);
     if (existing && existing.status !== "draft") {

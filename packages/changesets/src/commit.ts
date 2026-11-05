@@ -131,6 +131,7 @@ function applyOperation(world: World, op: Operation, input: CommitInput, seenSub
 }
 
 function writeAssignment(world: World, op: Operation, set: AttributeMap, input: CommitInput): void {
+  // structural: optional value absent; empty string for typing
   const id = op.assignmentId ?? op.targetId ?? "";
   if (op.op === "assignment.end") set = { ...set, status: "ended" };
   if (op.op === "compensation.set_rate" && set.rate === undefined && set.amount !== undefined) {
@@ -144,6 +145,7 @@ function writeAssignment(world: World, op: Operation, set: AttributeMap, input: 
     throw new CanDoError("MUST_CHOOSE_CHANGE_OR_CORRECTION");
   }
   const patch = Object.keys(set).length > 0 ? set : { status: "open" };
+  // structural: in-memory merge strategy for tests, not platform.setting()
   const resolution: ConflictResolution = input.conflictResolution ?? "merge";
   if (!existing) {
     world.assignments[id] = {
@@ -205,6 +207,7 @@ function vacateIfEmpty(world: World, positionId: string, endedAssignmentId: stri
 }
 
 function terminateEmployment(world: World, op: Operation): void {
+  // structural: optional value absent; empty string for typing
   const id = op.employmentId ?? op.targetId ?? "";
   const employment = world.employments[id];
   if (!employment) throw new CanDoError("EMPLOYMENT_UNKNOWN");
@@ -215,6 +218,7 @@ function hireEmployment(world: World, op: Operation): void {
   const id = op.employmentId ?? op.targetId ?? crypto.randomUUID();
   world.employments[id] = world.employments[id] ?? {
     id,
+    // structural: optional value absent; empty string for typing
     personId: op.personId ?? "",
     status: "active",
     assignmentIds: [],
@@ -222,6 +226,7 @@ function hireEmployment(world: World, op: Operation): void {
 }
 
 function updateProfile(world: World, op: Operation, set: AttributeMap): void {
+  // structural: optional value absent; empty string for typing
   const assignmentId = op.assignmentId ?? op.targetId ?? "";
   const profile = world.profiles[assignmentId];
   if (!profile) throw new CanDoError("PROFILE_UNKNOWN");
@@ -230,6 +235,7 @@ function updateProfile(world: World, op: Operation, set: AttributeMap): void {
 }
 
 function setPositionStatus(world: World, op: Operation, status: "frozen" | "eliminated"): void {
+  // structural: optional value absent; empty string for typing
   const id = op.positionId ?? op.targetId ?? "";
   const position = world.positions[id];
   if (!position) throw new CanDoError("POSITION_UNKNOWN");
@@ -239,6 +245,7 @@ function setPositionStatus(world: World, op: Operation, status: "frozen" | "elim
 
 function upsertPosition(world: World, op: Operation, set: AttributeMap): void {
   const id = op.positionId ?? op.targetId ?? crypto.randomUUID();
+  // structural: nullish coalescing for optional input in tests or adapters
   const current = world.positions[id] ?? { id, status: "active" as const, version: 0, orgUnitId: "" };
   if (typeof set.orgUnitId === "string") current.orgUnitId = set.orgUnitId;
   if (set.status === "vacant" || set.status === "active" || set.status === "frozen" || set.status === "eliminated") {
@@ -250,6 +257,7 @@ function upsertPosition(world: World, op: Operation, set: AttributeMap): void {
 
 function upsertPerson(world: World, op: Operation, set: AttributeMap): void {
   const id = op.personId ?? op.targetId ?? crypto.randomUUID();
+  // structural: nullish coalescing for optional input in tests or adapters
   const current = world.people[id] ?? { id, attributes: {} };
   current.attributes = { ...current.attributes, ...set };
   world.people[id] = current;
@@ -257,6 +265,7 @@ function upsertPerson(world: World, op: Operation, set: AttributeMap): void {
 
 function upsertOrgUnit(world: World, op: Operation, set: AttributeMap): void {
   const id = op.orgUnitId ?? op.targetId ?? crypto.randomUUID();
+  // structural: nullish coalescing for optional input in tests or adapters
   const current = world.orgUnits[id] ?? { id, parentId: null, status: "active" };
   if (typeof set.parentId === "string") current.parentId = set.parentId;
   if (op.op === "org_unit.close") current.status = "closed";

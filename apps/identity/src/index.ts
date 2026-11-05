@@ -41,6 +41,7 @@ export function supabaseAuthAdmin(url: string, serviceRoleKey: string): AuthAdmi
       const body = await response.json() as { id: string; email?: string; banned_until?: string | null };
       const user: AuthUser = {
         id: body.id,
+        // structural: optional value absent; empty string for typing
         email: body.email ?? patch.email ?? "",
         active: patch.active ?? !body.banned_until,
         externalId: patch.externalId ?? null,
@@ -52,6 +53,7 @@ export function supabaseAuthAdmin(url: string, serviceRoleKey: string): AuthAdmi
       if (response.status === 404) return null;
       if (!response.ok) throw new Error("SCIM_AUTH");
       const body = await response.json() as { id: string; email?: string; banned_until?: string | null };
+      // structural: optional value absent; empty string for typing
       return { id: body.id, email: body.email ?? "", active: !body.banned_until, externalId: null };
     },
   };

@@ -29,6 +29,7 @@ export function createDb(connectionString: string, options?: { max?: number }): 
   ensureParsers();
   const pool = new pg.Pool({
     connectionString,
+    // structural: connection pool cap for local dev, not a tenant setting
     max: options?.max ?? 10,
   });
   return new Kysely<Database>({

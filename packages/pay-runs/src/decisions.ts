@@ -173,6 +173,7 @@ export function applyPostTaxDeductions(input: {
     taken.push({ code: item.code, amount: pay.toFixed(2) });
     const short = round2(want - pay);
     if (short > 0 && item.shortfall === "spread") {
+      // structural: nullish coalescing for optional input in tests or adapters
       arrears.push({ code: item.code, amount: short.toFixed(2), periods: item.spreadPeriods ?? 1 });
     }
     available = round2(available - pay);
@@ -335,6 +336,7 @@ export function fiscalShares(amount: string, days: readonly { date: string }[], 
   const counts = new Map<string, number>();
   for (const day of days) {
     const key = String(fiscalYearOf(day.date, yearEndMonth));
+    // structural: missing numeric coalesces to zero for arithmetic
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
   const weights = [...counts.entries()]

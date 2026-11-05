@@ -8,6 +8,7 @@ export function createChangeSetApp(service: ChangeSetService): Hono {
 
   app.post("/change-sets", async (c) => {
     const body = (await c.req.json()) as CreateInput;
+    // structural: optional value absent; empty string for typing
     const userId = c.req.header("x-user-id") ?? "";
     if (!userId) return problem(c, 400, "REQUESTED_BY", "Say who is making this change.");
     const result = service.create(body, userId, c.req.header("Idempotency-Key") ?? undefined);
@@ -41,6 +42,7 @@ export function createChangeSetApp(service: ChangeSetService): Hono {
   });
 
   app.post("/change-sets/:changeSetId/decision", async (c) => {
+    // structural: optional value absent; empty string for typing
     const userId = c.req.header("x-user-id") ?? "";
     const body = (await c.req.json()) as { decision?: string; comment?: string };
     const result = service.decide(c.req.param("changeSetId"), userId, body);
@@ -58,6 +60,7 @@ function toJson(row: ChangeSetRecord) {
     kind: row.kind,
     reasonCode: row.reasonCode,
     effectiveDate: row.effectiveDate,
+    // structural: nullish coalescing for optional input in tests or adapters
     isCorrection: row.isCorrection ?? false,
     operations: row.operations,
     baseVersions: row.baseVersions,

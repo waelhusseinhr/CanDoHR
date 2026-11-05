@@ -160,6 +160,7 @@ function daysPerWeek(rules: Record<string, unknown> | undefined): Decimal | null
 function bestTier<T extends { service_years?: number }>(tiers: T[], years: number): T | null {
   const eligible = tiers.filter((tier) => typeof tier.service_years === "number" && years >= tier.service_years);
   if (eligible.length === 0) return null;
+  // structural: missing numeric coalesces to zero for arithmetic
   return eligible.reduce((best, tier) => ((tier.service_years ?? 0) > (best.service_years ?? 0) ? tier : best));
 }
 
@@ -250,6 +251,7 @@ export function resolve(input: ResolveInput): ResolveResult {
   const wage = wageOn(jurisdiction.minimum_wage, input.date);
   return {
     jurisdiction: input.jurisdiction,
+    // structural: rules edition label for error messages
     esVersion: `${input.edition.id ?? "es"}@${input.jurisdiction}#${input.editionHash.slice(0, 12)}`,
     agreement: input.agreement ? { id: input.agreement.id, version: input.agreement.version } : null,
     overtime: keepFavourable(tiers),

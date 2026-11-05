@@ -23,6 +23,7 @@ export interface SubjectRef {
 
 export function assignBuckets(subjects: readonly SubjectRef[], count = bucketCountFor(subjects.length)): Map<number, SubjectRef[]> {
   const groups = new Map<number, SubjectRef[]>();
+  // structural: loop index or iteration bound, not a business default
   for (let bucket = 0; bucket < count; bucket += 1) groups.set(bucket, []);
   for (const subject of subjects) {
     const bucket = bucketFor(subject.payrollAccountId, subject.personId, count);

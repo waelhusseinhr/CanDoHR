@@ -34,6 +34,7 @@ function aesDecrypt(keyBytes: Uint8Array, iv: Uint8Array, ciphertext: Uint8Array
  * Dev stand-in for AWS KMS. The master key stays in this object.
  * Production replaces it with KMS GenerateDataKey; the private key never leaves KMS.
  */
+// structural: local dev KMS label, not a tenant setting
 export function createDevKms(keyId = "dev-envelope"): Kms {
   const master = randomBytes(32);
   return {

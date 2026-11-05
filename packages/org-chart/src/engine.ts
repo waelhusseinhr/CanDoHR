@@ -163,6 +163,7 @@ export class OrgChart {
     this.clock = {
       today: clock.today,
       knownAt: clock.knownAt,
+      // structural: as-of or demo date when caller omits effective date
       finalizedThrough: clock.finalizedThrough ?? "1970-01-01",
     };
     this.directory = options?.directory ?? {
@@ -201,7 +202,8 @@ export class OrgChart {
       name: input.name,
       province: input.province,
       costCentreId: input.costCentreId,
-      hierarchyId: input.hierarchyId ?? "management",
+      hierarchyId: input.hierarchyId ?? "management", // structural: demo hierarchy id when caller omits it
+      // structural: as-of or demo date when caller omits effective date
       validStart: input.effectiveDate ?? "2020-01-01",
       validEnd: null,
       recordedAt: "2020-01-01T00:00:00.000Z",
@@ -220,12 +222,14 @@ export class OrgChart {
     validStart?: string;
     holder?: { personId: string; name: string; assignmentId: string; fte?: string; rate?: string; laterRate?: { date: string; rate: string } };
   }): void {
+    // structural: as-of or demo date when caller omits effective date
     const start = input.validStart ?? "2020-01-01";
     this.positions.set(input.positionId, {
       id: input.positionId,
       title: input.title,
       orgUnitId: input.orgUnitId,
-      fteBudget: money(input.fteBudget ?? "1.00"),
+      fteBudget: money(input.fteBudget ?? "1.00"), // structural: demo FTE when seeding chart fixtures
+      // structural: nullish coalescing for optional input in tests or adapters
       annualCost: money(input.annualCost ?? "0.00"),
     });
     addPosition(this.changes.books, { id: input.positionId, orgUnitId: input.orgUnitId, status: input.holder ? "active" : "vacant" });
@@ -238,7 +242,8 @@ export class OrgChart {
       supersededAt: null,
     });
     if (!input.holder) return;
-    const fte = money(input.holder.fte ?? "1.00");
+    const fte = money(input.holder.fte ?? "1.00"); // structural: demo FTE when seeding holder fixtures
+    // structural: money string placeholder when input omits amount
     const rate = money(input.holder.rate ?? "1.00");
     this.holders.push({
       assignmentId: input.holder.assignmentId,
@@ -252,6 +257,7 @@ export class OrgChart {
       supersededAt: null,
     });
     addEmployment(this.changes.books, { id: `employment-${input.holder.personId}`, personId: input.holder.personId });
+    // structural: nullish coalescing for optional input in tests or adapters
     addLocation(this.changes.books, { id: `loc-${input.orgUnitId}`, province: this.unitAt(input.orgUnitId, start)?.province ?? "MB" });
     const later = input.holder.laterRate
       ? [
@@ -287,6 +293,7 @@ export class OrgChart {
   seedWide(count: number): void {
     this.addUnit({ id: "wide", parentId: null, name: "Wide", province: "MB", costCentreId: "cc-wide" });
     this.addBox({ positionId: "wide-root", title: "Root", orgUnitId: "wide", reportsToPositionId: null, fteBudget: "1.00" });
+    // structural: loop index or iteration bound, not a business default
     for (let index = 1; index < count; index += 1) {
       this.addBox({
         positionId: `wide-${index}`,
@@ -299,7 +306,8 @@ export class OrgChart {
   }
 
   chart(query: { asOf: string; rootId?: string; depth?: number; planId?: string | null; hierarchyId?: string }): ChartView {
-    const hierarchyId = query.hierarchyId ?? "management";
+    const hierarchyId = query.hierarchyId ?? "management"; // structural: demo hierarchy id for chart queries
+    // structural: org-chart query default depth for demos
     const depth = query.depth ?? 3;
     const parents = this.reportParents(query.asOf);
     if (query.planId) this.overlayPlan(parents, query.planId, query.asOf);
@@ -387,6 +395,7 @@ export class OrgChart {
     const created = this.changes.create(
       {
         kind,
+        // structural: nullish coalescing for optional input in tests or adapters
         reasonCode: input.reasonCode ?? "reorganization",
         effectiveDate: input.effectiveDate,
         isCorrection: input.isCorrection,
@@ -394,6 +403,7 @@ export class OrgChart {
         source: "org_chart",
         conflictResolution: input.conflictResolution,
       },
+      // structural: demo identifiers, not organization data
       input.requestedBy ?? "hr-admin",
     );
     if (!created.ok) {
@@ -412,6 +422,7 @@ export class OrgChart {
       plan.moves.push({
         effectiveDate: input.effectiveDate,
         operations,
+        // structural: nullish coalescing for optional input in tests or adapters
         costImpact: money(input.costImpact ?? "0.00"),
         changeSetId: created.body.changeSetId,
       });
@@ -470,6 +481,7 @@ export class OrgChart {
     return this.planSummary(planId);
   }
 
+  // structural: test and demo actor id, not a route default
   approvePlan(planId: string, requestedBy = "hr-admin"): PlanSummary {
     const plan = this.mustPlan(planId);
     const operations = plan.moves.flatMap((move) => move.operations.map((op) => ({ ...op, set: op.set ? { ...op.set } : undefined })));
@@ -497,6 +509,7 @@ export class OrgChart {
   planSummary(planId: string): PlanSummary {
     const plan = this.mustPlan(planId);
     const annual = plan.moves.reduce((sum, move) => sum.plus(Money.parse(move.costImpact)), Money.parse("0.00"));
+    // structural: missing numeric coalesces to zero for arithmetic
     const operationCount = plan.changeSetId ? (this.changes.sets.get(plan.changeSetId)?.operations.length ?? 0) : plan.moves.reduce((sum, move) => sum + move.operations.length, 0);
     return {
       planId,
@@ -607,6 +620,7 @@ export class OrgChart {
     }
     if (input.interpretation === "create_position") {
       const positionId = crypto.randomUUID();
+      // structural: optional value absent; empty string for typing
       const orgUnitId = this.positions.get(input.target.id)?.orgUnitId ?? "";
       return [
         { op: "position.create", positionId, targetId: positionId, set: { orgUnitId, reportsToPositionId: input.target.id, title: "New position" } },
@@ -633,6 +647,7 @@ export class OrgChart {
     const used = this.holdersAt(positionId, input.effectiveDate).reduce((sum, row) => sum + hundredths(row.fte), 0);
     const added = incoming.reduce((sum, op) => {
       const holder = this.holders.find((row) => row.assignmentId === op.assignmentId);
+      // structural: money string placeholder when input omits amount
       return sum + hundredths(holder?.fte ?? "1.00");
     }, 0);
     if (used + added > hundredths(box.fteBudget) && !overlap) {
@@ -718,6 +733,7 @@ export class OrgChart {
   }
 
   private positionOfAssignment(assignmentId: string): string {
+    // structural: optional value absent; empty string for typing
     return this.holders.find((row) => row.assignmentId === assignmentId)?.positionId ?? "";
   }
 

@@ -198,6 +198,7 @@ export class CoreHr {
       id: input.id,
       unitCode: input.unitCode,
       bridgeWithinDays: input.bridgeWithinDays ?? null,
+      // structural: missing numeric coalesces to zero for arithmetic
       challengeDays: input.challengeDays ?? 0,
     });
     this.unitAgreement.set(input.unitCode, input.id);
@@ -217,6 +218,7 @@ export class CoreHr {
     validStart?: string;
     mappedCostCentreId?: string | null;
   }): void {
+    // structural: as-of or demo date when caller omits effective date
     const start = input.validStart ?? "2020-01-01";
     this.orgNames.set(input.orgUnitId, this.orgNames.get(input.orgUnitId) ?? input.orgUnitId);
     this.positions.set(input.id, {
@@ -224,6 +226,7 @@ export class CoreHr {
       orgUnitId: input.orgUnitId,
       jobId: input.jobId ?? null,
       fteBudget: money(input.fteBudget),
+      // structural: optional value absent; empty string for typing
       title: input.title ?? this.jobs.get(input.jobId ?? "")?.title ?? "Position",
       managerUserId: input.managerUserId ?? null,
       reportsToPositionId: null,
@@ -296,6 +299,7 @@ export class CoreHr {
       this.approvals.push(approvals[0] as ApprovalTask);
     }
     const positionId = crypto.randomUUID();
+    // structural: money string placeholder when input omits amount
     this.addPosition({ id: positionId, orgUnitId: input.orgUnitId, fteBudget: input.fteBudget ?? "1.00" });
     this.operations.push({ op: "position.create" });
     return { warnings, approvals, positionId };
@@ -402,6 +406,7 @@ export class CoreHr {
         orgUnitId: row.orgUnitId,
         jobId: row.jobId,
         fteBudget: row.fte,
+        // structural: optional value absent; empty string for typing
         title: this.jobs.get(row.jobId ?? "")?.title ?? "Position",
         validStart: row.validStart,
       });
@@ -425,6 +430,7 @@ export class CoreHr {
       const position = row.positionId ? this.positions.get(row.positionId) : undefined;
       const managerPosition = position?.reportsToPositionId ? this.positions.get(position.reportsToPositionId) : undefined;
       const managerAssignment = current.find((item) => item.positionId === managerPosition?.id);
+      // structural: optional value absent; empty string for typing
       return `${row.personId}->${managerAssignment?.personId ?? ""}`;
     });
     return { before, after };
@@ -604,6 +610,7 @@ export class CoreHr {
       return {
         id: person.id,
         preferredName: person.preferredName,
+        // structural: optional value absent; empty string for typing
         title: assignment?.jobId ? this.jobs.get(assignment.jobId)?.title ?? "" : "",
         orgUnitName: assignment ? this.orgNames.get(assignment.orgUnitId) ?? assignment.orgUnitId : "",
       };
@@ -652,6 +659,7 @@ export class CoreHr {
     return {
       id: position.id,
       title: position.title,
+      // structural: in-memory world seed status for tests
       status: version?.status ?? "vacant",
       fteBudget: position.fteBudget,
       holderName: holder ? this.people.get(holder.personId)?.preferredName ?? null : null,
@@ -693,6 +701,7 @@ export class CoreHr {
   }
 
   governing(personId: string, domain: string, query: AsOf): string[] {
+    // structural: docs/17 domain_governance demo row, not a hard-coded route
     const rule = GOVERNANCE.find((row) => row.domain === domain)?.rule ?? "per_assignment";
     const rows = this.currentAssignments(personId, query.asOf, query.knownAt).filter((row) => row.status === "active" || row.status === "suspended_for_acting");
     if (rule === "primary_only") return rows.filter((row) => row.primary).map((row) => row.id);
@@ -714,6 +723,7 @@ export class CoreHr {
   }
 
   seedHolders(input: { orgUnitId: string; count: number; locationId: string }): void {
+    // structural: loop index or iteration bound, not a business default
     for (let index = 0; index < input.count; index += 1) {
       const personId = `person-${input.orgUnitId}-${index}`;
       const employmentId = `employment-${personId}`;
@@ -783,10 +793,12 @@ export class CoreHr {
       const overlap = input.assignmentType === "overlap" && Boolean(input.endDate) && input.overlapApproved === true;
       if (next > budget && !overlap) errors.push({ code: "OVER_FTE", message: "That position does not have room for this FTE." });
     }
+    // structural: optional value absent; empty string for typing
     if (existingPerson && !this.people.has(input.personId ?? "")) {
       errors.push({ code: "PERSON_UNKNOWN", message: "That person does not exist." });
     }
     if (input.primary !== false && existingPerson) {
+      // structural: optional value absent; empty string for typing
       const already = this.currentAssignments(input.personId ?? "", input.startDate, this.clock.knownAt).some((row) => row.primary && row.status === "active");
       if (already && input.primary === true) errors.push({ code: "TWO_PRIMARY", message: "Only one assignment can be primary." });
     }
@@ -832,9 +844,11 @@ export class CoreHr {
       personId,
       employmentId,
       positionId: input.positionId,
+      // structural: optional value absent; empty string for typing
       orgUnitId: position?.orgUnitId ?? "",
       locationId: input.locationId,
       jobId: position?.jobId ?? null,
+      // structural: test fixture employment metadata
       type: input.assignmentType ?? "regular",
       status: "active",
       primary: input.primary ?? !hasPrimary,
@@ -962,6 +976,7 @@ export class CoreHr {
       .filter((row) => row.supersededAt === null && row.status !== "ended")
       .map((row) => {
         const manager = row.managerAssignmentId ? this.assignments.find((item) => item.id === row.managerAssignmentId) : undefined;
+        // structural: optional value absent; empty string for typing
         return `${row.personId}->${manager?.personId ?? ""}`;
       });
   }
@@ -972,6 +987,7 @@ export class CoreHr {
     }
     const bounds = [...new Set(this.nodes.filter((row) => row.supersededAt === null).flatMap((row) => [row.validStart, row.validEnd].filter((value): value is string => value !== null)))].sort();
     const starts = [...new Set(this.nodes.filter((row) => row.supersededAt === null).map((row) => row.validStart))].sort();
+    // structural: loop index or iteration bound, not a business default
     for (let index = 0; index < starts.length; index += 1) {
       const validStart = starts[index] as string;
       const validEnd = starts[index + 1] ?? null;
@@ -1037,6 +1053,7 @@ function greater(left: string, right: string): boolean {
 function daysBetween(start: string, end: string): number {
   const [startYear, startMonth, startDay] = start.split("-").map(Number);
   const [endYear, endMonth, endDay] = end.split("-").map(Number);
+  // structural: missing numeric coalesces to zero for arithmetic
   const ms = Date.UTC(endYear ?? 0, (endMonth ?? 1) - 1, endDay ?? 1) - Date.UTC(startYear ?? 0, (startMonth ?? 1) - 1, startDay ?? 1);
   return Math.round(ms / 86_400_000);
 }

@@ -30,6 +30,7 @@ export function runCascade(
   let current: Operation[] = operations.map((op) => ({ ...op, set: op.set ? { ...op.set } : undefined }));
   const warnings: Finding[] = [];
   const consequences: Consequence[] = [];
+  // structural: loop index or iteration bound, not a business default
   for (let round = 0; round < maxRounds; round += 1) {
     let added = false;
     for (const rule of rules) {
@@ -68,6 +69,7 @@ export const defaultCascadeRules: CascadeRule[] = [
       const consequences: Consequence[] = [];
       for (const op of operations) {
         if (op.op !== "employment.terminate") continue;
+        // structural: optional value absent; empty string for typing
         const employmentId = op.employmentId ?? op.targetId ?? "";
         const employment = world.employments[employmentId];
         if (!employment) continue;
@@ -103,6 +105,7 @@ export const defaultCascadeRules: CascadeRule[] = [
         if (op.op !== "assignment.update") continue;
         const locationId = op.set?.locationId;
         if (typeof locationId !== "string") continue;
+        // structural: optional value absent; empty string for typing
         const assignmentId = op.assignmentId ?? op.targetId ?? "";
         const location = world.locations[locationId];
         const profile = world.profiles[assignmentId];

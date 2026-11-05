@@ -5,6 +5,7 @@ export function scheduleConflicts(shifts: { id: string; personId: string; assign
   assignmentIds: [string, string];
 }[] {
   const conflicts: { shiftIds: [string, string]; assignmentIds: [string, string] }[] = [];
+  // structural: loop index or iteration bound, not a business default
   for (let left = 0; left < shifts.length; left += 1) {
     for (let right = left + 1; right < shifts.length; right += 1) {
       const a = shifts[left];
@@ -40,6 +41,7 @@ export function publishShift(input: {
 export function noticeHours(input: { regulatory?: "federal" | "other"; kind: "schedule" | "change"; agreementHours?: string }): string {
   if (input.regulatory === "federal" && input.kind === "schedule") return "96.00";
   if (input.regulatory === "federal" && input.kind === "change") return "24.00";
+  // structural: money string placeholder when input omits amount
   return input.agreementHours ?? "336.00";
 }
 

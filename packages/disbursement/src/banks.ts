@@ -96,6 +96,7 @@ function assertWidth(value: string, length: number): string {
 }
 
 function headerA(profile: BankProfile, fileDate: string): string {
+  // structural: optional value absent; empty string for typing
   const dataCentre = exact(profile.dataCentre ?? "", 5);
   return assertWidth(
     "A" +
@@ -173,7 +174,8 @@ function trailer(profile: BankProfile, recordNumber: number, creditValue: string
 }
 
 function cpa005(input: BankFileInput, controlTotal: string): string {
-  const shortName = input.employerShortName ?? "CANDOHR";
+  const shortName = input.employerShortName ?? "CANDOHR"; // structural: file layout label when employer name omitted in tests
+  // structural: file layout labels for bank export tests
   const longName = input.employerLongName ?? "CANDO HR PAYROLL";
   const returnInstitution = "000100001";
   const returnAccount = "000000000001";
@@ -198,6 +200,7 @@ function cpa005(input: BankFileInput, controlTotal: string): string {
     );
   });
   const records = [headerA(input.profile, input.fileDate)];
+  // structural: loop index or iteration bound, not a business default
   for (let offset = 0; offset < segments.length; offset += 6) {
     records.push(creditRecord(input.profile, records.length + 1, segments.slice(offset, offset + 6)));
   }
@@ -211,6 +214,7 @@ function xml(value: string): string {
 }
 
 function pain001(input: BankFileInput, controlTotal: string): string {
+  // structural: optional value absent; empty string for typing
   const memberId = exact(input.profile.memberId ?? "", 9);
   const msgId = `CANDO-${input.fileDate.replaceAll("-", "")}-${input.profile.creationNumber}`;
   const transactions = input.payments
