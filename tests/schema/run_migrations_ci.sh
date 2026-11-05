@@ -3,13 +3,14 @@
 #
 # Behaviour (Wa'el / AGENTS.md Step 1):
 #   1. One database with migrations 0001 through the latest in supabase/migrations applied in order.
-#   2. Baseline smoke (schema_smoke.sql) on that database.
+#   2. Baseline for this path is the migration apply itself (0001 initial + 0002 roles + …), not
+#      tests/schema/schema_smoke.sql — that file pairs with schema/cando_schema.sql (see load_schema.sh)
+#      and inserts the same tenant keys as schema_0003_smoke.sql, so running both on one DB duplicates rows.
 #   3. Then schema_0003_smoke.sql through schema_0020_smoke.sql in order on the *same* database,
 #      without resetting between smokes. Each smoke adds fixtures and checks constraints for its
 #      migration tranche; later smokes assume earlier migrations and fixtures are already present.
 #
-# CI applies every migration before calling this script. Do not run `supabase db reset` here except
-# when you intentionally want a fresh chain outside CI.
+# CI applies every migration before calling this script. Do not run `supabase db reset` here.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -45,8 +46,7 @@ run_smoke() {
 DB_URL="$(db_url)"
 allow_set_role "$DB_URL"
 
-echo "run_migrations_ci: baseline smoke (0001 effective-dating, RLS, audit, leases)"
-run_smoke "baseline" "tests/schema/schema_smoke.sql"
+echo "run_migrations_ci: baseline = migrations 0001–latest already applied (see script header)"
 
 for n in $(seq -w 3 20); do
   run_smoke "migration 00${n} smoke" "tests/schema/schema_00${n}_smoke.sql"
